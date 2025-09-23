@@ -1,4 +1,4 @@
-import type { OrderNumber } from "../product/OrderNumber"
+
 import { UserRole } from "../enums/UserRole"
 
 export type User = {
@@ -8,7 +8,6 @@ export type User = {
     password: string
     email: string
     role: UserRole
-    orderNumber: OrderNumber
     createdAt: Date
     updatedAt: Date
 
