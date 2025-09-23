@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { getDb } from '../../lib/mongodb';
 import { OrderNumberfactory } from '../../factories/orderNumber.factory';
+import { ObjectId } from 'mongodb';
 import type { OrderNumber } from '../../types/product/OrderNumber';
 import type { ApiResponse } from '../../types/ApiResponse';
 
 async function readAllOrderNumbers(req: Request, res: Response<ApiResponse<OrderNumber[]>>): Promise<void> {
 
-    const consumerID: string = req.params.id;
+    const consumerID = new ObjectId(req.params.id) ;
     const db = await getDb();
     const orderCollection = db.collection<OrderNumber>('orders');
 

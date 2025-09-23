@@ -6,13 +6,12 @@ import type { ApiResponse } from '../../types/ApiResponse';
 
 async function deleteOrderNumber(req: Request, res: Response<ApiResponse<OrderNumber>>): Promise<void> {
 
-    const orderID = req.params.id;
     const db = await getDb();
     const orderCollection = db.collection<OrderNumber>('orders');
 
     try {
 
-        const deleteOrder = await orderCollection.deleteOne({ _id: new ObjectId (orderID) });
+        const deleteOrder = await orderCollection.deleteOne({ _id: new ObjectId (req.params.id) });
 
         if(deleteOrder.deletedCount === 0) {
             res.status(400).json({ 
