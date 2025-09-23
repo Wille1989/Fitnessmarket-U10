@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { CreateOrderNumber, OrderNumber } from "../types/product/OrderNumber";
+import { CreateOrderNumber, OrderNumber, UpdateOrderNumber } from "../types/product/OrderNumber";
 
 export const OrderNumberfactory = {
 
@@ -9,7 +9,7 @@ export const OrderNumberfactory = {
             _id: new ObjectId,
             consumerID: input.consumerID,
             content: input.content,
-            createdAt: new Date()
+            createdAt: new Date
 
         }
     },
@@ -24,6 +24,15 @@ export const OrderNumberfactory = {
             createdAt: orderInfo.createdAt,
             updatedAt: orderInfo.updatedAt
 
+        }
+    },
+
+    update: (updatedInput: UpdateOrderNumber): UpdateOrderNumber => {
+        return {
+            _id: updatedInput._id,
+            consumerID: updatedInput.consumerID,
+            content: updatedInput.content,
+            updatedAt: new Date
         }
     }
 

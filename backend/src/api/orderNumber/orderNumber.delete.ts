@@ -1,18 +1,25 @@
 import { Request, Response } from 'express';
-import type { OrderNumber } from '../../types/product/OrderNumber';
+import { ObjectId } from 'mongodb';
 import { getDb } from '../../lib/mongodb';
-import { OrderNumberfactory } from '../../factories/orderNumber.factory';
+import type { OrderNumber } from '../../types/product/OrderNumber';
 import type { ApiResponse } from '../../types/ApiResponse';
 
-async function showOrderNumbers(req: Request, res: Response<ApiResponse<OrderNumber[]>>): Promise<void> {
+async function deleteOrderNumber(req: Request, res: Response<ApiResponse<OrderNumber>>): Promise<void> {
 
-    const orderNumberID = req.params.id;
+    const orderID = req.params.id;
     const db = await getDb();
-    const orderCollection = db.collection<OrderNumber | OrderNumber[]>('orders');
+    const orderCollection = db.collection<OrderNumber>('orders');
 
     try {
 
-        const allOrders = await orderCollection.deleteOne(orderNumberID)
+        const deleteOrder = await orderCollection.deleteOne({ _id: new ObjectId (orderID) });
+
+        if(deleteOrder.deletedCount === 0) {
+            res.status(400).json({ 
+                message: 'Ordern togs inte bort',
+            });
+
+        };
 
         res.status(200).json({
             message: 'Ordern är nu borttagen'
@@ -26,4 +33,4 @@ async function showOrderNumbers(req: Request, res: Response<ApiResponse<OrderNum
     };
 };
 
-export default showOrderNumbers;
+export default deleteOrderNumber;
