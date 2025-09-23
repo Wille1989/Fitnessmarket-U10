@@ -5,7 +5,7 @@ import type { Product } from "./Products"
 export type OrderNumber = {
 
     _id?: ObjectId
-    consumerID: string
+    consumerID: ObjectId
     orderNumber: Date
     content: Product[]
     createdAt: Date
@@ -17,7 +17,7 @@ export type OrderNumber = {
 export type CreateOrderNumber = {
 
     _id?: ObjectId
-    consumerID: string
+    consumerID: ObjectId
     content: Product[]
     createdAt: Date
 
@@ -27,7 +27,7 @@ export type CreateOrderNumber = {
 export type UpdateOrderNumber = {
 
     _id?: ObjectId
-    consumerID: string
+    consumerID: ObjectId
     content: Product[]
     updatedAt: Date
 

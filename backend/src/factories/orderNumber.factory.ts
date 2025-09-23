@@ -29,7 +29,6 @@ export const OrderNumberfactory = {
 
     update: (updatedInput: UpdateOrderNumber): UpdateOrderNumber => {
         return {
-            _id: updatedInput._id,
             consumerID: updatedInput.consumerID,
             content: updatedInput.content,
             updatedAt: new Date

@@ -3,6 +3,7 @@ import { OrderNumberfactory } from '../../factories/orderNumber.factory';
 import type { CreateOrderNumber } from '../../types/product/OrderNumber';
 import type { ApiResponse } from '../../types/ApiResponse';
 import { getDb } from '../../lib/mongodb';
+import { ObjectId } from 'mongodb';
 
 
 async function createOrderNumber(req: Request, res: Response<ApiResponse<CreateOrderNumber>>): Promise<void> {
@@ -13,7 +14,7 @@ async function createOrderNumber(req: Request, res: Response<ApiResponse<CreateO
     try {
 
         const newOrder = OrderNumberfactory.create({
-            consumerID: req.params.id,
+            consumerID: new ObjectId(req.params.id),
             content: req.body,
             createdAt: new Date
         });
