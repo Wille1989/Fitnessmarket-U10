@@ -2,16 +2,22 @@ import type { Product } from "../types/product/Products"
 import { CategoryObject } from "./category.object"
 import { NutritionalContentObject } from "./nutritionalContent.object"
 
-export const ProductFactory = (overrides?: Partial<Product>): Product => ({
+export const ProductFactory = {
 
-    title: '',
-    price: 0,
-    pricePerKilo: 0,
-    weight: 0,
-    originCountry: '',
-    customerGroup: '',
-    category: { ...CategoryObject },
-    nutritionalContent: { ...NutritionalContentObject },
-    ...overrides
+    create: (input: Partial<Product>, overrides?: Partial<Product>): Product => {
 
-});
+        return {
+            
+            title: input.title || '',
+            price: input.price || 0,
+            pricePerKilo: input.pricePerKilo || 0,
+            weight: input.weight || 0,
+            originCountry: input.originCountry || 'okänd',
+            customerGroup: input.customerGroup || 'alla',
+            category: { ...CategoryObject || 'inte specificerat' },
+            nutritionalContent: { ...NutritionalContentObject || 'inte angivit' },
+            ...overrides
+
+        }
+    }
+}
