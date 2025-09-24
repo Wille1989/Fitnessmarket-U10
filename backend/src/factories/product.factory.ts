@@ -1,11 +1,10 @@
-import type { Product } from "../types/product/Products"
+import type { Product, UpdateProduct } from "../types/product/Products"
 import { CategoryObject } from "./category.object"
 import { NutritionalContentObject } from "./nutritionalContent.object"
 
 export const ProductFactory = {
 
-    create: (input: Partial<Product>, overrides?: Partial<Product>): Product => {
-
+    create: (input: Partial<Product>): Product => {
         return {
             
             title: input.title || '',
@@ -16,8 +15,25 @@ export const ProductFactory = {
             customerGroup: input.customerGroup || 'alla',
             category: { ...CategoryObject || 'inte specificerat' },
             nutritionalContent: { ...NutritionalContentObject || 'inte angivit' },
-            ...overrides
 
         }
-    }
+    },
+
+    read: (orderInfo: Product): Product => {
+        return {
+
+            ...orderInfo,
+            
+        }
+    },
+
+    update: (changes: UpdateProduct): UpdateProduct => {
+        return {
+
+            ...changes,
+            updatedAt: new Date,
+            
+        }
+    },
+
 }

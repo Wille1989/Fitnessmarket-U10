@@ -15,3 +15,18 @@ export type Product = {
     nutritionalContent: NutritionalContent
 
 }
+
+export type UpdateProduct = Partial<{
+    
+    _id?: ObjectId
+    title: string
+    price: number
+    pricePerKilo: number
+    weight: number
+    originCountry: string
+    customerGroup: string
+    category: Category
+    nutritionalContent: NutritionalContent
+    updatedAt: Date
+
+}>;
