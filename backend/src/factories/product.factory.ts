@@ -1,6 +1,8 @@
+
 import type { Product, UpdateProduct } from "../types/product/Products"
-import { CategoryObject } from "./category.object"
+import { CategoryFactory } from "./category.factory"
 import { NutritionalContentObject } from "./nutritionalContent.object"
+
 
 export const ProductFactory = {
 
@@ -13,7 +15,7 @@ export const ProductFactory = {
             weight: input.weight || 0,
             originCountry: input.originCountry || 'okänd',
             customerGroup: input.customerGroup || 'alla',
-            category: { ...CategoryObject || 'inte specificerat' },
+            category: CategoryFactory.read() || 'inte specificerat',
             nutritionalContent: { ...NutritionalContentObject || 'inte angivit' },
 
         }

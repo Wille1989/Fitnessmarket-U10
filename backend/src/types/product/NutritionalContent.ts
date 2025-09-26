@@ -1,7 +1,8 @@
+import { ObjectId } from "mongodb";
 
 export type NutritionalContent = {
 
-    _id?: number
+    _id?: ObjectId
     energy: string
     fat: string
     saturatedFat: string
