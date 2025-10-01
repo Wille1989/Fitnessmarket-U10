@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { getDb } from '../../lib/mongodb';
-import { OrderNumberfactory } from '../../factories/orderNumber.factory';
+import { OrderNumberfactory } from '../../factories/order.factory';
 import { ObjectId } from 'mongodb';
-import type { OrderNumber } from '../../types/product/OrderNumber';
+import type { OrderNumber } from '../../types/product/Order';
 import type { ApiResponse } from '../../types/ApiResponse';
 
 async function readAllOrderNumbers(req: Request, res: Response<ApiResponse<OrderNumber[]>>): Promise<void> {

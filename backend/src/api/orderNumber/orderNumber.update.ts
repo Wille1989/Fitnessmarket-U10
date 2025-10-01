@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { OrderNumberfactory } from '../../factories/orderNumber.factory';
+import { OrderNumberfactory } from '../../factories/order.factory';
 import { getDb } from '../../lib/mongodb';
-import type { UpdateOrderNumber } from '../../types/product/OrderNumber';
+import type { UpdateOrderNumber } from '../../types/product/Order';
 import type { ApiResponse } from '../../types/ApiResponse';
 import { ObjectId } from 'mongodb';
 

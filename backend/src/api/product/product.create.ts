@@ -21,8 +21,8 @@ async function createProduct(req: Request, res: Response<ApiResponse<Product>>):
             weight: req.body.weight,
             originCountry: req.body.originCountry,
             customerGroup: req.body.customerGroup,
-            category: req.body.category,
-            nutritionalContent: req.body.nutritionalContent
+            category: req.body.categoryID,
+            nutritionalContent: req.body.nutritionalContentID
 
         });
 

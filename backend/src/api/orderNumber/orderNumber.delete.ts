@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { getDb } from '../../lib/mongodb';
-import type { OrderNumber } from '../../types/product/OrderNumber';
+import type { OrderNumber } from '../../types/product/Order';
 import type { ApiResponse } from '../../types/ApiResponse';
 
 async function deleteOrderNumber(req: Request, res: Response<ApiResponse<OrderNumber>>): Promise<void> {

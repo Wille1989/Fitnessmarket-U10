@@ -6,7 +6,9 @@ const dbName: string = process.env.MONGO_DB_NAME || 'fitnessMarket';
 let client = new MongoClient(uri);
 let clientPromise = client.connect();
 
-export async function getDb() {
+async function getDb() {
     const client = await clientPromise;
     return client.db(dbName);
 };
+
+export default getDb;

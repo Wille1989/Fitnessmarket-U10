@@ -20,12 +20,10 @@ export const UserFactory = {
         }
     },
 
-    update: (input: UpdateUser ): UpdateUser => {
+    update: (changes: UpdateUser ): UpdateUser => {
         return {
 
-            name: input.name,
-            password: input.password,
-            email: input.email,
+            ...changes,
             updatedAt: new Date()
 
         }

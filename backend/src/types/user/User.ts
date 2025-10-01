@@ -1,21 +1,21 @@
-
+import { ObjectId } from "mongodb"
 import { UserRole } from "../enums/UserRole"
 
 export type User = {
 
-    _id?: string
+    _id?: ObjectId
     name: string
     password: string
     email: string
     role: UserRole
     createdAt: Date
-    updatedAt: Date
+    updatedAt?: Date
 
 }
 
 export type CreateUser = {
 
-    _id?: string
+    _id?: ObjectId
     name: string
     password: string
     email: string
@@ -26,7 +26,7 @@ export type CreateUser = {
 
 export type UpdateUserByAdmin = {
 
-    name?: string
+    name?: ObjectId
     password?: string
     email?: string
     role?: UserRole
@@ -34,11 +34,11 @@ export type UpdateUserByAdmin = {
 
 }
 
-export type UpdateUser = {
+export type UpdateUser = Partial<{
 
-    name?: string
-    password?: string
-    email?: string
-    updatedAt?: Date
+    name: string
+    password: string
+    email: string
+    updatedAt: Date
 
-}
+}>

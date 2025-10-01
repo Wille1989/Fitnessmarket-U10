@@ -9,6 +9,13 @@ export type Category = {
 
 }
 
+export type CreateCategory = {
+
+    title: string
+    description: string
+
+}
+
 export type UpdateCategory = Partial<{
 
     _id?: ObjectId
