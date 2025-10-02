@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb"
-import { CreateNutritionalContent } from "./NutritionalContent"
-import { CreateCategory } from "./Category"
+import { CreateNutritionalContent, NutritionalContent } from "./NutritionalContent"
+import { CreateCategory, Category } from "./Category"
 
 export type Product = {
     
@@ -11,14 +11,14 @@ export type Product = {
     weight: number
     originCountry: string
     customerGroup: string
-    category: ObjectId
-    nutritionalContent: ObjectId
+    category: Category
+    nutritionalContent: NutritionalContent
+    createdAt: Date
 
 }
 
 export type CreateProduct = {
     
-    _id?: ObjectId
     title: string
     price: number
     pricePerKilo: number
@@ -27,6 +27,7 @@ export type CreateProduct = {
     customerGroup: string
     category: CreateCategory
     nutritionalContent: CreateNutritionalContent
+    createdAt: Date
 
 }
 

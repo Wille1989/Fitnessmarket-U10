@@ -3,8 +3,8 @@ import { UserRole } from "../types/enums/UserRole";
 import type { 
     CreateUser, 
     UpdateUser, 
-    UpdateUserByAdmin } 
-    from "../types/user/User";
+    UpdateUserByAdmin,
+} from "../types/user/User";
 
 export const UserFactory = {   
 
@@ -29,12 +29,10 @@ export const UserFactory = {
         }
     },
 
-    updateByAdmin: (input: UpdateUserByAdmin): UpdateUserByAdmin => {
+    updateByAdmin: (changes: UpdateUserByAdmin): UpdateUserByAdmin => {
         return {
 
-            name: input.name,
-            password: input.password,
-            email: input.email,
+            ...changes,
             role: UserRole.consumer || UserRole.retailer || UserRole.superAdmin,
             updatedAt: new Date()
 

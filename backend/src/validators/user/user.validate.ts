@@ -1,10 +1,20 @@
 import { CreateUser } from "../../types/user/User";
 
-export function validateUser(data: CreateUser): void {
+export function validateUser(data: CreateUser): CreateUser {
 
-    // Check for password+email
-    if(!data.email || !data.password) {
-        throw new Error('Obligastoriska fält är tomma');
+    // Check to see that all input fields have values
+    if(Object.values(data).some(value => !value)) {
+            throw new Error('Alla fält måste vara ifyllda!');
+        };
+
+    // Check for value in email input
+    if(!data.email) {
+        throw new Error('emailfältet är tomt');
+    };
+
+    // Check for value in password input
+    if(!data.password) {
+        throw new Error('lösenordsfältet är tomt');
     };
 
     // Check for valid email
@@ -16,5 +26,14 @@ export function validateUser(data: CreateUser): void {
     if(data.password.length < 8) {
         throw new Error('Lösenordet är för kort');
     };
+
+    // trim and lowercase to check in next step
+    const lowerCaseTrimmedEmail = data.email.trim().toLowerCase();
+
+    return {
+        ...data,
+        email: lowerCaseTrimmedEmail,
+
+    }
 
 };

@@ -1,14 +1,13 @@
 import { ObjectId } from "mongodb";
-import type { Category, UpdateCategory } from "../types/product/Category";
+import type { Category, CreateCategory, UpdateCategory } from "../types/product/Category";
 
 export const CategoryFactory = {
 
-    create: (input: Category): Category => {
+    create: (input: CreateCategory): CreateCategory => {
         return {
 
-            _id: new ObjectId,
-            title: input.title || 'Ingen kategori vald',
-            description: input.description || 'Beskrivning saknas',
+            title: input.title,
+            description: input.description,
             createdAt: new Date
 
         }

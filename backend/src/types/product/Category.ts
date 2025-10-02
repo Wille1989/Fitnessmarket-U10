@@ -13,6 +13,7 @@ export type CreateCategory = {
 
     title: string
     description: string
+    createdAt: Date
 
 }
 

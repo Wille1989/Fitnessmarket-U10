@@ -1,12 +1,12 @@
 
-import type { Product, UpdateProduct } from "../types/product/Products"
+import type { CreateProduct, Product, UpdateProduct } from "../types/product/Products"
 import { CategoryFactory } from "./category.factory"
 import { NutritionalContentFactory } from "./nutritionalContent.factory"
 
 
 export const ProductFactory = {
 
-    create: (input: Partial<Product>): Product => {
+    create: (input: CreateProduct): Product => {
         return {
             
             title: input.title || '',
@@ -15,8 +15,9 @@ export const ProductFactory = {
             weight: input.weight || 0,
             originCountry: input.originCountry || 'okänd',
             customerGroup: input.customerGroup || 'alla',
-            category: CategoryFactory.read() || 'inte specificerat',
-            nutritionalContent: { ...NutritionalContentFactory || 'inte angivit' },
+            category: CategoryFactory.create(input.category),
+            nutritionalContent: NutritionalContentFactory.create(input.nutritionalContent),
+            createdAt: new Date()
 
         }
     },

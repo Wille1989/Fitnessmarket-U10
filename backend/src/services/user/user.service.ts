@@ -7,6 +7,7 @@ import type {
     User,
     UpdateUser
 } from "../../types/user/User";
+import { validateUser } from '../../validators/user/user.validate';
 
 
 
@@ -16,11 +17,11 @@ export async function CreateUserService(frontendData: CreateUser): Promise<User>
     const db = await getDb();
     const userCollection = db.collection<User>('users');
 
-    // trim and lowercase to check in next step
-    const sanitizedEmail = frontendData.email.trim().toLowerCase();
+    // validate the user, method runs in a seperate file
+    validateUser(frontendData);
 
-     // Check if user already exists
-    const existingUser = await userCollection.findOne({ email: sanitizedEmail });
+    // Check if user already exists
+    const existingUser = await userCollection.findOne({ email: frontendData.email });
     if(existingUser) {
         throw new Error('Det finns redan en användare med denna mejladress.');
     };
@@ -32,7 +33,7 @@ export async function CreateUserService(frontendData: CreateUser): Promise<User>
     const newUser = UserFactory.create(
         {
             ...frontendData,
-            email: sanitizedEmail,
+            email: frontendData.email,
             password: hashedPassword
         }
     );
@@ -63,9 +64,9 @@ export async function getUserByIdService(userID: ObjectId): Promise<User | null>
     const db = await getDb();
     const userCollection = db.collection<User>('users');
 
-    const foundUser = await userCollection.findOne({ _id: userID });
+    const theUser = await userCollection.findOne({ _id: userID });
 
-    return foundUser;
+    return theUser;
 };
 
 // GET ALL USERS
@@ -74,13 +75,13 @@ export async function findAllUsersService(): Promise<User[]> {
     const db = await getDb();
     const userCollection = db.collection<User>('users');
 
-    const foundUsers = await userCollection.find({}).toArray();
+    const theUsers = await userCollection.find({}).toArray();
 
-    if(foundUsers.length === 0) {
+    if(theUsers.length === 0) {
         throw new Error('Kunde inte hitta några användare!');
     };
 
-    return foundUsers;
+    return theUsers;
 };
 
 // FIND AND UPDATE USER
@@ -95,7 +96,7 @@ export async function findAndUpdateUserService(userID: ObjectId, frontendData: U
     };
 
     const returnUpdatedUser = await userCollection.findOneAndUpdate(
-        { userID },
+        { _id: userID },
         { $set: updatedUser },
         { returnDocument: 'after' }
     );

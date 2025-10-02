@@ -10,12 +10,13 @@ import {
     findAndUpdateUserService
 } from '../services/user/user.service';
 import { ObjectId } from 'mongodb';
-import { validateUser } from '../validators/user/user.validate';
 import type { ApiResponse } from '../types/ApiResponse';
 import type { 
     CreateUser, 
     User 
 } from '../types/user/User';
+import { UserMapper } from '../mappers/user.mapper';
+import { PrivateUserDTO } from '../types/dto/UserDTO';
 
 
 
@@ -26,11 +27,10 @@ export async function createUser(req: Request, res: Response<ApiResponse<CreateU
         // User input
         const frontendData = req.body;
 
-        // validate the user, method runs in a seperate file
-        validateUser(frontendData);
-
         // Run the method of creating a user
         const newUser = await CreateUserService(frontendData);
+
+        
 
         // Response
         res.status(201).json({ data: newUser });
@@ -73,7 +73,7 @@ export async function deleteUser(req: Request, res: Response<ApiResponse<null>>)
 
 
 // GET THE USER
-export async function getUserById(req: Request, res: Response<ApiResponse<User>>): Promise<void> {
+export async function getUserById(req: Request, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
     try {
 
         const userID = new ObjectId(req.params.id);
@@ -82,10 +82,14 @@ export async function getUserById(req: Request, res: Response<ApiResponse<User>>
 
         if(!user) {
             res.status(404).json({ message: 'Användaren kunde inte hittas' });
+            return;
         };
 
-        res.status(200).json({ message: 'Anvädaren hittades!',
-            data: user
+        const DTO = UserMapper.toPrivateDTO(user);
+
+        res.status(200).json({ 
+            message: 'Användaren hittades!',
+            data: DTO
         });
 
     } catch (error) {

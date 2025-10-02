@@ -24,15 +24,15 @@ export type CreateUser = {
 
 }
 
-export type UpdateUserByAdmin = {
+export type UpdateUserByAdmin = Partial<{
 
-    name?: ObjectId
-    password?: string
-    email?: string
-    role?: UserRole
-    updatedAt?: Date
+    name: string
+    password: string
+    email: string
+    role: UserRole
+    updatedAt: Date
 
-}
+}>
 
 export type UpdateUser = Partial<{
 
