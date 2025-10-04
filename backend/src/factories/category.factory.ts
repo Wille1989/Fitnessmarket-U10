@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import type { Category, CreateCategory, UpdateCategory } from "../types/product/Category";
 
 export const CategoryFactory = {
@@ -8,7 +7,6 @@ export const CategoryFactory = {
 
             title: input.title,
             description: input.description,
-            createdAt: new Date
 
         }
     },

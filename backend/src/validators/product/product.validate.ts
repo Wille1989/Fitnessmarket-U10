@@ -1,36 +1,44 @@
 import type { CreateProduct, Product } from "../../types/product/Products";
+import { validateCategory } from "./category.validate";
+import { validateNutritionalContent } from "./nutritionalContent.validate";
 
-export async function validateProduct(frontendData: CreateProduct): Promise<Product> {
+export async function validateProduct(productData: CreateProduct): Promise<Product> {
 
-    if(frontendData.customerGroup.length > 20) {
+    // Validate the object category
+    validateCategory(productData.category);
+
+    // Validate the object of nutritional content
+    validateNutritionalContent(productData.nutritionalContent);
+
+    if(productData.customerGroup.length > 20) {
         throw new Error('fältet konsumentgrupp innehåller för många tecken');
     };
 
-    if(frontendData.originCountry.length > 25) {
+    if(productData.originCountry.length > 25) {
         throw new Error('fältet ursprungsland innehåller för många tecken');
     };
 
     // Ensure no special values are allowed
     const inputRegex = /^[a-zA-Z0-9\s]+$/;
     if(!inputRegex.test(
-        frontendData.originCountry && 
-        frontendData.customerGroup && 
-        frontendData.title)) {
+        productData.originCountry && 
+        productData.customerGroup && 
+        productData.title)) {
         throw new Error('fälten innehåller otillåtna tecken');
     };
 
-    if(frontendData.price <= 0) {
+    if(productData.price <= 0) {
         throw new Error('Priset måste vara ett positivt tal');
     };
 
-    if(frontendData.weight <= 0) {
+    if(productData.weight <= 0) {
         throw new Error('vikten måste vara ett positivt tal');
     };
 
-    if(frontendData.pricePerKilo != Math.round(frontendData.price / frontendData.weight * 1000)){
+    if(productData.pricePerKilo != Math.round(productData.price / productData.weight * 1000)){
         throw new Error('Pris per kilo stämmer inte, granska din indata');
     };
 
-    return frontendData;
+    return productData;
 
 };

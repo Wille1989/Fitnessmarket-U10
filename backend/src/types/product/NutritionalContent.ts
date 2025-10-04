@@ -5,7 +5,7 @@ export type NutritionalContent = {
     _id?: ObjectId
     energy: number
     fat: number
-    saturatedFat: number
+    saturatedfat: number
     protein: number
     salt: number
 
@@ -15,7 +15,7 @@ export type CreateNutritionalContent = {
 
     energy: number
     fat: number
-    saturatedFat: number
+    saturatedfat: number
     protein: number
     salt: number
 

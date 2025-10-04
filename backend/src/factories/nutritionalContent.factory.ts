@@ -7,7 +7,7 @@ export const NutritionalContentFactory = {
 
             energy: input.energy,
             fat: input.fat,
-            saturatedFat: input.saturatedFat,
+            saturatedfat: input.saturatedfat,
             protein: input.protein,
             salt: input.salt
         }
