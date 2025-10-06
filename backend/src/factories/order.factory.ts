@@ -1,4 +1,4 @@
-import { CreateOrder, ReadOrder, UpdateOrder } from "../types/product/Order";
+import { CreateOrder, UpdateOrder } from "../types/product/Order";
 
 export const Orderfactory = {
 
@@ -9,14 +9,6 @@ export const Orderfactory = {
             content: input.content,
             orderNumber: '000000000',
             createdAt: new Date()
-
-        }
-    },
-
-    read: (orderInfo: ReadOrder): ReadOrder => {
-        return {
-
-        ...orderInfo
 
         }
     },

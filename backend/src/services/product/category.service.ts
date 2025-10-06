@@ -1,6 +1,9 @@
-import { CreateCategory, Category } from "../types/product/Category";
-import { getDb } from "../lib/mongodb";
-import { CategoryFactory } from "../factories/category.factory";
+import getDb from "../../lib/mongodb";
+import { CategoryFactory } from "../../factories/category.factory";
+import type { 
+    CreateCategory, 
+    Category 
+} from "../../types/product/Category";
 
 export async function createCategoryService(frontendData: CreateCategory): Promise<Category> {
 

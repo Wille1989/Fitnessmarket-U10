@@ -1,10 +1,11 @@
 import getDb from "../../lib/mongodb";
 import { ObjectId } from "mongodb";
-import type { CreateProduct, 
-    Product 
-} from "../../types/product/Products";
 import { ProductFactory } from "../../factories/product.factory";
 import { validateProduct } from "../../validators/product/product.validate";
+import type { 
+    CreateProduct, 
+    Product 
+} from "../../types/product/Products";
 
 
 // CREATE PRODUCT

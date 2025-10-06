@@ -17,16 +17,8 @@ export const ProductFactory = {
             customerGroup: input.customerGroup || 'alla',
             category: CategoryFactory.create(input.category),
             nutritionalContent: NutritionalContentFactory.create(input.nutritionalContent),
-            createdAt: new Date()
+            createdAt: new Date(),
 
-        }
-    },
-
-    read: (orderInfo: Product): Product => {
-        return {
-
-            ...orderInfo,
-            
         }
     },
 

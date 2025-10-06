@@ -12,6 +12,7 @@ export type Product = {
     originCountry: string
     customerGroup: string
     category: Category
+    quantity?: number
     nutritionalContent: NutritionalContent
     createdAt: Date
 

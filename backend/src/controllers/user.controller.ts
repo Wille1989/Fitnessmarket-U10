@@ -7,7 +7,7 @@ import {
     deleteUserService, 
     getUserByIdService,
     findAllUsersService,
-    findAndUpdateUserService
+    findAndUpdateUserService,
 } from '../services/user/user.service';
 import { ObjectId } from 'mongodb';
 import type { ApiResponse } from '../types/ApiResponse';
@@ -17,56 +17,78 @@ import type {
 } from '../types/user/User';
 import { UserMapper } from '../mappers/user.mapper';
 import { PrivateUserDTO } from '../types/dto/UserDTO';
-
-
+import { ValidationError, NotFoundError } from '../classes/ErrorHandling';
 
 // CREATE USER
 export async function createUser(req: Request, res: Response<ApiResponse<CreateUser>>): Promise<void> {
-
     try {
-        // User input
         const frontendData = req.body;
 
-        // Run the method of creating a user
+        if(Object.values(frontendData).some(v => v === null || v === undefined || v === '')){
+            throw new ValidationError('Fälten får inte vara tomma', );
+        };
+
         const newUser = await CreateUserService(frontendData);
 
-        
+        if(!newUser) {
+            throw new NotFoundError('Användaren kunde inte hittas', 404);
+        };
 
-        // Response
         res.status(201).json({ data: newUser });
         
     } catch (error) {
-        res.status(500).json({ 
-            message: 'Något gick fel när servern anropades!', 
-            error: error 
+        const err = error as any;
 
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
         });
-        return;
-
     };
 };
-
 
 // DELETE USER
 export async function deleteUser(req: Request, res: Response<ApiResponse<null>>): Promise<void> {   
     try {
+        const { id } = req.params;
+        const userID = new ObjectId(id);
 
-        if(!ObjectId.isValid(req.params.id)) {
-            res.status(400).json({ message: 'Inget giltigt ID' });
-            return;
+        if(!ObjectId.isValid(userID)) {
+            throw new ValidationError('Ogiltigt ID');
         };
 
-        const userID = new ObjectId(req.params.id);
+        if(!userID) {
+            throw new NotFoundError('Användaren kunde inte hittas');
+        };
+
         await deleteUserService(userID);
 
         res.status(200).json({ message: `användaren är borttagen!` });
-    } catch (error) {
-        res.status(500).json({ 
-            message: 'Något gick fel när servern anropades!', 
-            error: error
 
+    } catch (error) {
+        const err = error as any;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
         });
-        return;
 
     };
 };
@@ -75,14 +97,17 @@ export async function deleteUser(req: Request, res: Response<ApiResponse<null>>)
 // GET THE USER
 export async function getUserById(req: Request, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
     try {
-
-        const userID = new ObjectId(req.params.id);
+        const { id } = req.params;
+        const userID = new ObjectId(id);
+        
+        if(!ObjectId.isValid(id)){
+            throw new ValidationError('Ogiltigt ID')
+        };
 
         const user = await getUserByIdService(userID);
 
         if(!user) {
-            res.status(404).json({ message: 'Användaren kunde inte hittas' });
-            return;
+            throw new NotFoundError('Kunde inte hitta användare');
         };
 
         const DTO = UserMapper.toPrivateDTO(user);
@@ -93,23 +118,31 @@ export async function getUserById(req: Request, res: Response<ApiResponse<Privat
         });
 
     } catch (error) {
+        const err = error as any;
 
-        res.status(500).json({ 
-            message: 'Kunde inte hämta användare', 
-            error: error
-        });
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        }); 
     };
 };
 
 // GET ALL USERS
 export async function findAllUsers(_req: Request, res: Response<ApiResponse<User[]>>): Promise<void> {
     try {
-
         const getAllUsers = await findAllUsersService();
 
         if(getAllUsers.length === 0) {
-            res.status(404).json({ message: 'Inga användare retunerades!' });
-            return;
+            throw new NotFoundError('Inga användare hittades');
         };
 
         res.status(200).json({
@@ -118,45 +151,63 @@ export async function findAllUsers(_req: Request, res: Response<ApiResponse<User
         });
         
     } catch (error) {
-         res.status(500).json({ 
-            message: 'Något gick fel när servern anropades!', 
-            error: error });
-        return;
+        const err = error as any;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
     };
 };
 
 // UPDATE USER
-export async function findAndUpdateUser (req: Request, res: Response<ApiResponse<User>>): Promise<void> {
+export async function findAndUpdateUser(req: Request, res: Response<ApiResponse<User>>): Promise<void> {
     try {
-
-        if(ObjectId.isValid(req.params.id)) {
-            res.status(404).json({ message: 'Felaktigt ID' });
-            return;
-        };
-        const userID = new ObjectId(req.params.id);
-
+        const { id } = req.params;
+        const userID = new ObjectId(id);
         const frontendData = req.body;
-        if(Object.keys(frontendData.length === 0)) {
-            res.status(404).json({ message: 'Tom data!' });
-            return;
+
+        if(ObjectId.isValid(userID)) {
+            throw new ValidationError('Ogiltigt ID');
+        };
+
+        if(Object.values(frontendData).some(v => v === null || v === undefined || v === '')) {
+            throw new ValidationError('Fälten måste ha värden');
         };
 
         const response = await findAndUpdateUserService(userID, frontendData)
 
         if(response == null) {
-            res.status(404).json({ message: 'Svaret är tomt'});
-            return;
+            throw new NotFoundError('Datan kunde inte uppdateras');
         };
 
-        res.status(200).json({ 
-            message: 'användaren uppdaterades', 
-            data: response
-        });
+        res.status(200).json({ message: 'användaren uppdaterades', data: response });
 
     } catch (error) {
-        res.status(500).json({ 
-            message: 'Något gick fel när servern anropades!', 
-            error: error });
-        return;
+        const err = error as any;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
     };
 };
+

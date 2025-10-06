@@ -1,13 +1,11 @@
-
-import 'dotenv/config';
-
+import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import { env } from './config/env';
 import { Request, Response } from 'express';
 
+dotenv.config();
 
-const bcrypt = require('bcrypt');
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 

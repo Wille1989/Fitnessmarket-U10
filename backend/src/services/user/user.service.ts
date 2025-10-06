@@ -1,15 +1,19 @@
 import bcrypt from 'bcrypt';
 import getDb from "../../lib/mongodb";
-import { UserFactory } from "../../factories/user.factory";
+import jwt from 'jsonwebtoken';
 import { ObjectId } from "mongodb";
 import type { 
     CreateUser, 
     User,
     UpdateUser
 } from "../../types/user/User";
+import { 
+    ConflictError, 
+    NotFoundError, 
+    ValidationError 
+} from '../../classes/ErrorHandling';
+import { UserFactory } from "../../factories/user.factory";
 import { validateUser } from '../../validators/user/user.validate';
-
-
 
 // CREATE USER
 export async function CreateUserService(frontendData: CreateUser): Promise<User> {
@@ -23,7 +27,7 @@ export async function CreateUserService(frontendData: CreateUser): Promise<User>
     // Check if user already exists
     const existingUser = await userCollection.findOne({ email: frontendData.email });
     if(existingUser) {
-        throw new Error('Det finns redan en användare med denna mejladress.');
+        throw new ConflictError('Det finns redan en användare med denna mejladress');
     };
 
     // Hash the password
@@ -54,7 +58,7 @@ export async function deleteUserService(userID: ObjectId): Promise<void> {
     const response = await userCollection.deleteOne({ _id: userID });
 
     if(response.deletedCount === 0) {
-        throw new Error('Ingen användare hittades med det ID:t');
+        throw new NotFoundError('Ingen användare hittades med det ID:t');
     };
 };
 
@@ -78,7 +82,7 @@ export async function findAllUsersService(): Promise<User[]> {
     const theUsers = await userCollection.find({}).toArray();
 
     if(theUsers.length === 0) {
-        throw new Error('Kunde inte hitta några användare!');
+        throw new ValidationError('Kunde inte hitta några användare!');
     };
 
     return theUsers;
@@ -92,7 +96,7 @@ export async function findAndUpdateUserService(userID: ObjectId, frontendData: U
     const updatedUser = UserFactory.update({ ...frontendData });
 
     if(Object.keys(frontendData).length === 0) {
-        throw new Error('Inga fält att uppdatera');
+        throw new ValidationError('Inga fält att uppdatera');
     };
 
     const returnUpdatedUser = await userCollection.findOneAndUpdate(
@@ -102,4 +106,25 @@ export async function findAndUpdateUserService(userID: ObjectId, frontendData: U
     );
 
     return returnUpdatedUser;
+};
+
+export async function loginUserService(frontendData: User): Promise<{ user: User, token: string }> {
+
+    validateUser(frontendData);
+
+    const token = jwt.sign(
+        { 
+            userID: frontendData._id, 
+            email: frontendData.email, 
+            role: frontendData.role 
+        },
+        process.env.JWT_SECRET!,
+        { expiresIn: '2h' }
+    );
+
+    if(!token) {
+        throw new NotFoundError('Kunde inte skapa token');
+    };
+
+    return { user: frontendData, token};
 };
