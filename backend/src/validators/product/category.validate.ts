@@ -1,5 +1,5 @@
 import { Category, CreateCategory } from "../../types/product/Category";
-import { ValidationError } from "../../classes/errorhandling";
+import { ValidationError } from "../../classes/ErrorHandling";
 
 
 export async function validateCategory(frontendData: CreateCategory): Promise<Category> {

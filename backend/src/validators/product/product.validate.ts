@@ -1,12 +1,8 @@
 import type { CreateProduct, Product } from "../../types/product/Products";
-import { validateCategory } from "./category.validate";
 import { validateNutritionalContent } from "./nutritionalContent.validate";
-import { ValidationError } from "../../classes/errorhandling";
+import { ValidationError } from "../../classes/ErrorHandling";
 
 export async function validateProduct(productData: CreateProduct): Promise<Product> {
-
-    // Validate the object category
-    validateCategory(productData.category);
 
     // Validate the object of nutritional content
     validateNutritionalContent(productData.nutritionalContent);

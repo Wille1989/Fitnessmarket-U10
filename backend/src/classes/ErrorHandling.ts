@@ -1,3 +1,7 @@
+export class AppError extends Error {
+    status?: number;
+}
+
 export class ValidationError extends Error {
     status: number;
     constructor(message: string, status = 400) {

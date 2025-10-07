@@ -137,7 +137,7 @@ export async function getUserById(req: Request, res: Response<ApiResponse<Privat
 };
 
 // GET ALL USERS
-export async function findAllUsers(_req: Request, res: Response<ApiResponse<User[]>>): Promise<void> {
+export async function getAllUsers(_req: Request, res: Response<ApiResponse<User[]>>): Promise<void> {
     try {
         const getAllUsers = await findAllUsersService();
 
@@ -170,7 +170,7 @@ export async function findAllUsers(_req: Request, res: Response<ApiResponse<User
 };
 
 // UPDATE USER
-export async function findAndUpdateUser(req: Request, res: Response<ApiResponse<User>>): Promise<void> {
+export async function updateUser(req: Request, res: Response<ApiResponse<User>>): Promise<void> {
     try {
         const { id } = req.params;
         const userID = new ObjectId(id);

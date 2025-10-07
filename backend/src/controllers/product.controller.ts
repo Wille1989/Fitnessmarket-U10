@@ -6,8 +6,10 @@ import {
     createProductService, 
     deleteProductService, 
     getProductByIdService, 
-    getAllProductsService } 
+    getAllProductsService, 
+    updateProductService} 
     from '../services/product/product.service';
+import { ValidationError } from '../classes/ErrorHandling';
 
 // CREATE A PRODUCT
 export async function createProduct(req: Request, res: Response<ApiResponse<CreateProduct>>): Promise<void> {
@@ -21,8 +23,21 @@ export async function createProduct(req: Request, res: Response<ApiResponse<Crea
         res.status(201).json({ message: 'Produkten har lagts till!', data: newProduct });
 
     } catch (error) {
-        const err = error as Error;
-        res.status(400).json({ message: err.message });
+        const err = error as any;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK PRODUCTS:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
     };
 
 };
@@ -54,10 +69,22 @@ export async function getProduct(req: Request, res: Response<ApiResponse<Product
         };
        
     } catch (error) {
-        const err = error as Error;
-        res.status(400).json({message: err.message});
-    };
+        const err = error as any;
 
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK PRODUCTS:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
+    }
 };
 
 // DELETE PRODUCT
@@ -66,6 +93,11 @@ export async function deleteProduct(req: Request, res: Response<ApiResponse<null
     try {
         const { id } = req.params;
         const productID = new ObjectId(id);
+
+        if(!ObjectId.isValid(id)) {
+            throw new ValidationError('Ogiltligt ID');
+        };
+
         const deleteProduct = await deleteProductService(productID);
 
         if(deleteProduct.deletedCount === 0) {
@@ -75,20 +107,54 @@ export async function deleteProduct(req: Request, res: Response<ApiResponse<null
         res.status(200).json({ message: 'Produkten togs bort!' });
 
     } catch (error) {
-        const err = error as Error;
-        res.status(400).json({ message: err.message });
-        return;
-    }
+        const err = error as any;
 
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK PRODUCTS:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
+    }
 };
 
 export async function updateProduct(req: Request, res: Response<ApiResponse<Product>>): Promise<void> {
+    try {
+        const { id } = req.params;
+        const productID = new ObjectId(id);
+        const changesToProduct = req.body;
 
-    const { id } = req.params;
-    const productID = new ObjectId(id);
-    const changesToProduct = req.body;
+        if(!ObjectId.isValid(id)) {
+            throw new ValidationError('Ogiltligt ID');
+        };
 
-    
+        if(Object.values(changesToProduct).some(v => v === null || v === undefined || v === '')) {
+            throw new ValidationError('Fälten måste ha giltiga värden');
+        };
 
+        await updateProductService(changesToProduct, productID);
+    } catch (error) {
+         const err = error as any;
 
-}
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK PRODUCTS:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
+    };
+};

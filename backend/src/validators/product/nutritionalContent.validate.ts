@@ -1,5 +1,5 @@
 import { CreateNutritionalContent, NutritionalContent } from "../../types/product/NutritionalContent";
-import { ValidationError } from "../../classes/errorhandling";
+import { ValidationError } from "../../classes/ErrorHandling";
 
 export async function validateNutritionalContent(productData: CreateNutritionalContent): Promise<NutritionalContent> {
 

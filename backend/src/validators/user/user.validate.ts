@@ -1,5 +1,5 @@
 import { CreateUser } from "../../types/user/User";
-import { ValidationError } from "../../classes/errorhandling";
+import { ValidationError } from "../../classes/ErrorHandling"
 
 export function validateUser(data: CreateUser): CreateUser {
 
