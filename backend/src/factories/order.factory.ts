@@ -1,4 +1,4 @@
-import { CreateOrder, UpdateOrder } from "../types/product/Order";
+import type { CreateOrder, Order } from "../types/product/Order"
 
 export const Orderfactory = {
 
@@ -13,7 +13,7 @@ export const Orderfactory = {
         }
     },
 
-    update: (updatedInput: UpdateOrder): UpdateOrder => {
+    update: (updatedInput: Order): Order => {
         return {
 
             ...updatedInput,

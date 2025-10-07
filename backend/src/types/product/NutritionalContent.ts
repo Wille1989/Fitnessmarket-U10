@@ -32,3 +32,12 @@ export type UpdateNutritionalContent = Partial<{
     updatedAt: Date
 
 }>
+
+export type NutritionalContentComparison = {
+
+    field: keyof NutritionalContent
+    productA: number
+    productB: number
+    comparedData: number
+    
+}

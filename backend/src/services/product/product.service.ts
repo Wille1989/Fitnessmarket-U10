@@ -6,6 +6,8 @@ import type {
     CreateProduct, 
     Product 
 } from "../../types/product/Products";
+import { NotFoundError } from "../../classes/ErrorHandling";
+import { NutritionalContent } from "../../types/product/NutritionalContent";
 
 
 // CREATE PRODUCT
@@ -92,4 +94,70 @@ export async function updateProductService(frontendData: Product, id: ObjectId):
     };
 
     return response;
+};
+
+
+// COMPARE PRODUCTS
+export async function compareProductsService( ids: string[] ) {
+
+    const db = await getDb();
+    const productCollection = db.collection<Product>('products');
+
+    const products = await productCollection.find(
+        { _id: { $in: ids.map(id => new ObjectId(id)) } }).toArray();
+
+    if(products.length !== 2) {
+        throw new NotFoundError('En eller båda produkterna kunde inte hittas');
+    };
+
+    const [a,b] = products;
+
+    const nutritionalComparison = (
+        Object.keys(a.nutritionalContent) as Array <keyof NutritionalContent>).map(nutrient  => {
+        const valueA = a.nutritionalContent[nutrient] as number;
+        const valueB = b.nutritionalContent[nutrient] as number;
+
+        const difference = valueA - valueB;
+
+        return {
+            field: nutrient ,
+            productA: valueA,
+            productB: valueB,
+            comparedData: difference
+        }
+    });
+
+    return {
+        comparedProducts: [a.title, b.title],
+        comparison: nutritionalComparison
+    };
+};
+
+// PRODUCT RATING
+export async function rateProductService(id: ObjectId, ratingValue: number): Promise<Product>{
+
+    const db = await getDb();
+    const product = await db.collection<Product>('products').findOne({ _id: id });
+
+    if(!product) {
+        throw new NotFoundError('Kunde inte hämta produkten');
+    };
+
+    const newSum = product.rating.sum + ratingValue;
+    const newTotal = product.rating.totalRatings +1;
+
+    const newAverage = newSum / newTotal;
+
+    const updateProductRating = await db.collection<Product>('products').
+        findOneAndUpdate(
+            { _id: id }, 
+            { $set: { 'rating.sum': newSum, 'rating.totalRatings': newTotal, 'rating.average': newAverage } }, 
+            { returnDocument:'after' }
+        );
+
+    if(!updateProductRating) {
+        throw new NotFoundError('Produkten kunde inte uppdateras');
+    };
+
+    return updateProductRating;
 };
