@@ -1,7 +1,16 @@
-import { CreateUser } from "../../types/user/User";
-import { ValidationError } from "../../classes/ErrorHandling"
+import { CreateUser, User } from "../../types/user/User";
+import { NotFoundError, ValidationError } from "../../classes/ErrorHandling"
+import { ObjectId } from "mongodb";
 
 export function validateUser(data: CreateUser): CreateUser {
+
+    if(!data.email) {
+        throw new NotFoundError('Ingen email är angiven');
+    };
+
+    if(!data.password) {
+        throw new NotFoundError('Inget lösenord angivet');
+    };
 
     function sanitizedInput(value: string): string {
         return value.replace(/<[^>]*>?/gm,'').trim();
@@ -32,5 +41,15 @@ export function validateUser(data: CreateUser): CreateUser {
         ...data,
         email: cleanEmail,
         password: cleanPassword
-    }
+    };
+};
+
+export function validateUserId(data: string): ObjectId {
+
+    if(!data || !ObjectId.isValid(data)){
+        console.log('ERROR THROWN: VALIDATEUSERID');
+        throw new ValidationError('Valideringen misslyckades');
+    };
+
+    return new ObjectId(data);
 };

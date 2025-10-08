@@ -17,7 +17,7 @@ export function verifyToken(req: AuthenticatedRequest, res: Response, next: Next
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
         req.user = decoded;
-
+        console.log('Decoded token i verifyToken:', decoded);
         next();
 
     } catch (error) {
@@ -31,7 +31,12 @@ export function requireRole(...allowedRoles: string[]) {
     return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         const role = req.user?.role;
 
-        if(!role || !allowedRoles.includes(role)){
+        if(!role) {
+            res.status(403).json({ message: 'Kan inte identifera din roll' });
+            return;
+        };
+
+        if(!allowedRoles.includes(role)){
             res.status(403).json({ message: 'Du har inte tillgång till detta' });
             return;
         };

@@ -1,23 +1,19 @@
-import { 
-    Request, 
-    Response 
-} from 'express';
-import { 
-    CreateUserService, 
-    deleteUserService, 
-    getUserByIdService,
-    findAllUsersService,
-    findAndUpdateUserService,
-} from '../services/user/user.service';
+import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
-import type { ApiResponse } from '../types/ApiResponse';
-import type { 
-    CreateUser, 
-    User 
-} from '../types/user/User';
 import { UserMapper } from '../mappers/user.mapper';
 import { PrivateUserDTO } from '../types/dto/UserDTO';
-import { ValidationError, NotFoundError } from '../classes/ErrorHandling';
+import { ValidationError, NotFoundError, AppError } from '../classes/ErrorHandling';
+import type { ApiResponse } from '../types/ApiResponse';
+import type { CreateUser, User } from '../types/user/User';
+import { CreateUserService, 
+        deleteUserService, 
+        getUserByIdService,
+        findAllUsersService,
+        findAndUpdateUserService,
+        } from '../services/user/user.service';
+import { AuthenticatedRequest } from '../types/user/UserAuth';
+import { validateUserId } from '../validators/user/user.validate';
+
 
 // CREATE USER
 export async function createUser(req: Request, res: Response<ApiResponse<CreateUser>>): Promise<void> {
@@ -37,10 +33,10 @@ export async function createUser(req: Request, res: Response<ApiResponse<CreateU
         res.status(201).json({ data: newUser });
         
     } catch (error) {
-        const err = error as any;
+        const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK:');
+            console.error('ERROR STACK USER:');
             console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
@@ -56,28 +52,26 @@ export async function createUser(req: Request, res: Response<ApiResponse<CreateU
 };
 
 // DELETE USER
-export async function deleteUser(req: Request, res: Response<ApiResponse<null>>): Promise<void> {   
+export async function deleteUser(req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {   
     try {
-        const { id } = req.params;
-        const userID = new ObjectId(id);
+        const userID = validateUserId(req.user!.userID);
+        const extractedEmail = req.user?.email;
 
-        if(!ObjectId.isValid(userID)) {
-            throw new ValidationError('Ogiltigt ID');
+        if(!extractedEmail) {
+            throw new ValidationError('Kan inte validera Email för borttagning');
         };
 
-        if(!userID) {
-            throw new NotFoundError('Användaren kunde inte hittas');
-        };
-
-        await deleteUserService(userID);
-
-        res.status(200).json({ message: `användaren är borttagen!` });
+        await deleteUserService(userID, extractedEmail);
+ 
+        res.status(200).json({ message: `användaren är borttagen!`, data: null });
+        console.log(`Användare ${extractedEmail} raderades (${userID}).`);
+        return;
 
     } catch (error) {
-        const err = error as any;
+        const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK:');
+            console.error('ERROR STACK USER:');
             console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
@@ -95,15 +89,9 @@ export async function deleteUser(req: Request, res: Response<ApiResponse<null>>)
 
 
 // GET THE USER
-export async function getUserById(req: Request, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
+export async function getUserById(req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
     try {
-        const { id } = req.params;
-        const userID = new ObjectId(id);
-        
-        if(!ObjectId.isValid(id)){
-            throw new ValidationError('Ogiltigt ID')
-        };
-
+        const userID = validateUserId(req.user!.userID);
         const user = await getUserByIdService(userID);
 
         if(!user) {
@@ -118,10 +106,10 @@ export async function getUserById(req: Request, res: Response<ApiResponse<Privat
         });
 
     } catch (error) {
-        const err = error as any;
+        const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK:');
+            console.error('ERROR STACK USER:');
             console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
@@ -151,10 +139,10 @@ export async function getAllUsers(_req: Request, res: Response<ApiResponse<User[
         });
         
     } catch (error) {
-        const err = error as any;
+        const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK:');
+            console.error('ERROR STACK USER:');
             console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
@@ -170,33 +158,19 @@ export async function getAllUsers(_req: Request, res: Response<ApiResponse<User[
 };
 
 // UPDATE USER
-export async function updateUser(req: Request, res: Response<ApiResponse<User>>): Promise<void> {
+export async function updateUser(req: AuthenticatedRequest, res: Response<ApiResponse<User>>): Promise<void> {
     try {
-        const { id } = req.params;
-        const userID = new ObjectId(id);
+        const userID = validateUserId(req.user!.userID);
         const frontendData = req.body;
-
-        if(ObjectId.isValid(userID)) {
-            throw new ValidationError('Ogiltigt ID');
-        };
-
-        if(Object.values(frontendData).some(v => v === null || v === undefined || v === '')) {
-            throw new ValidationError('Fälten måste ha värden');
-        };
-
         const response = await findAndUpdateUserService(userID, frontendData)
-
-        if(response == null) {
-            throw new NotFoundError('Datan kunde inte uppdateras');
-        };
 
         res.status(200).json({ message: 'användaren uppdaterades', data: response });
 
     } catch (error) {
-        const err = error as any;
+        const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK:');
+            console.error('ERROR STACK USER:');
             console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);

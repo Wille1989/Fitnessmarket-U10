@@ -1,20 +1,15 @@
-
 import { UserRole } from "../types/enums/UserRole";
-import type { 
-    CreateUser, 
-    UpdateUser, 
-    UpdateUserByAdmin,
-} from "../types/user/User";
+import type { CreateUser, UpdateUser, UpdateUserByAdmin } from "../types/user/User";
 
 export const UserFactory = {   
 
     create: (input: CreateUser ): CreateUser => {
         return {
 
-            name: input.name,
+            name: input.name || 'Användare',
             password: input.password,
             email: input.email,
-            role: UserRole.consumer,
+            role: UserRole.customer,
             createdAt: new Date()
 
         }
@@ -33,10 +28,10 @@ export const UserFactory = {
         return {
 
             ...changes,
-            role: UserRole.consumer || UserRole.retailer || UserRole.superAdmin,
+            role: UserRole.customer || UserRole.sales || UserRole.admin,
             updatedAt: new Date()
 
         }
     }
 
-}
+};

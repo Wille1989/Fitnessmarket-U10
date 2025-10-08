@@ -1,17 +1,22 @@
 import dotenv from 'dotenv';
+
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import { env } from './config/env';
 import { Request, Response } from 'express';
-
-dotenv.config();
+import userRouter from '../src/routes/user.routes';
+import authRouter from './routes/auth.routes';
 
 const app = express();
-const PORT = Number(process.env.PORT) || 3000;
 
 // Middleware
 app.use(express.json());
-app.use(cors())
+app.use(cors());
+
+app.use('/user', userRouter);
+app.use('/auth', authRouter);
 
 app.get('/health', (_req: Request, res: Response): Response => {
     return res.status(200).json ({
@@ -22,6 +27,6 @@ app.get('/health', (_req: Request, res: Response): Response => {
     });
 });
 
-app.listen(PORT, () => {
+app.listen(env.PORT, () => {
     console.log(`Server is running on http://localhost:${env.PORT}`);
 });

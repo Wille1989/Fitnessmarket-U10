@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import type { ApiResponse } from '../types/ApiResponse';
 import type { LoginPayload } from '../types/user/UserAuth';
-import { AppError, ValidationError } from '../classes/ErrorHandling';
+import type { AuthenticatedRequest } from '../types/user/UserAuth';
+import { AppError, NotFoundError, ValidationError } from '../classes/ErrorHandling';
 import { loginUserService } from '../services/user/user.service';
 
 export async function loginUser(req: Request, res: Response<ApiResponse<LoginPayload>>): Promise<void> {
@@ -36,9 +37,13 @@ export async function loginUser(req: Request, res: Response<ApiResponse<LoginPay
     }
 };
 
- export async function logoutUser(_req: Request, res: Response<ApiResponse<null>>): Promise<void> {
-
+export async function logoutUser(req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {
     try {
+        const userID = req.user?.userID;
+
+        if(!userID) {
+            throw new NotFoundError('Finns ingen användare i token');
+        };
         
         res.status(200).json({ message: 'du är utloggad!', data: null });
 
@@ -59,8 +64,4 @@ export async function loginUser(req: Request, res: Response<ApiResponse<LoginPay
             : err.message,
         });
     }
-
-    
-
 };
-

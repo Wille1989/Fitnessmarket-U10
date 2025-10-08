@@ -2,16 +2,8 @@ import bcrypt from 'bcrypt';
 import getDb from "../../lib/mongodb";
 import jwt from 'jsonwebtoken';
 import { ObjectId } from "mongodb";
-import type { 
-    CreateUser, 
-    User,
-    UpdateUser
-} from "../../types/user/User";
-import { 
-    ConflictError, 
-    NotFoundError, 
-    ValidationError 
-} from '../../classes/ErrorHandling';
+import type { CreateUser, User,UpdateUser } from "../../types/user/User";
+import { ConflictError, NotFoundError, ValidationError } from '../../classes/ErrorHandling';
 import { UserFactory } from "../../factories/user.factory";
 import { validateUser } from '../../validators/user/user.validate';
 
@@ -50,15 +42,15 @@ export async function CreateUserService(frontendData: CreateUser): Promise<User>
 };
 
 // DELETE USER
-export async function deleteUserService(userID: ObjectId): Promise<void> {
+export async function deleteUserService(userID: ObjectId, data: string): Promise<void> {
 
     const db = await getDb();
     const userCollection = db.collection<User>('users');
 
-    const response = await userCollection.deleteOne({ _id: userID });
+    const response = await userCollection.deleteOne({ _id: userID, email: data });
 
     if(response.deletedCount === 0) {
-        throw new NotFoundError('Ingen användare hittades med det ID:t');
+        throw new NotFoundError('Finns ingen användare med detta ID');
     };
 };
 
@@ -89,7 +81,7 @@ export async function findAllUsersService(): Promise<User[]> {
 };
 
 // FIND AND UPDATE USER
-export async function findAndUpdateUserService(userID: ObjectId, frontendData: UpdateUser): Promise<User | null> {
+export async function findAndUpdateUserService(userID: ObjectId, frontendData: UpdateUser): Promise<User> {
 
     const db = await getDb();
     const userCollection = db.collection<User>('users');
@@ -99,24 +91,37 @@ export async function findAndUpdateUserService(userID: ObjectId, frontendData: U
         throw new ValidationError('Inga fält att uppdatera');
     };
 
+    console.log(updatedUser);
     const returnUpdatedUser = await userCollection.findOneAndUpdate(
         { _id: userID },
         { $set: updatedUser },
         { returnDocument: 'after' }
     );
 
+    console.log(returnUpdatedUser);
+    if(!returnUpdatedUser) {
+        throw new NotFoundError('Datan är null');
+    };
+
     return returnUpdatedUser;
 };
 
-export async function loginUserService(frontendData: User): Promise<{ user: User, token: string }> {
+export async function loginUserService(data: User): Promise<{ user: User, token: string }> {
 
-    validateUser(frontendData);
+    validateUser(data);
+
+    const db = await getDb();
+    const existingUser = await db.collection<User>('users').findOne({ email: data.email });
+
+    if(!existingUser) {
+        throw new NotFoundError('Det finns ingen användare med denna epost adressen');
+    };
 
     const token = jwt.sign(
         { 
-            userID: frontendData._id, 
-            email: frontendData.email, 
-            role: frontendData.role 
+            userID: existingUser._id, 
+            email: existingUser.email, 
+            role: existingUser.role
         },
         process.env.JWT_SECRET!,
         { expiresIn: '2h' }
@@ -126,5 +131,5 @@ export async function loginUserService(frontendData: User): Promise<{ user: User
         throw new NotFoundError('Kunde inte skapa token');
     };
 
-    return { user: frontendData, token};
+    return { user: existingUser, token};
 };

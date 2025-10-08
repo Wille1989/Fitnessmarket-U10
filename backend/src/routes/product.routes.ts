@@ -14,3 +14,5 @@ productRouter.post('/product/new-product', verifyToken, requireRole('admin', 'sa
 productRouter.get('/product/delete/:id', verifyToken, requireRole('admin', 'sales'), deleteProduct);
 
 productRouter.patch('/product/update-product/:id', verifyToken, requireRole('admin', 'sales'), updateProduct);
+
+export default productRouter;
