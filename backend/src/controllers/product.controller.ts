@@ -12,15 +12,17 @@ import {
     rateProductService } 
     from '../services/product/product.service';
 import { ValidationError, AppError, NotFoundError } from '../classes/ErrorHandling';
+import { AuthenticatedRequest } from '../types/user/UserAuth';
+import { validateUserId } from '../validators/user/user.validate';
 
 // CREATE A PRODUCT
-export async function createProduct(req: Request, res: Response<ApiResponse<CreateProduct>>): Promise<void> {
-
+export async function createProduct(
+    req: AuthenticatedRequest, res: Response<ApiResponse<Product>>): Promise<void> {
     try {
+        validateUserId(req.user!.userID);
+        const fromBody = req.body.product;
 
-        const frontendData: CreateProduct = req.body;
-
-        const newProduct = await createProductService(frontendData);
+        const newProduct = await createProductService(fromBody);
 
         res.status(201).json({ message: 'Produkten har lagts till!', data: newProduct });
 

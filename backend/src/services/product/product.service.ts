@@ -8,23 +8,28 @@ import type {
 } from "../../types/product/Products";
 import { NotFoundError } from "../../classes/ErrorHandling";
 import { NutritionalContent } from "../../types/product/NutritionalContent";
+import { ProductRating } from "../../types/product/ProductRating";
 
 
 // CREATE PRODUCT
-export async function createProductService(frontendData: CreateProduct): Promise<Product> {
+export async function createProductService(
+    fromBody: CreateProduct): Promise<Product> {
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
 
     // Validate the product
-    validateProduct(frontendData);
+    validateProduct(fromBody);
+    const createdAt = new Date();
+    const rating: ProductRating = {
+        average: 0,
+        sum: 0,
+        totalRatings: 0
+    };
 
     // Create object
     const product = ProductFactory.create(
-        {
-            ...frontendData,
-            createdAt: new Date()
-        });
+        { fromBody, rating: rating, createdAt: createdAt });
 
     // send to database
     const newProduct = await productCollection.insertOne(product); 

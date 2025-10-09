@@ -7,12 +7,25 @@ const productRouter: Router = express.Router();
 
 productRouter.get('/', getProduct);
 
-productRouter.get('/all-products', verifyToken, requireRole('admin', 'sales'), getProduct);
+productRouter.post('/new', 
+    verifyToken, 
+    requireRole('admin', 'sales'), 
+    createProduct);
 
-productRouter.post('/product/new-product', verifyToken, requireRole('admin', 'sales'), createProduct);
+productRouter.delete('/delete', 
+    verifyToken, 
+    requireRole('admin', 'sales'), 
+    deleteProduct);
 
-productRouter.get('/product/delete/:id', verifyToken, requireRole('admin', 'sales'), deleteProduct);
+productRouter.patch('/update', 
+    verifyToken, 
+    requireRole('admin', 'sales'), 
+    updateProduct);
 
-productRouter.patch('/product/update-product/:id', verifyToken, requireRole('admin', 'sales'), updateProduct);
+/*// ADMIN ROUTES
+productRouter.get('/all/admin', 
+verifyToken, 
+requireRole('admin', 'sales'), 
+getProduct);*/
 
 export default productRouter;
