@@ -1,8 +1,8 @@
-import type { User } from "./User"
+import { PrivateUserDTO } from "../dto/UserDTO";
 import { Request } from 'express';
 
 export type LoginPayload = {
-    user: User
+    user: PrivateUserDTO
     token: string
 }
 

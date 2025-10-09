@@ -5,9 +5,9 @@ import { requireRole, verifyToken } from '../middleware/auth';
 
 const userRouter: Router = express.Router();
 
-userRouter.patch('/update', verifyToken, requireRole('consumer', 'admin'), updateUser);
-userRouter.get('/delete', verifyToken, requireRole('consumer', 'admin'), deleteUser);
+userRouter.patch('/update', verifyToken, requireRole('customer', 'admin'), updateUser);
+userRouter.delete('/delete', verifyToken, requireRole('customer', 'admin'), deleteUser);
 userRouter.get('/all', verifyToken, requireRole('admin'), getAllUsers);
-userRouter.get('/:id', verifyToken, requireRole('consumer', 'admin'), getUserById);
+userRouter.get('/:id', verifyToken, requireRole('customer', 'admin'), getUserById);
 
 export default userRouter;

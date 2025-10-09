@@ -1,4 +1,4 @@
-import { User } from "../types/user/User";
+import { CreateUser, User } from "../types/user/User";
 import type { 
     PublicUserDTO,
     PrivateUserDTO,
@@ -15,7 +15,8 @@ export const UserMapper = {
     toPrivateDTO: (user: User): PrivateUserDTO => ({
         id: user._id?.toString(),
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role
     }),
 
     toAdminDTO: (user: User): AdminUserDTO => ({

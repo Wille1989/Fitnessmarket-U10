@@ -8,6 +8,9 @@ const authRouter: Router = express.Router();
 
 authRouter.post('/register', createUser);
 authRouter.post('/login', loginUser);
-authRouter.get('/logout', verifyToken, requireRole('admin', 'consumer', 'sales'), logoutUser);
+authRouter.get('/logout', 
+    verifyToken, 
+    requireRole('admin', 'customer', 'sales'), 
+    logoutUser);
 
 export default authRouter;

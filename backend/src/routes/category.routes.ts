@@ -1,18 +1,35 @@
-import { Router } from "express";
 import express from 'express';
+import { Router } from "express";
 import { requireRole, verifyToken } from "../middleware/auth";
-import { createCategory, deleteCategory, getCategory, updateCategory } from "../controllers/category.controller";
+import { 
+    createCategory, 
+    deleteCategory, 
+    getCategory, 
+    updateCategory,
+    getCategoryById } from "../controllers/category.controller";
 
 const catRouter: Router = express.Router();
 
-catRouter.post('/category/new-category', verifyToken, requireRole('admin', 'sales'), createCategory);
+catRouter.post('/new', 
+    verifyToken, 
+    requireRole('admin', 'sales'), 
+    createCategory);
 
-catRouter.get('/category/delete-category', verifyToken, requireRole('admin', 'sales'), deleteCategory);
+catRouter.delete('/delete', 
+    verifyToken, 
+    requireRole('admin', 'sales'), 
+    deleteCategory);
 
-catRouter.patch('/category/update-category', verifyToken, requireRole('admin', 'sales'), updateCategory);
+catRouter.patch('/update', 
+    verifyToken, 
+    requireRole('admin', 'sales'),
+    updateCategory);
 
-catRouter.get('/category/get-category/:id', getCategory);
+catRouter.get('/show/:id', 
+    verifyToken, 
+    requireRole('admin', 'customer', 'sales'), 
+    getCategoryById);
 
-catRouter.get('/category/get-category', getCategory);
+catRouter.get('/index', getCategory);
 
-export default Router;
+export default catRouter;

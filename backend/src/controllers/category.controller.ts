@@ -3,6 +3,8 @@ import { ObjectId } from 'mongodb';
 import type { ApiResponse } from '../types/ApiResponse';
 import type { Category } from '../types/product/Category';
 import { ValidationError, AppError } from '../classes/ErrorHandling';
+import { AuthenticatedRequest } from '../types/user/UserAuth';
+import { validateUserId } from '../validators/user/user.validate';
 import { 
     createCategoryService, 
     deleteCategoryService, 
@@ -11,15 +13,24 @@ import {
     updateCategoryService } 
     from '../services/product/category.service';
 
-export async function createCategory(req: Request, res: Response<ApiResponse<Category>>): Promise<void> {
+// CREATE CATEGORY
+export async function createCategory(
+    req: AuthenticatedRequest, res: Response<ApiResponse<Category>>): Promise<void> {
     try {
-        const { body } = req.body;
-        if(Object.values(body).some(v => v === null || v === undefined || v === '')) {
-            throw new ValidationError('Alla fält måste vara ifyllda');
-        };
+        // Token validation
+        validateUserId(req.user!.userID);
 
-        const result = await createCategoryService(body);
+        // Destruct title and description from category object
+        const { title, description } = req.body.category;
 
+        // Check that title and description has value      
+        if(!title || !description) {
+            throw new ValidationError('titel eller beskrivning saknas')};
+
+        // Send desctructed valeus to service
+        const result = await createCategoryService(title, description);
+
+        // response with message and data
         res.status(201).json({ message: 'Ny kategori tillagd!', data: result });
         
     } catch (error) {
@@ -41,17 +52,26 @@ export async function createCategory(req: Request, res: Response<ApiResponse<Cat
     };
 };
 
-export async function deleteCategory(req: Request, res: Response<ApiResponse<null>>): Promise<void> {
+// DELETE CATEGORY
+export async function deleteCategory(req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {
     try {
-        const { id } = req.params;
-        const categoryID = new ObjectId(id);
+        // Token validation
+        validateUserId(req.user!.userID);
 
-        if(!ObjectId.isValid(id)) {
-            throw new ValidationError('Ogiltligt ID');
-        };
+        // destrukt id from category object
+        const { _id } = req.body.category;
 
+        // check that string is valid
+        if(!ObjectId.isValid(_id)) {
+            throw new ValidationError('Ogiltligt ID')};
+
+        // convert string to objectId
+        const categoryID = new ObjectId(String(_id));
+
+        // send to service / database
         await deleteCategoryService(categoryID);
 
+        // response with a message
         res.status(200).json({ message: 'Kategorin har tagits bort' });
         
     } catch (error) {
@@ -73,22 +93,27 @@ export async function deleteCategory(req: Request, res: Response<ApiResponse<nul
     };
 };
 
-export async function updateCategory(req: Request, res: Response<ApiResponse<Category>>): Promise<void> {
+// UPDATE A CATEGORY
+export async function updateCategory(
+    req: AuthenticatedRequest, res: Response<ApiResponse<Category>>): Promise<void> {
     try {
-        const { id } = req.params;
-        const { body } = req.body;
-        const categoryID = new ObjectId(id);
+        // Token validation
+        validateUserId(req.user!.userID);
 
-        if(!ObjectId.isValid(id)) {
-            throw new ValidationError('Ogiltligt ID');
-        };
+        // Destruct values from category object
+        const { _id, title, description } = req.body.category;
 
-        if(Object.values(body).some(v => v === null || v === undefined || v === '')){
-            throw new Error('Alla fält måste ha ett värde');
-        };
+        // Check string valid for req id
+        if(!ObjectId.isValid(_id)){
+            throw new ValidationError('Kunde inte validera ID')};
 
-        await updateCategoryService(categoryID, body);
+        // convert string to objectID
+        const categoryID = new ObjectId(String(_id));
 
+        // Send to database
+        await updateCategoryService(categoryID, title, description);
+
+        // the response from database
         res.status(200).json({ message: 'Kategorin har uppdaterats!' });
         
     } catch (error) {
@@ -110,24 +135,28 @@ export async function updateCategory(req: Request, res: Response<ApiResponse<Cat
     };
 };
 
-export async function getCategory(req: Request, res: Response<ApiResponse<Category | Category[]>>): Promise<void> {
+// GET A CATEGORY BY ITS ID
+export async function getCategoryById(req: AuthenticatedRequest, res: Response<ApiResponse<Category>>): Promise<void> {
     try {
+        // User validation
+        validateUserId(req.user!.userID);
+
+        // Destruct value id from object category
         const { id } = req.params;
-        if(id) {
-            const categoryID = new ObjectId(id);
-            if(!ObjectId.isValid(id)) {
-                throw new ValidationError('Ogiltigt ID');
-            };
 
-            const response = await getCategoryByIdService(categoryID);
+        // Check that string is valid from category object
+        if(!ObjectId.isValid(id)) {
+            throw new ValidationError(`Valideringen misslyckades ${id}`)};
 
-            res.status(200).json({ data: response });
+        // Convert string til objectID
+        const categoryID = new ObjectId(id);
 
-        } else {
-            const response = await getAllCategoriesService();
+        // send data to service
+        const result = await getCategoryByIdService(categoryID);
 
-            res.status(200).json({ data: response });
-        }
+        // response from database
+        res.status(200).json({ message: 'retunerar kategori', data: result });
+    
     } catch (error) {
         const err = error as AppError;
 
@@ -145,4 +174,32 @@ export async function getCategory(req: Request, res: Response<ApiResponse<Catego
             : err.message,
         });
     };
+};
+
+// GET ALL CATEGORIES IN DATABASE
+export async function getCategory(
+    _req: Request, res: Response<ApiResponse<Category[]>>): Promise<void> {
+    try {
+
+        const result = await getAllCategoriesService()
+
+        res.status(200).json({ message: `retunerar: ${result.length} kategorier`, data: result })
+
+    } catch (error) {
+        const err = error as AppError;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK CATEGORY:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
+    }
 };

@@ -2,21 +2,27 @@ import { Request, Response } from 'express';
 import type { ApiResponse } from '../types/ApiResponse';
 import type { LoginPayload } from '../types/user/UserAuth';
 import type { AuthenticatedRequest } from '../types/user/UserAuth';
-import { AppError, NotFoundError, ValidationError } from '../classes/ErrorHandling';
-import { loginUserService } from '../services/user/user.service';
+import { AppError, ValidationError } from '../classes/ErrorHandling';
+import { loginUserService } from '../services/user/auth.service';
+import { UserMapper } from '../mappers/user.mapper';
+import { validateUserId } from '../validators/user/user.validate';
 
+// LOG IN 
 export async function loginUser(req: Request, res: Response<ApiResponse<LoginPayload>>): Promise<void> {
 
     try {
+        // store request from frontend
         const frontendData = req.body;
-
+        // Check object from req contain values
         if(Object.values(frontendData).some(v => v === null || v === undefined || v === '')){
             throw new ValidationError('Fälten måste vara ifyllda');
         };
-
+        // object with the user and the token 
         const { user, token } = await loginUserService(frontendData);
+        // filter sensitive data
+        const privateDTO = UserMapper.toPrivateDTO(user);
 
-        res.status(200).json({ message: 'datan matchade, inloggad', data: { user, token }})
+        res.status(200).json({ message: 'Svar Från Databas:', data: { user: privateDTO, token }})
         
     } catch (error) {
         const err = error as AppError;
@@ -37,14 +43,12 @@ export async function loginUser(req: Request, res: Response<ApiResponse<LoginPay
     }
 };
 
+// LOG OUT
 export async function logoutUser(req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {
     try {
-        const userID = req.user?.userID;
+        // User valdiation for userID
+        validateUserId(req.user!.userID);
 
-        if(!userID) {
-            throw new NotFoundError('Finns ingen användare i token');
-        };
-        
         res.status(200).json({ message: 'du är utloggad!', data: null });
 
     } catch (error) {

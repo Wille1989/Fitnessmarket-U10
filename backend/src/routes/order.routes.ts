@@ -3,18 +3,37 @@ import { Router } from 'express';
 import { 
     createOrder,
     deleteOrder,
-    getOrder
+    getOrderByID,
+    getOrdersForUser,
 } from '../controllers/order.controller';
 import { requireRole, verifyToken } from '../middleware/auth';
 
 const orderRouter: Router = express.Router();
 
-orderRouter.post('/order/checkout', verifyToken, requireRole('consumer', 'admin'), createOrder);
+orderRouter.post('/checkout', 
+    verifyToken, 
+    requireRole('customer', 'admin'), 
+    createOrder);
 
-orderRouter.get('/order/delete-order/:id', verifyToken, requireRole('consumer', 'admin'), deleteOrder);
+orderRouter.delete('/delete/:id', 
+    verifyToken, 
+    requireRole('customer', 'admin'), 
+    deleteOrder);
 
-orderRouter.get('/order/user-order/:id', verifyToken, requireRole('consumer', 'admin'), getOrder);
+orderRouter.get('/show/:id', 
+    verifyToken, 
+    requireRole('customer', 'admin'), 
+    getOrderByID);
 
-orderRouter.get('/admindashboard/order/get-all-orders', verifyToken, requireRole('admin'), getOrder);
+orderRouter.get('/index',
+    verifyToken,
+    requireRole('customer'),
+    getOrdersForUser);
 
-export default Router;
+/* ADMIN SPECIFIK ROUTES
+orderRouter.get('/admin/order/all', 
+    verifyToken, 
+    requireRole('admin'), 
+    getOrder);*/
+
+export default orderRouter;

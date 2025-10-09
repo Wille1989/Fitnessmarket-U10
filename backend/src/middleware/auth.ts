@@ -3,7 +3,7 @@ import { Response, NextFunction } from 'express';
 import type { AuthenticatedRequest, DecodedToken } from '../types/user/UserAuth';
 
 export function verifyToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-    
+
     const authHeader = req.headers.authorization;
 
     if(!authHeader || !authHeader.startsWith('Bearer')) {
@@ -29,6 +29,11 @@ export function verifyToken(req: AuthenticatedRequest, res: Response, next: Next
 
 export function requireRole(...allowedRoles: string[]) {
     return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+
+        if(!req.user) {
+            res.status(401).json({ message: 'Ingen giltig inloggning' });
+        };
+
         const role = req.user?.role;
 
         if(!role) {
@@ -37,7 +42,7 @@ export function requireRole(...allowedRoles: string[]) {
         };
 
         if(!allowedRoles.includes(role)){
-            res.status(403).json({ message: 'Du har inte tillgång till detta' });
+            res.status(403).json({ message: `Du har inte behörighet för detta - ${role}` });
             return;
         };
 

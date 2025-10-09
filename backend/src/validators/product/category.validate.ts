@@ -1,21 +1,23 @@
-import { Category, CreateCategory } from "../../types/product/Category";
+import { Category } from "../../types/product/Category";
 import { ValidationError } from "../../classes/ErrorHandling";
 
+export async function validateCategory(title: string, description: string): Promise<Category> {
 
-export async function validateCategory(frontendData: CreateCategory): Promise<Category> {
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
 
-    if(frontendData.title.length >= 30) {
+    if(trimmedTitle.length >= 30) {
         throw new ValidationError('Titeln är för lång, max 30 tecken');
     };
 
-    if(frontendData.description.length >= 255) {
+    if(trimmedDescription.length >= 255) {
         throw new ValidationError('beskrivningen får max innehålla 255 tecken');
     };
 
-    const inputRegex = /^[a-zA-Z0-9\s]+$/;
-    if(!inputRegex.test(frontendData.title || frontendData.description)){
+    const inputRegex = /^[a-öA-Ö0-9\s]+$/;
+    if(!inputRegex.test(trimmedTitle || trimmedDescription)){
         throw new ValidationError('inputfält innehåller otillåtna tecken');
     };
 
-    return frontendData;
+    return { title: trimmedTitle, description: trimmedDescription };
 };

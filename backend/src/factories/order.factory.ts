@@ -1,25 +1,26 @@
-import type { CreateOrder, Order } from "../types/product/Order"
+import { ObjectId } from "mongodb"
+import type { CreateOrder, Order, OrderNumberCounter, ProductItem } from "../types/product/Order"
 
 export const Orderfactory = {
 
-    create: (input: CreateOrder): CreateOrder => {
+    create: (input: { 
+        customerID: ObjectId
+        orderNumber: OrderNumberCounter
+        content: ProductItem[]
+        createdAt: Date
+        } ): Order => {
         return {
-
-            consumerID: input.consumerID,
+            customerID: input.customerID,
+            orderNumber: input.orderNumber,
             content: input.content,
-            orderNumber: '000000000',
             createdAt: new Date()
-
         }
     },
 
     update: (updatedInput: Order): Order => {
         return {
-
             ...updatedInput,
             updatedAt: new Date
-
         }
     }
-
 }

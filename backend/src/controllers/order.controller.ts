@@ -1,96 +1,163 @@
 import { Request, Response } from 'express';
 import type { ApiResponse } from "../types/ApiResponse";
 import type { Order } from "../types/product/Order";
-import type { Product } from '../types/product/Products';
-import { getProductByIdService } from '../services/product/product.service';
 import { 
+    createOrderService,
     deletOrderService, 
-    getOrderByIdService, 
-    getOrdersService,
+    getOrderByIdService,
+    getOrdersForUserService,
 } from '../services/order/order.service';
 import { ObjectId } from 'mongodb';
+import { AuthenticatedRequest } from '../types/user/UserAuth';
+import { validateUserId } from '../validators/user/user.validate';
+import { ValidationError } from '../classes/ErrorHandling';
+import { AppError } from '../classes/ErrorHandling';
 
 // CREATE ORDER
-export async function createOrder(req: Request, res: Response<ApiResponse<Order>>): Promise<void>{
+export async function createOrder(
+    req: AuthenticatedRequest, res: Response<ApiResponse<Order>>): Promise<void>{
     try {
-        const frontendData = req.body;
+        // User validation with Token, 
+        // store userID for connection between order and user
+        const customerID = validateUserId(req.user!.userID);
 
-        if(Object.values(frontendData).some(v => v === null || v === undefined || v === '')){
-            res.status(400).json({ message: 'Alla fält måste vara ifyllda' });
+        // grab the entire order object from frontend
+        const orderData = req.body.order;
+
+        // Check that inputs contains value
+        if(Object.values(orderData).some(v => v === null || v === undefined || v === '')){
+            res.status(400).json({ message: 'Valideringsfel, något fält är tomt' });
             return;
         };
 
-        const products = await Promise.all(frontendData.content.map(async(item: Product) => {
-            const product = await getProductByIdService(new ObjectId(item._id));
-            if(!product) {
-                throw new Error(`Produkt ${item._id} hittades inte`);
-            };
-            return { ...product, quantity: item.quantity };
-        }));
-
-        if (!products || products.length === 0) {
-            res.status(400).json({ message: 'Ordern saknar produkter!' });
-            return;
-        };
+        // Sending the userID and the order object to service
+        const result = await createOrderService(customerID, orderData, orderData.orderNumberCounter);
 
         res.status(201).json({ message: 'Ordern har skapats' });
 
     } catch (error) {
-        const err = error as Error;
-        res.status(400).json({ message: err.message });
-        return;
+        const err = error as AppError;
+        
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK ORDER:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
     };
 };
 
 // DELETE ORDER
-export async function deleteOrder(req: Request, res: Response<ApiResponse<null>>): Promise<void> { 
+export async function deleteOrder(
+    req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> { 
     try {
-        const { id } = req.params;
-        const orderID = new ObjectId(id);
+        const customerID = validateUserId(req.user!.userID);
+        const { _id } = req.body.order;
 
-        if(!ObjectId.isValid( id )) {
+        if(!ObjectId.isValid(_id)) {
         throw new Error('Kunde inte verifiera ID');
         };
 
-        await deletOrderService(orderID);
+        const orderID = new ObjectId(String(_id));
+
+        await deletOrderService(customerID, orderID);
 
         res.status(200).json({ message: 'Ordern har tagits bort' });
         
     } catch (error) {
-        const err = error as Error;
-        res.status(400).json({ message: err.message });
-        return;
+        const err = error as AppError;
+        
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK ORDER:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
     };
 };
 
 // GET ORDER OR ORDERS
-export async function getOrder(req: Request, res: Response<ApiResponse<Order | Order []>>): Promise<void> {
+export async function getOrderByID(
+    req: AuthenticatedRequest, res: Response<ApiResponse<Order>>): Promise<void> {
     try {
-        const { id } = req.params;
-    
-        if(id) {
+        const customerID = validateUserId(req.user!.userID);
+        const { _id } = req.body.order;
 
-            if(!ObjectId.isValid(id)) {
-                res.status(400).json({ message: 'ogiltigt format' });
-                return;
-            };
-
-            const orderID = new ObjectId(req.params.id);
-            const order = await getOrderByIdService(orderID);
-
-            res.status(200).json({ 
-                message: `order med ID:${orderID} hämtad`, 
-                data: order });
-            
-        } else {
-            const orders = await getOrdersService();
-            res.status(200).json({
-                message: `Ordrar hämtade!`,
-                data: orders });
+        if(!ObjectId.isValid(_id)){
+            throw new ValidationError('Orderns ID är inte giltig');
         };
-        
+
+        const orderID = new ObjectId(String(_id));
+
+        const order = await getOrderByIdService(customerID, orderID);
+
+        res.status(200).json({ 
+            message: `order med ID:${orderID} hämtad`, 
+            data: order });
+  
     } catch (error) {
-        const err = error as Error;
-        res.status(400).json({ message: err.message });
+        const err = error as AppError;
+        
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK ORDER:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
     };
 };
+
+export async function getOrdersForUser(
+    req: AuthenticatedRequest, res: Response<ApiResponse<Order[]>>): Promise<void> {
+        try {
+            const customerID = validateUserId(req.user!.userID);
+            const order = req.body.order;
+            
+            if(!ObjectId.isValid(order._id)){
+                throw new ValidationError('Orderns ID är inte giltig')};
+
+            const orderID = new ObjectId(String(order._id));
+
+            const orders = await getOrdersForUserService(orderID, customerID);
+
+            res.status(200).json({ message: `${orders.length} ordrar retunerades!`, data: orders });
+
+        } catch (error) {
+            const err = error as AppError;
+        
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK ORDER:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
+        }
+}

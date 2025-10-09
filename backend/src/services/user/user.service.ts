@@ -91,7 +91,6 @@ export async function findAndUpdateUserService(userID: ObjectId, frontendData: U
         throw new ValidationError('Inga fält att uppdatera');
     };
 
-    console.log(updatedUser);
     const returnUpdatedUser = await userCollection.findOneAndUpdate(
         { _id: userID },
         { $set: updatedUser },
@@ -104,32 +103,4 @@ export async function findAndUpdateUserService(userID: ObjectId, frontendData: U
     };
 
     return returnUpdatedUser;
-};
-
-export async function loginUserService(data: User): Promise<{ user: User, token: string }> {
-
-    validateUser(data);
-
-    const db = await getDb();
-    const existingUser = await db.collection<User>('users').findOne({ email: data.email });
-
-    if(!existingUser) {
-        throw new NotFoundError('Det finns ingen användare med denna epost adressen');
-    };
-
-    const token = jwt.sign(
-        { 
-            userID: existingUser._id, 
-            email: existingUser.email, 
-            role: existingUser.role
-        },
-        process.env.JWT_SECRET!,
-        { expiresIn: '2h' }
-    );
-
-    if(!token) {
-        throw new NotFoundError('Kunde inte skapa token');
-    };
-
-    return { user: existingUser, token};
 };

@@ -3,34 +3,34 @@ import { ObjectId } from "mongodb";
 import { Orderfactory } from "../../factories/order.factory";
 import type { 
     CreateOrder, 
-    Order 
+    Order, 
+    OrderNumberCounter,
+    ProductItem
 } from "../../types/product/Order";
 
 
 // CREATE ORDER
-export async function createOrderService(frontendData: CreateOrder): Promise<Order> {
+export async function createOrderService(customerID: ObjectId, content: ProductItem[], orderNumber: OrderNumberCounter ): Promise<Order> {
     const db = await getDb();
     const orderNumberCollection = db.collection<Order>('orders');
 
-    if(!frontendData.consumerID) {
-        throw new Error('Användarens ID kunde inte hittas');
-    };
-
-    const newOrder = Orderfactory.create({
-            ...frontendData,
-            createdAt: new Date() });
+        const newOrder = Orderfactory.create({
+            customerID: customerID,
+            orderNumber: orderNumber,
+            content: content,
+            createdAt: new Date(),
+            });
     
     const response = await orderNumberCollection.insertOne(newOrder);
 
     return { ...newOrder, _id: response.insertedId }
-
 };
 
-export async function deletOrderService( id: ObjectId ) {
+export async function deletOrderService(customerID: ObjectId, orderID: ObjectId ) {
     const db = await getDb();
     const orderCollection = db.collection('orders');
 
-    const result = await orderCollection.deleteOne({ _id: id });
+    const result = await orderCollection.deleteOne({ customerID, orderID });
 
     if(result.deletedCount === 0) {
         throw new Error('Ordern togs inte bort');
@@ -40,12 +40,12 @@ export async function deletOrderService( id: ObjectId ) {
 
 };
 
-export async function getOrderByIdService( id: ObjectId ): Promise<Order> {
+export async function getOrderByIdService(customerID: ObjectId, orderID: ObjectId): Promise<Order> {
 
     const db = await getDb();
     const orderCollection = db.collection<Order>('orders');
 
-    const result = await orderCollection.findOne({ _id: id });
+    const result = await orderCollection.findOne({ customerID, orderID });
 
     if(!result) {
         throw new Error('Inget dokument hittades');
@@ -55,12 +55,12 @@ export async function getOrderByIdService( id: ObjectId ): Promise<Order> {
 
 };
 
-export async function getOrdersService(): Promise<Order[]>{
+export async function getOrdersForUserService(orderID: ObjectId, customerID: ObjectId): Promise<Order[]>{
 
     const db = await getDb();
     const orderCollection = db.collection<Order>('orders');
 
-    const result = await orderCollection.find({}).toArray();
+    const result = await orderCollection.find({ orderID, customerID }).toArray();
 
     if(!result) {
         throw new Error('Inget dokument hittades');

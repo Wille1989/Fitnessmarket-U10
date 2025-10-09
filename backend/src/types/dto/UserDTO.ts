@@ -10,6 +10,7 @@ export type PrivateUserDTO = {
     id?: string
     name: string
     email: string
+    role: UserRole
 }
 
 export type AdminUserDTO = {

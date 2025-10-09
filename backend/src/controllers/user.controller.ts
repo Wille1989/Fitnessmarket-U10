@@ -1,10 +1,8 @@
 import { Request, Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { UserMapper } from '../mappers/user.mapper';
 import { PrivateUserDTO } from '../types/dto/UserDTO';
 import { ValidationError, NotFoundError, AppError } from '../classes/ErrorHandling';
 import type { ApiResponse } from '../types/ApiResponse';
-import type { CreateUser, User } from '../types/user/User';
 import { CreateUserService, 
         deleteUserService, 
         getUserByIdService,
@@ -13,10 +11,11 @@ import { CreateUserService,
         } from '../services/user/user.service';
 import { AuthenticatedRequest } from '../types/user/UserAuth';
 import { validateUserId } from '../validators/user/user.validate';
+import { User } from '../types/user/User';
 
 
 // CREATE USER
-export async function createUser(req: Request, res: Response<ApiResponse<CreateUser>>): Promise<void> {
+export async function createUser(req: Request, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
     try {
         const frontendData = req.body;
 
@@ -29,8 +28,9 @@ export async function createUser(req: Request, res: Response<ApiResponse<CreateU
         if(!newUser) {
             throw new NotFoundError('Användaren kunde inte hittas', 404);
         };
+        const privateDTO = UserMapper.toPrivateDTO(newUser);
 
-        res.status(201).json({ data: newUser });
+        res.status(201).json({ data: privateDTO });
         
     } catch (error) {
         const err = error as AppError;
@@ -51,7 +51,7 @@ export async function createUser(req: Request, res: Response<ApiResponse<CreateU
     };
 };
 
-// DELETE USER
+// DELETE YOUR OWN ACCOUNT
 export async function deleteUser(req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {   
     try {
         const userID = validateUserId(req.user!.userID);
