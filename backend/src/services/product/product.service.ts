@@ -76,6 +76,10 @@ export async function deleteProductService( id: ObjectId) {
     const productCollection = db.collection<Product>('products');
     const response = await productCollection.deleteOne({ _id: id });
 
+    if(response.deletedCount === 0){
+        throw new NotFoundError('Produkten togs inte bort');
+    };
+
     return response;
 }
 

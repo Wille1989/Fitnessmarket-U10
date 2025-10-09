@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 import type { ApiResponse } from '../types/ApiResponse';
-import type { CreateProduct, Product, ComparedProducts } from '../types/product/Products';
+import type { Product, ComparedProducts } from '../types/product/Products';
 import { 
     createProductService, 
     deleteProductService, 
@@ -43,7 +43,6 @@ export async function createProduct(
             : err.message,
         });
     };
-
 };
 
 
@@ -92,21 +91,25 @@ export async function getProduct(req: Request, res: Response<ApiResponse<Product
 };
 
 // DELETE PRODUCT
-export async function deleteProduct(req: Request, res: Response<ApiResponse<null>>): Promise<void> {
-
+export async function deleteProduct(
+    req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {
     try {
-        const { id } = req.params;
-        const productID = new ObjectId(id);
+        // Validate user is admin or sales account
+        validateUserId(req.user!.userID);
 
-        if(!ObjectId.isValid(id)) {
+        // destruct value id from product object
+        const { _id } = req.body.product;
+        
+        // check if string is valid
+        if(!ObjectId.isValid(_id)) {
             throw new ValidationError('Ogiltligt ID');
         };
 
-        const deleteProduct = await deleteProductService(productID);
+        // convert string to objectID
+        const productID = new ObjectId(String(_id));
 
-        if(deleteProduct.deletedCount === 0) {
-            res.status(400).json({ message: 'Inga produkter togs bort!' });
-        };
+        // Call service function
+        await deleteProductService(productID);
 
         res.status(200).json({ message: 'Produkten togs bort!' });
 
