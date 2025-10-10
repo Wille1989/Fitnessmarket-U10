@@ -4,20 +4,18 @@ import { NutritionalContentFactory } from "./nutritionalContent.factory";
 
 export const ProductFactory = {
 
-    create: (data: 
-        { fromBody: CreateProduct, 
-            rating: ProductRating
-        }): Product => {
+    create: (fromBody: CreateProduct, rating: ProductRating
+        ): Product => {
             return {         
-                title: data.fromBody.title,
-                price: data.fromBody.price,
-                pricePerKilo: data.fromBody.pricePerKilo,
-                weight: data.fromBody.weight,
-                originCountry: data.fromBody.originCountry,
-                category: data.fromBody.category,
+                title: fromBody.title,
+                price: fromBody.price,
+                pricePerKilo: fromBody.pricePerKilo,
+                weight: fromBody.weight,
+                originCountry: fromBody.originCountry,
+                category: fromBody.category,
                 nutritionalContent: NutritionalContentFactory.create(
-                    data.fromBody.nutritionalContent),
-                rating: data.rating,
+                    fromBody.nutritionalContent),
+                rating: rating,
                 createdAt: new Date(),    
             }
         },

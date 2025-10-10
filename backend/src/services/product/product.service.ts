@@ -10,7 +10,6 @@ import { NotFoundError } from "../../classes/ErrorHandling";
 import { NutritionalContent } from "../../types/product/NutritionalContent";
 import { ProductRating } from "../../types/product/ProductRating";
 
-
 // CREATE PRODUCT
 export async function createProductService(
     fromBody: CreateProduct): Promise<Product> {
@@ -27,8 +26,7 @@ export async function createProductService(
     };
 
     // Create object
-    const product = ProductFactory.create(
-        { fromBody, rating: rating });
+    const product = ProductFactory.create(fromBody, rating);
 
     // send to database
     const newProduct = await productCollection.insertOne(product); 
@@ -39,7 +37,8 @@ export async function createProductService(
 };
 
 // SPECIFIC PRODUCT ON ID
-export async function getProductByIdService( id: ObjectId): Promise<Product> {
+export async function getProductByIdService(
+    id: ObjectId): Promise<Product> {
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
@@ -69,7 +68,8 @@ export async function getAllProductsService(): Promise<Product[]> {
 };
 
 // DELETE A PRODUCT
-export async function deleteProductService( id: ObjectId) {
+export async function deleteProductService(
+    id: ObjectId) {
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
@@ -83,7 +83,8 @@ export async function deleteProductService( id: ObjectId) {
 };
 
 // UPDATE PRODUCT
-export async function updateProductService(formBody: Product, id: ObjectId): Promise<Product> {
+export async function updateProductService(
+    formBody: Product, id: ObjectId): Promise<Product> {
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
@@ -104,9 +105,9 @@ export async function updateProductService(formBody: Product, id: ObjectId): Pro
     return response;
 };
 
-
 // COMPARE PRODUCTS
-export async function compareProductsService( productIDs: string[] ) {
+export async function compareProductsService(
+    productIDs: string[] ) {
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
@@ -142,7 +143,8 @@ export async function compareProductsService( productIDs: string[] ) {
 };
 
 // PRODUCT RATING
-export async function rateProductService(id: ObjectId, ratingValue: number): Promise<Product>{
+export async function rateProductService(
+    id: ObjectId, ratingValue: number): Promise<Product>{
 
     const db = await getDb();
     const product = await db.collection<Product>('products').findOne({ _id: id });
