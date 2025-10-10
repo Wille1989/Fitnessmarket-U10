@@ -1,11 +1,20 @@
 import express from 'express';
 import { Router } from 'express';
-import { createProduct, deleteProduct, getProduct, updateProduct } from '../controllers/product.controller';
 import { requireRole, verifyToken } from '../middleware/auth';
+import { 
+    createProduct, 
+    deleteProduct, 
+    getArrayOfProducts, 
+    getProductById, 
+    updateProduct } from '../controllers/product.controller';
 
 const productRouter: Router = express.Router();
 
-productRouter.get('/', getProduct);
+productRouter.get('/index', 
+    getArrayOfProducts);
+
+productRouter.get('/show/:id', 
+    getProductById)
 
 productRouter.post('/new', 
     verifyToken, 

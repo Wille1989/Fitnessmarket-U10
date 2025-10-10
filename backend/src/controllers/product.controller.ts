@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 import type { ApiResponse } from '../types/ApiResponse';
 import type { Product, ComparedProducts } from '../types/product/Products';
+import { ValidationError, AppError, NotFoundError } from '../classes/ErrorHandling';
+import { AuthenticatedRequest } from '../types/user/UserAuth';
+import { validateUserId } from '../validators/user/user.validate';
 import { 
     createProductService, 
     deleteProductService, 
@@ -11,9 +14,6 @@ import {
     compareProductsService,
     rateProductService } 
     from '../services/product/product.service';
-import { ValidationError, AppError, NotFoundError } from '../classes/ErrorHandling';
-import { AuthenticatedRequest } from '../types/user/UserAuth';
-import { validateUserId } from '../validators/user/user.validate';
 
 // CREATE A PRODUCT
 export async function createProduct(
@@ -45,34 +45,54 @@ export async function createProduct(
     };
 };
 
-
-// GET PRODUCT OR ARRAY OF PRODUCTS
-export async function getProduct(req: Request, res: Response<ApiResponse<Product | Product[]>>): Promise<void> {
+// GET PRODUCT FROM ITS ID
+export async function getProductById(req: Request, res: Response<ApiResponse<Product>>): Promise<void> {
 
     try {
-
-        const { id } = req.params;
-
-        if( id ) {
-            const productID = new ObjectId(id);
-            const product: Product = await getProductByIdService(productID);
-    
-            if(!product){
-                res.status(400).json({ message: 'Kunde inte hitta en produkt' });
-                return;
-            };
-
-            res.status(200).json({ message: 'Produkten hittades', data: product });
-
-        } else {
-            const allProducts = await getAllProductsService();
-
-            res.status(200).json({ message: `Antal produkter funna: ${allProducts.length}`, data: allProducts });
-
+        // Validate string of ID from frontend
+        if(!ObjectId.isValid(req.params.id)){
+            throw new ValidationError('Kunde inte validera ID');
         };
+
+        // Convert ID from string to ObjectId
+        const productID = new ObjectId(String(req.params.id));
+
+        // Send product object to service
+        const product: Product = await getProductByIdService(productID);
+
+        res.status(200).json({ 
+            message: `retunerar ${product.title} i kategory ${product.category}`, data: product });
        
     } catch (error) {
         const err = error as any;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK PRODUCTS:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
+    }
+};
+
+export async function getArrayOfProducts(
+    req: Request, res: Response<ApiResponse<Product[]>>): Promise<void> {
+    try {
+        // Get response from database
+        const allProducts = await getAllProductsService();
+
+        res.status(200).json({ 
+            message: `retunerar ${allProducts.length} produkter`, data: allProducts })
+
+    } catch (error){
+        const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
             console.error('ERROR STACK PRODUCTS:');
@@ -132,21 +152,29 @@ export async function deleteProduct(
     }
 };
 
-export async function updateProduct(req: Request, res: Response<ApiResponse<Product>>): Promise<void> {
+// UPDATE PRODUCT
+export async function updateProduct(
+    req: AuthenticatedRequest, res: Response<ApiResponse<Product>>): Promise<void> {
     try {
-        const { id } = req.params;
-        const productID = new ObjectId(id);
-        const changesToProduct = req.body;
+        // Validate user token
+        validateUserId(req.user!.userID);
 
-        if(!ObjectId.isValid(id)) {
-            throw new ValidationError('Ogiltligt ID');
+        // Grab the entire request of product object
+        const formBody = req.body.product;
+
+        // check id to ensure it is valid
+        if(!ObjectId.isValid(formBody._id)) {
+            throw new ValidationError('Valideringen av ID misslyckades');
         };
 
-        if(Object.values(changesToProduct).some(v => v === null || v === undefined || v === '')) {
-            throw new ValidationError('Fälten måste ha giltiga värden');
-        };
+        // store converted id from string to ObjectID
+        const productID = new ObjectId(String(formBody._id));
 
-        await updateProductService(changesToProduct, productID);
+        // response from database
+        const result = await updateProductService(formBody, productID);
+
+        res.status(200).json({ message: 'Produkten har uppdaterats!', data: result })
+
     } catch (error) {
         const err = error as AppError;
 
@@ -169,6 +197,7 @@ export async function updateProduct(req: Request, res: Response<ApiResponse<Prod
 
 export async function compareProducts(req: Request, res: Response<ApiResponse<ComparedProducts>>): Promise<void> {
     try {
+        // destruct products object
         const { products } = req.body;
 
         if(!products || products.length === 0) {
@@ -205,12 +234,13 @@ export async function compareProducts(req: Request, res: Response<ApiResponse<Co
 
 export async function rateProduct(req: Request, res: Response<ApiResponse<Product>>): Promise<void> {
     try {
-        const { _id, rating } = req.body as { _id: string, rating: number };
-        const productID = new ObjectId(_id);
+        const { _id, rating } = req.body.product;
 
         if(!ObjectId.isValid(_id)) {
             throw new ValidationError('Ogiltligt ID');
         };
+
+        const productID = new ObjectId(String(_id));
 
         const response = await rateProductService(productID, rating);
 

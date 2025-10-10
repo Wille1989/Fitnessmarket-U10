@@ -14,9 +14,9 @@ export type Product = {
     originCountry: string
     rating: ProductRating
     category: Category
-    quantity?: number
     nutritionalContent: NutritionalContent
-    createdAt: Date
+    createdAt?: Date
+    updatedAt?: Date
 
 }
 
@@ -40,9 +40,9 @@ export type UpdateProduct = Partial<{
     pricePerKilo: number
     weight: number
     originCountry: string
-    customerGroup: string
-    category: ObjectId
-    nutritionalContent: ObjectId
+    rating: ProductRating
+    category: Category
+    nutritionalContent: NutritionalContent
     updatedAt: Date
 
 }>;

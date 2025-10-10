@@ -20,7 +20,6 @@ export async function createProductService(
 
     // Validate the product
     validateProduct(fromBody);
-    const createdAt = new Date();
     const rating: ProductRating = {
         average: 0,
         sum: 0,
@@ -29,7 +28,7 @@ export async function createProductService(
 
     // Create object
     const product = ProductFactory.create(
-        { fromBody, rating: rating, createdAt: createdAt });
+        { fromBody, rating: rating });
 
     // send to database
     const newProduct = await productCollection.insertOne(product); 
@@ -84,13 +83,13 @@ export async function deleteProductService( id: ObjectId) {
 }
 
 // UPDATE PRODUCT
-export async function updateProductService(frontendData: Product, id: ObjectId): Promise<Product> {
+export async function updateProductService(formBody: Product, id: ObjectId): Promise<Product> {
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
 
     // Validate the product changes
-    const validatedProduct = await validateProduct(frontendData);
+    const validatedProduct = await validateProduct(formBody);
 
     const response = await productCollection.findOneAndUpdate(
         { _id: id }, // filter

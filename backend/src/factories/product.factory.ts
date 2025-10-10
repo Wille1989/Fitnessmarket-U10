@@ -6,8 +6,7 @@ export const ProductFactory = {
 
     create: (data: 
         { fromBody: CreateProduct, 
-            rating: ProductRating, 
-            createdAt: Date 
+            rating: ProductRating
         }): Product => {
             return {         
                 title: data.fromBody.title,
@@ -18,16 +17,15 @@ export const ProductFactory = {
                 category: data.fromBody.category,
                 nutritionalContent: data.fromBody.nutritionalContent,
                 rating: data.rating,
-                createdAt: data.createdAt,    
+                createdAt: new Date(),    
             }
         },
 
-    update: (changes: UpdateProduct): UpdateProduct => {
+    update: (current: Product, changes: UpdateProduct): Product => {
         return {
-
+            ...current,
             ...changes,
             updatedAt: new Date,
-            
         }
     },
 };
