@@ -82,6 +82,7 @@ export async function getProductById(req: Request, res: Response<ApiResponse<Pro
     }
 };
 
+// ARRAY OF PRODUCTS
 export async function getArrayOfProducts(
     req: Request, res: Response<ApiResponse<Product[]>>): Promise<void> {
     try {
@@ -195,6 +196,7 @@ export async function updateProduct(
     };
 };
 
+// PRODUCT COMPARISON
 export async function compareProducts(req: Request, res: Response<ApiResponse<ComparedProducts>>): Promise<void> {
     try {
         // destruct products object
@@ -232,18 +234,24 @@ export async function compareProducts(req: Request, res: Response<ApiResponse<Co
     };
 };
 
+// PRODUCT RATING
 export async function rateProduct(req: Request, res: Response<ApiResponse<Product>>): Promise<void> {
     try {
+        // Destruct id and rating from object products
         const { _id, rating } = req.body.product;
 
+        // check id string validation
         if(!ObjectId.isValid(_id)) {
             throw new ValidationError('Ogiltligt ID');
         };
 
+        // convert id string to objectID
         const productID = new ObjectId(String(_id));
 
+        // response from database operation
         const response = await rateProductService(productID, rating);
 
+        // response status + response data
         res.status(200).json({ data: response });
 
     } catch (error) {
@@ -264,4 +272,4 @@ export async function rateProduct(req: Request, res: Response<ApiResponse<Produc
         });
         return;
     };
-}
+};

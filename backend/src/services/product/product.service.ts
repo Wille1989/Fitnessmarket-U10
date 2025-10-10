@@ -106,16 +106,16 @@ export async function updateProductService(formBody: Product, id: ObjectId): Pro
 
 
 // COMPARE PRODUCTS
-export async function compareProductsService( ids: string[] ) {
+export async function compareProductsService( productIDs: string[] ) {
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
 
     const products = await productCollection.find(
-        { _id: { $in: ids.map(id => new ObjectId(id)) } }).toArray();
+        { _id: { $in: productIDs.map(id => new ObjectId(id)) } }).toArray();
 
     if(products.length !== 2) {
-        throw new NotFoundError('En eller båda produkterna kunde inte hittas');
+        throw new NotFoundError(`Kunde inte jämföra, hittade ${products.length}`);
     };
 
     const [a,b] = products;
