@@ -90,7 +90,7 @@ export async function getArrayOfProducts(
         const allProducts = await getAllProductsService();
 
         res.status(200).json({ 
-            message: `retunerar ${allProducts.length} produkter`, data: allProducts })
+            message: `retunerar ${allProducts.length} produkter`, data: allProducts });
 
     } catch (error){
         const err = error as AppError;

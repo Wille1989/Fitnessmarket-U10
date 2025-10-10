@@ -1,5 +1,6 @@
 import { ProductRating } from "../types/product/ProductRating";
 import type { CreateProduct, Product, UpdateProduct } from "../types/product/Products"
+import { NutritionalContentFactory } from "./nutritionalContent.factory";
 
 
 export const ProductFactory = {
@@ -15,7 +16,8 @@ export const ProductFactory = {
                 weight: data.fromBody.weight,
                 originCountry: data.fromBody.originCountry,
                 category: data.fromBody.category,
-                nutritionalContent: data.fromBody.nutritionalContent,
+                nutritionalContent: NutritionalContentFactory.create(
+                    data.fromBody.nutritionalContent),
                 rating: data.rating,
                 createdAt: new Date(),    
             }

@@ -1,32 +1,25 @@
 import type { NutritionalContent, UpdateNutritionalContent } from "../types/product/NutritionalContent";
 
 export const NutritionalContentFactory = {
-
-    create: (input: NutritionalContent): NutritionalContent => {
+    create: (
+        formBody: NutritionalContent) : 
+        NutritionalContent => {
         return {
-
-            energy: input.energy,
-            fat: input.fat,
-            saturatedfat: input.saturatedfat,
-            protein: input.protein,
-            salt: input.salt
+            energy: formBody.energy,
+            fat: formBody.fat,
+            saturatedfat: formBody.saturatedfat,
+            protein: formBody.protein,
+            salt: formBody.salt
         }
     },
-
-    read: (orderInfo: NutritionalContent): NutritionalContent => {
+    update: (
+        current: NutritionalContent, 
+        changes: UpdateNutritionalContent) : 
+        NutritionalContent => {
         return {
-
-            ...orderInfo
-
-        }
-    },
-
-    update: (changes: UpdateNutritionalContent): UpdateNutritionalContent => {
-        return {
-
+            ...current,
             ...changes,
-            updatedAt: new Date
+            updatedAt: new Date()
         }
     }
-    
 };

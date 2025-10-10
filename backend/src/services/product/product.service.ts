@@ -80,7 +80,7 @@ export async function deleteProductService( id: ObjectId) {
     };
 
     return response;
-}
+};
 
 // UPDATE PRODUCT
 export async function updateProductService(formBody: Product, id: ObjectId): Promise<Product> {
