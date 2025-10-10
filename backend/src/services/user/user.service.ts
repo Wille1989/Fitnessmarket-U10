@@ -1,35 +1,35 @@
 import bcrypt from 'bcrypt';
 import getDb from "../../lib/mongodb";
-import jwt from 'jsonwebtoken';
 import { ObjectId } from "mongodb";
-import type { CreateUser, User,UpdateUser } from "../../types/user/User";
+import type { CreateUser, User,UpdateUser, UpdateUserByAdmin } from "../../types/user/User";
 import { ConflictError, NotFoundError, ValidationError } from '../../classes/ErrorHandling';
 import { UserFactory } from "../../factories/user.factory";
 import { validateUser } from '../../validators/user/user.validate';
 
 // CREATE USER
-export async function CreateUserService(frontendData: CreateUser): Promise<User> {
+export async function CreateUserService(
+    formBody: CreateUser): Promise<User> {
 
     const db = await getDb();
     const userCollection = db.collection<User>('users');
 
     // validate the user, method runs in a seperate file
-    validateUser(frontendData);
+    validateUser(formBody);
 
     // Check if user already exists
-    const existingUser = await userCollection.findOne({ email: frontendData.email });
+    const existingUser = await userCollection.findOne({ email: formBody.email });
     if(existingUser) {
         throw new ConflictError('Det finns redan en användare med denna mejladress');
     };
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(frontendData.password, 10);
+    const hashedPassword = await bcrypt.hash(formBody.password, 10);
 
     // Create new userobject
     const newUser = UserFactory.create(
         {
-            ...frontendData,
-            email: frontendData.email,
+            ...formBody,
+            email: formBody.email,
             password: hashedPassword
         }
     );
@@ -41,32 +41,48 @@ export async function CreateUserService(frontendData: CreateUser): Promise<User>
     return { ...newUser, _id: response.insertedId }
 };
 
-// DELETE USER
-export async function deleteUserService(userID: ObjectId, data: string): Promise<void> {
-
+// DELETE OWN ACCOUNT
+export async function deleteOwnAccountService(
+    userID: ObjectId, data: string): Promise<void> {
     const db = await getDb();
     const userCollection = db.collection<User>('users');
 
     const response = await userCollection.deleteOne({ _id: userID, email: data });
 
     if(response.deletedCount === 0) {
-        throw new NotFoundError('Finns ingen användare med detta ID');
-    };
+        throw new NotFoundError('Kunde inte ta bort ditt användare konto')};
+};
+
+// ADMIN DELETE USER ACCOUNT
+export async function deleteUserAccountService(
+    userID: ObjectId, email: string): Promise<User | null> {
+    const db = await getDb();
+    const result = await db.collection<User>('users').findOneAndDelete({ _id: userID, email: email });
+
+    if(!result) {
+        throw new NotFoundError('Kunde inte ta bort användaren, ID eller Email matchade ej')};
+
+    return result;
 };
 
 // GET USER
-export async function getUserByIdService(userID: ObjectId): Promise<User | null> {
+export async function getUserByIdService(
+    userID: ObjectId): Promise<User> {
 
     const db = await getDb();
     const userCollection = db.collection<User>('users');
 
     const theUser = await userCollection.findOne({ _id: userID });
 
+    if(!theUser) {
+        throw new NotFoundError('Kunde inte retunera någon användare');
+    };
+
     return theUser;
 };
 
 // GET ALL USERS
-export async function findAllUsersService(): Promise<User[]> {
+export async function getAllUsersService(): Promise<User[]> {
 
     const db = await getDb();
     const userCollection = db.collection<User>('users');
@@ -81,26 +97,61 @@ export async function findAllUsersService(): Promise<User[]> {
 };
 
 // FIND AND UPDATE USER
-export async function findAndUpdateUserService(userID: ObjectId, frontendData: UpdateUser): Promise<User> {
+export async function updateOwnAccountService(
+    userDataID: ObjectId, changes: UpdateUser): Promise<User> {
 
     const db = await getDb();
     const userCollection = db.collection<User>('users');
-    const updatedUser = UserFactory.update({ ...frontendData });
 
-    if(Object.keys(frontendData).length === 0) {
+    const current = await userCollection.findOne({ _id: userDataID });
+
+    if(!current) {
+        throw new NotFoundError('Kunde inte hämta från databasen');
+    };
+
+    if(Object.keys(changes).length === 0){
+        throw new ValidationError('Det finns inga fält att uppdatera');
+    };
+
+    const updatedUser = UserFactory.update(current, changes);
+
+    if(Object.keys(changes).length === 0) {
         throw new ValidationError('Inga fält att uppdatera');
     };
 
     const returnUpdatedUser = await userCollection.findOneAndUpdate(
-        { _id: userID },
+        { _id: userDataID },
         { $set: updatedUser },
         { returnDocument: 'after' }
     );
 
-    console.log(returnUpdatedUser);
     if(!returnUpdatedUser) {
         throw new NotFoundError('Datan är null');
     };
 
     return returnUpdatedUser;
+};
+
+// FIND AND UPDATE A USER AS ADMIN
+export async function UpdateUserByAdmin(
+    userDataID: ObjectId, changes: UpdateUserByAdmin): Promise<User> {
+
+    const db = await getDb();
+    const currentUserData = await db.collection<User>('users').findOne({ _id: userDataID });
+
+    if(!currentUserData) {
+        throw new NotFoundError('Hittar inget dokument som matchar ID')};
+
+    const updatedUserData = UserFactory.updateByAdmin(currentUserData, changes);
+
+    const result = await db.collection<User>('users').findOneAndUpdate(
+        { _id: userDataID },
+        { $set: updatedUserData },
+        { returnDocument: 'after' }
+    );
+
+    if(!result) {
+        throw new NotFoundError(`Kunde inte retunera resultat`)};
+
+    return result;
 };

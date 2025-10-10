@@ -1,4 +1,4 @@
-import { CreateUser, User } from "../types/user/User";
+import { User } from "../types/user/User";
 import type { 
     PublicUserDTO,
     PrivateUserDTO,
@@ -8,15 +8,12 @@ import type {
 export const UserMapper = {
 
     toPublicDTO: (user: User): PublicUserDTO => ({
-        id: user._id?.toString(),
         name: user.name
     }),
 
     toPrivateDTO: (user: User): PrivateUserDTO => ({
-        id: user._id?.toString(),
         name: user.name,
-        email: user.email,
-        role: user.role
+        email: user.email
     }),
 
     toAdminDTO: (user: User): AdminUserDTO => ({
@@ -24,15 +21,7 @@ export const UserMapper = {
         name: user.name,
         email: user.email,
         userRole: user.role,
-        createdAt: user.createdAt.toISOString(),
-        updatedAt: user.updatedAt?.toISOString()
+        updatedAt: user.updatedAt?.toISOString(),
+        createdAt: user.createdAt?.toISOString(),
     }),
-
-    toDTO: (user: User, view: 'public' | 'private' | 'admin') => {
-        switch(view) {
-            case 'public': return UserMapper.toPublicDTO(user);
-            case 'private': return UserMapper.toPrivateDTO(user);
-            case 'admin': return UserMapper.toAdminDTO(user) as AdminUserDTO;
-        };
-    }
 };

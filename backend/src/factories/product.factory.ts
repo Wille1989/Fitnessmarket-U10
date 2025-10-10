@@ -2,7 +2,6 @@ import { ProductRating } from "../types/product/ProductRating";
 import type { CreateProduct, Product, UpdateProduct } from "../types/product/Products"
 import { NutritionalContentFactory } from "./nutritionalContent.factory";
 
-
 export const ProductFactory = {
 
     create: (data: 

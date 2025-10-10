@@ -1,32 +1,34 @@
 import { Request, Response } from 'express';
 import { UserMapper } from '../mappers/user.mapper';
-import { PrivateUserDTO } from '../types/dto/UserDTO';
+import { AdminUserDTO, PrivateUserDTO } from '../types/dto/UserDTO';
 import { ValidationError, NotFoundError, AppError } from '../classes/ErrorHandling';
+import { AuthenticatedRequest } from '../types/user/UserAuth';
+import { validateUserId, validateUser } from '../validators/user/user.validate';
 import type { ApiResponse } from '../types/ApiResponse';
 import { CreateUserService, 
-        deleteUserService, 
+        deleteOwnAccountService, 
         getUserByIdService,
-        findAllUsersService,
-        findAndUpdateUserService,
+        updateOwnAccountService,
+        deleteUserAccountService,
+        getAllUsersService,
+        UpdateUserByAdmin
         } from '../services/user/user.service';
-import { AuthenticatedRequest } from '../types/user/UserAuth';
-import { validateUserId } from '../validators/user/user.validate';
-import { User } from '../types/user/User';
-
+import { ObjectId } from 'mongodb';
 
 // CREATE USER
-export async function createUser(req: Request, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
+export async function createUser(
+    req: Request, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
     try {
-        const frontendData = req.body;
+        const userData = req.body;
 
-        if(Object.values(frontendData).some(v => v === null || v === undefined || v === '')){
+        if(Object.values(userData).some(v => v === null || v === undefined || v === '')){
             throw new ValidationError('Fälten får inte vara tomma', );
         };
 
-        const newUser = await CreateUserService(frontendData);
+        const newUser = await CreateUserService(userData);
 
         if(!newUser) {
-            throw new NotFoundError('Användaren kunde inte hittas', 404);
+            throw new NotFoundError('Användaren kunde inte hittas');
         };
         const privateDTO = UserMapper.toPrivateDTO(newUser);
 
@@ -51,22 +53,40 @@ export async function createUser(req: Request, res: Response<ApiResponse<Private
     };
 };
 
-// DELETE YOUR OWN ACCOUNT
-export async function deleteUser(req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {   
+// DELETE ACCOUNT
+export async function deleteUser(
+    req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {   
     try {
-        const userID = validateUserId(req.user!.userID);
-        const extractedEmail = req.user?.email;
+        // OWN USER ACCOUNT
+        const userData = req.user!;
+        // Convert userID from string to ObjectId
+        const userID = validateUserId(userData.userID);
 
-        if(!extractedEmail) {
-            throw new ValidationError('Kan inte validera Email för borttagning');
+        if(!userData.email) {
+            throw new ValidationError('Kan inte validera din mailadress')};
+
+        if(userData.role === 'customer'){
+            await deleteOwnAccountService(userID, userData.email);
+            res.status(200).json({ message: `användaren är borttagen!`, data: null });
+            console.log(`Användare ${userData.email} raderade ID(${userID}).`);
+
+        } else if (userData.role === 'admin'){ // access a users account as admin
+            const { _id, email } = req.body.user;
+
+            if(!ObjectId.isValid(_id)){
+                throw new ValidationError('Validering av ID misslyckades')};
+            new ObjectId(String(_id));
+
+            if(!email) {
+                throw new ValidationError('Kan inte validera användarens mail')};
+
+            await deleteUserAccountService(_id, email);
+            res.status(200).json({ message: `användaren med email ${email} är borttagen!`, data: email });
+            console.log(`Användare ${email} raderade ID(${_id}).`);
+        } else {
+            throw new ValidationError('Kontakta admin för borttagning av konto');
         };
-
-        await deleteUserService(userID, extractedEmail);
  
-        res.status(200).json({ message: `användaren är borttagen!`, data: null });
-        console.log(`Användare ${extractedEmail} raderades (${userID}).`);
-        return;
-
     } catch (error) {
         const err = error as AppError;
 
@@ -87,23 +107,27 @@ export async function deleteUser(req: AuthenticatedRequest, res: Response<ApiRes
     };
 };
 
-
 // GET THE USER
-export async function getUserById(req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
-    try {
-        const userID = validateUserId(req.user!.userID);
-        const user = await getUserByIdService(userID);
+export async function getUserById(
+    req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO | AdminUserDTO>>): Promise<void> {
+    try {   
+        // OWN USER ACCOUNT
+        const userData = req.user!;
+        // Convert userID from string to ObjectId
+        const userID = validateUserId(userData.userID);
 
-        if(!user) {
-            throw new NotFoundError('Kunde inte hitta användare');
+        if(userData.role === 'customer' || userData.role === 'sales'){
+            const myUser = await getUserByIdService(userID);
+            const myUserDTO: PrivateUserDTO = UserMapper.toPrivateDTO(myUser);
+
+            res.status(200).json({ message: `retunerar användaren med ID: ${userID}`, data: myUserDTO});
+
+        } else if(userData.role === 'admin'){
+            const user = await getUserByIdService(userID);
+            const userDTO: AdminUserDTO = UserMapper.toAdminDTO(user);
+
+            res.status(200).json({ message: `retunerar användaren: ${userDTO}`, data: userDTO })
         };
-
-        const DTO = UserMapper.toPrivateDTO(user);
-
-        res.status(200).json({ 
-            message: 'Användaren hittades!',
-            data: DTO
-        });
 
     } catch (error) {
         const err = error as AppError;
@@ -124,19 +148,61 @@ export async function getUserById(req: AuthenticatedRequest, res: Response<ApiRe
     };
 };
 
-// GET ALL USERS
-export async function getAllUsers(_req: Request, res: Response<ApiResponse<User[]>>): Promise<void> {
+// UPDATE USER
+export async function updateUser(
+    req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO | AdminUserDTO>>): Promise<void> {
     try {
-        const getAllUsers = await findAllUsersService();
+        // OWN USER ACCOUNT
+        const userData = req.user!;
+        // Convert userID from string to ObjectId
+        const userDataID = validateUserId(userData.userID);
+        
+        if(userData.role === 'customer' || userData.role === 'sales'){
+            const myUser = validateUser(req.body);
+            const response = await updateOwnAccountService(userDataID, myUser);
+            const privateDTO: PrivateUserDTO = UserMapper.toPrivateDTO(response);
 
-        if(getAllUsers.length === 0) {
-            throw new NotFoundError('Inga användare hittades');
+            res.status(200).json({ 
+                message: `Användaren ${privateDTO.name} har uppdaterats!`, data: privateDTO });
+
+        } else if(userData.role === 'admin') {
+            const user = validateUser(req.body);
+            const userID = req.body._id;
+            const response = await UpdateUserByAdmin(userID, user);
+            const adminDTO: AdminUserDTO = UserMapper.toAdminDTO(response);
+
+            res.status(200).json({ 
+                message: `användaren med ID:${adminDTO.name, adminDTO.email}` });
         };
 
-        res.status(200).json({
-            message: `Retunerar ${getAllUsers.length} användare`,
-            data: getAllUsers
+    } catch (error) {
+        const err = error as AppError;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK USER:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
         });
+    };
+};
+
+// GET ALL USERS
+export async function getUsers(
+    req: AuthenticatedRequest, res: Response<ApiResponse<AdminUserDTO[]>>): Promise<void> {
+    try {
+     
+        const users = await getAllUsersService();
+        const adminDTOs: AdminUserDTO[] = users.map(u => UserMapper.toAdminDTO(u));
+
+        res.status(200).json({ message: `retunerar ${adminDTOs}`, data: adminDTOs })
         
     } catch (error) {
         const err = error as AppError;
@@ -154,34 +220,5 @@ export async function getAllUsers(_req: Request, res: Response<ApiResponse<User[
             ? 'Server fel'
             : err.message,
         });
-    };
+    }
 };
-
-// UPDATE USER
-export async function updateUser(req: AuthenticatedRequest, res: Response<ApiResponse<User>>): Promise<void> {
-    try {
-        const userID = validateUserId(req.user!.userID);
-        const frontendData = req.body;
-        const response = await findAndUpdateUserService(userID, frontendData)
-
-        res.status(200).json({ message: 'användaren uppdaterades', data: response });
-
-    } catch (error) {
-        const err = error as AppError;
-
-        if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK USER:');
-            console.error('Name:', err.name);
-            console.error('Message:', err.message);
-            console.error('Status:', err.status);
-            console.error('Stack:', err.stack);
-        };
-
-        res.status(err.status || 500).json({
-            message: process.env.NODE_ENV === 'production'
-            ? 'Server fel'
-            : err.message,
-        });
-    };
-};
-

@@ -1,4 +1,4 @@
-import { CreateUser, User } from "../../types/user/User";
+import { CreateUser } from "../../types/user/User";
 import { NotFoundError, ValidationError } from "../../classes/ErrorHandling"
 import { ObjectId } from "mongodb";
 
@@ -47,7 +47,7 @@ export function validateUser(data: CreateUser): CreateUser {
 export function validateUserId(data: string): ObjectId {
 
     if(!data || !ObjectId.isValid(data)){
-        console.log('ERROR THROWN: VALIDATEUSERID');
+        console.log('ERROR THROWN: VALIDATE USER ID');
         throw new ValidationError('Valideringen misslyckades');
     };
 
