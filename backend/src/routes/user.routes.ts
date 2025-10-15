@@ -4,9 +4,8 @@ import { requireRole, verifyToken } from '../middleware/auth';
 import { 
     deleteUser, 
     getUsers, 
-    getUserById, 
-    updateUserByAdmin,
-    updateOwnAccount,
+    getUserById,
+    updateAccount,
     createUserAsAdmin } 
     from '../controllers/user.controller';
 
@@ -15,12 +14,12 @@ const userRouter: Router = express.Router();
 userRouter.patch('/update/myAccount', 
     verifyToken, 
     requireRole('customer', 'sales', 'admin'), 
-    updateOwnAccount);
+    updateAccount);
 
 userRouter.patch('/update', 
     verifyToken, 
     requireRole('admin'), 
-    updateUserByAdmin);
+    updateAccount);
 
 userRouter.post('/admin/register',
     verifyToken,
