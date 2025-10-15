@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import getDb from "../../lib/mongodb";
-import { ObjectId } from "mongodb";
 import type { CreateUser, User,UpdateUser, UpdateUserByAdmin } from "../../types/user/User";
 import { ConflictError, NotFoundError, ValidationError } from '../../classes/ErrorHandling';
 import { UserFactory } from "../../factories/user.factory";
