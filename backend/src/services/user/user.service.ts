@@ -82,31 +82,42 @@ export async function CreateUserAsAdminService(
 
 // DELETE OWN ACCOUNT (CONFIRMED WORKING WITH INSOMNIA)
 export async function deleteOwnAccountService(
-    userID: ObjectId, data: string): Promise<void> {
+    id: string, userEmail: string): Promise<void> {
+
+    const userID = convertStringToObjectId(id);
+    
     const db = await getDb();
     const userCollection = db.collection<User>('users');
 
-    const response = await userCollection.deleteOne({ _id: userID, email: data });
+    const response = await userCollection.deleteOne({ _id: userID, email: userEmail });
 
     if(response.deletedCount === 0) {
         throw new NotFoundError('Kunde inte ta bort ditt användare konto')};
+
 };
 
 // ADMIN DELETE USER ACCOUNT (CONFIMED WORKING WITH INSOMNIA)
 export async function deleteUserAccountService(
-    userID: ObjectId, email: string): Promise<User | null> {
+    id: string): Promise<User | null> {
+
+    const customerID = convertStringToObjectId(id);
+
     const db = await getDb();
-    const result = await db.collection<User>('users').findOneAndDelete({ _id: userID, email: email });
+
+    const result = await db.collection<User>('users')
+    .findOneAndDelete({ _id: customerID });
 
     if(!result) {
-        throw new NotFoundError('Kunde inte ta bort användaren, ID eller Email matchade ej')};
+        throw new NotFoundError('Kunde inte ta bort användaren')};
 
     return result;
 };
 
 // GET USER (CONFIMED WORKING WITH INSOMNIA)
 export async function getUserByIdService(
-    userID: ObjectId): Promise<User> {
+    id: string): Promise<User> {
+
+    const userID = convertStringToObjectId(id);
 
     const db = await getDb();
     const userCollection = db.collection<User>('users');

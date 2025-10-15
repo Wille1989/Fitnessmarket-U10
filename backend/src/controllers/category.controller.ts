@@ -1,10 +1,8 @@
 import { Request, Response } from 'express';
-import { ObjectId } from 'mongodb';
-import type { ApiResponse } from '../types/ApiResponse';
-import type { Category } from '../types/product/Category';
 import { ValidationError, AppError } from '../classes/ErrorHandling';
 import { AuthenticatedRequest } from '../types/user/UserAuth';
-import { convertStringToObjectId } from '../utils/convertData';
+import type { ApiResponse } from '../types/ApiResponse';
+import type { Category } from '../types/product/Category';
 import { 
     createCategoryService, 
     deleteCategoryService, 
@@ -34,8 +32,6 @@ export async function createCategory(
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK CATEGORY:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -50,30 +46,19 @@ export async function createCategory(
 };
 
 // DELETE CATEGORY
-export async function deleteCategory(req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {
+export async function deleteCategory(
+    req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {
     try {
-        // destrukt id from category object
-        const { _id } = req.body.category;
+        const categoryID = req.params.id;
 
-        // check that string is valid
-        if(!ObjectId.isValid(_id)) {
-            throw new ValidationError('Ogiltligt ID')};
-
-        // convert string to objectId
-        const categoryID = new ObjectId(String(_id));
-
-        // send to service / database
         await deleteCategoryService(categoryID);
 
-        // response with a message
         res.status(200).json({ message: 'Kategorin har tagits bort' });
         
     } catch (error) {
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK CATEGORY:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -94,18 +79,14 @@ export async function updateCategory(
         // Destruct values from category object
         const { category: { _id: categoryID, ...categoryData } } = req.body;
     
-        // Send to database
-        await updateCategoryService(categoryID, categoryData);
+        const result = await updateCategoryService(categoryID, categoryData);
 
-        // the response from database
-        res.status(200).json({ message: 'Kategorin har uppdaterats!' });
+        res.status(200).json({ message: 'Kategorin har uppdaterats!', data: result });
         
     } catch (error) {
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK CATEGORY:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -120,9 +101,10 @@ export async function updateCategory(
 };
 
 // GET A CATEGORY BY ITS ID
-export async function getCategoryById(req: AuthenticatedRequest, res: Response<ApiResponse<Category>>): Promise<void> {
+export async function getCategoryById(
+    req: AuthenticatedRequest, res: Response<ApiResponse<Category>>): Promise<void> {
     try {
-        const categoryID = req.body._id;
+        const categoryID = req.params.id;
 
         // send data to service
         const result = await getCategoryByIdService(categoryID);
@@ -134,8 +116,6 @@ export async function getCategoryById(req: AuthenticatedRequest, res: Response<A
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK CATEGORY:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -162,8 +142,6 @@ export async function getCategory(
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK CATEGORY:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);

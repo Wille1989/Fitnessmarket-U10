@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { ObjectId } from 'mongodb';
+import { AppError, NotFoundError } from '../classes/ErrorHandling';
 import type { ApiResponse } from '../types/ApiResponse';
 import type { Product, ComparedProducts } from '../types/product/Products';
-import { ValidationError, AppError, NotFoundError } from '../classes/ErrorHandling';
 import { AuthenticatedRequest } from '../types/user/UserAuth';
 import { 
     createProductService, 
@@ -13,15 +12,14 @@ import {
     compareProductsService,
     rateProductService } 
     from '../services/product/product.service';
-import { ProductRating } from '../types/product/ProductRating';
 
 // CREATE A PRODUCT
 export async function createProduct(
     req: AuthenticatedRequest, res: Response<ApiResponse<Product>>): Promise<void> {
     try {
-        const fromBody = req.body.product;
+        const product = req.body;
 
-        const newProduct = await createProductService(fromBody);
+        const newProduct = await createProductService(product);
 
         res.status(201).json({ message: 'Produkten har lagts till!', data: newProduct });
 
@@ -29,8 +27,6 @@ export async function createProduct(
         const err = error as any;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK PRODUCTS:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -49,7 +45,7 @@ export async function getProductById(
     req: Request, res: Response<ApiResponse<Product>>): Promise<void> {
 
     try {
-        const productID = req.body._id;    
+        const productID = req.params.id   
 
         const product: Product = await getProductByIdService(productID);
 
@@ -60,8 +56,6 @@ export async function getProductById(
         const err = error as any;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK PRODUCTS:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -75,22 +69,20 @@ export async function getProductById(
     }
 };
 
-// ARRAY OF PRODUCTS
-export async function getArrayOfProducts(
+// ALL PRODUCTS
+export async function getAllProducts(
     _req: Request, res: Response<ApiResponse<Product[]>>): Promise<void> {
     try {
-        // Get response from database
-        const allProducts = await getAllProductsService();
+
+        const products = await getAllProductsService();
 
         res.status(200).json({ 
-            message: `retunerar ${allProducts.length} produkter`, data: allProducts });
+            message: `retunerar ${products.length} produkter`, data: products });
 
     } catch (error){
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK PRODUCTS:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -108,11 +100,9 @@ export async function getArrayOfProducts(
 export async function deleteProduct(
     req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {
     try {
-        // destruct value id from product object
-        const { _id } = req.body;
+        const productID = req.params.id;
 
-        // Call service function
-        await deleteProductService(_id);
+        await deleteProductService(productID);
 
         res.status(200).json({ message: 'Produkten togs bort!' });
 
@@ -120,8 +110,6 @@ export async function deleteProduct(
         const err = error as any;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK PRODUCTS:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -142,16 +130,13 @@ export async function updateProduct(
         const { product: { _id: productID, ...productData } } = req.body;
         const result = await updateProductService(productData, productID);
 
-        console.log('RESULT:', result);
-
         res.status(200).json({ message: 'Produkten har uppdaterats!', data: result })
 
     } catch (error) {
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK PRODUCTS:');
-            console.error('Name:', err.name);
+
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -170,6 +155,7 @@ export async function updateProduct(
 export async function compareProducts(
     req: Request, res: Response<ApiResponse<ComparedProducts>>): Promise<void> {
     try {
+        // Create an array of object
         const { products } = req.body;
 
         const { comparedProducts, comparison } = await compareProductsService(products);
@@ -204,7 +190,9 @@ export async function compareProducts(
 export async function rateProduct(
     req: Request, res: Response<ApiResponse<Product>>): Promise<void> {
     try {
-        const { productRating: { _id: productID, rating: productRating } } = req.body;
+        const product = req.body;
+        const productID = product.id;
+        const productRating = product.productRating;
 
         const response = await rateProductService(productID, productRating);
 

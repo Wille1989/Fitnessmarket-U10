@@ -15,14 +15,24 @@ orderRouter.post('/checkout',
     requireRole('customer', 'admin'), 
     createOrder);
 
-orderRouter.delete('/delete', 
+orderRouter.delete('/delete/:id', 
     verifyToken, 
     requireRole('customer', 'admin'), 
     deleteOrder);
 
+orderRouter.delete('/delete/:id', 
+    verifyToken, 
+    requireRole('admin'), 
+    deleteOrder);
+
 orderRouter.get('/show', 
     verifyToken, 
-    requireRole('customer', 'admin'), 
+    requireRole('customer'), 
+    getOrderByID);
+
+orderRouter.get('/show/:id', 
+    verifyToken, 
+    requireRole('admin'), 
     getOrderByID);
 
 orderRouter.get('/index',

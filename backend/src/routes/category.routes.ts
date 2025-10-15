@@ -15,7 +15,7 @@ catRouter.post('/create',
     requireRole('admin', 'sales'), 
     createCategory);
 
-catRouter.delete('/delete', 
+catRouter.delete('/delete/:id', 
     verifyToken, 
     requireRole('admin', 'sales'), 
     deleteCategory);
@@ -25,7 +25,7 @@ catRouter.patch('/update',
     requireRole('admin', 'sales'),
     updateCategory);
 
-catRouter.get('/show', 
+catRouter.get('/show/:id', 
     verifyToken, 
     requireRole('admin', 'customer', 'sales'), 
     getCategoryById);

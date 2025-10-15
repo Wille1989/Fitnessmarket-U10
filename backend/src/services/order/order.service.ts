@@ -1,50 +1,34 @@
 import getDb from "../../lib/mongodb";
-import { ObjectId } from "mongodb";
-import { Orderfactory } from "../../factories/order.factory";
-import type { 
-    Order,
-    ProductItem
-} from "../../types/product/Order";
 import { convertStringToObjectId } from "../../utils/convertData";
 import { generateOrderNumber } from '../../utils/generateOrderNumber';
-import { NotFoundError, ValidationError } from "../../classes/ErrorHandling";
+import { NotFoundError } from "../../classes/ErrorHandling";
+import { Orderfactory } from "../../factories/order.factory";
+import type { Order, ProductItem } from "../../types/product/Order";
 
-// CREATE ORDER (CONFIRMED WOKRING WITH INSOMNIA) 
+// CREATE ORDER
 export async function createOrderService(id: string, content: ProductItem[] ): Promise<Order> {
     
     const db = await getDb();
-    const orderCollection = db.collection<Order>('orders');
     
     const customerID = convertStringToObjectId(id);
 
-    const newOrderNumber = await generateOrderNumber()
+    const newOrderNumber: Number = await generateOrderNumber()
 
-    console.log('content before factory:', content);
-    console.log('type of content:', Array.isArray(content));
     const newOrder = Orderfactory.create({ content }, customerID, newOrderNumber);
-    
-    const response = await orderCollection.insertOne(newOrder);
+    const response = await db.collection<Order>('orders').insertOne(newOrder);
 
     return { ...newOrder, _id: response.insertedId }
 };
 
 // DELETE ORDER
-export async function deletOrderService(userID: string, orderID: string ) {
+export async function deletOrderService(id: string ) {
 
-    const convertedUserID = convertStringToObjectId(userID);
-    const convertedOrderID = convertStringToObjectId(orderID);
+    const orderID = convertStringToObjectId(id);
 
     const db = await getDb();
 
-    const myUser = db.collection('orders')
-    .findOne(convertedUserID);
-
-    if(!myUser) {
-        throw new NotFoundError('Användaren hittades inte');
-    }
-
     const myOrder = await db.collection('orders')
-    .findOneAndDelete({ costumerID: myUser, _id: convertedOrderID })
+    .findOneAndDelete({ _id: orderID })
 
     if(!myOrder) {
         throw new NotFoundError('Användaren hittades inte');
@@ -59,6 +43,7 @@ export async function deletOrderService(userID: string, orderID: string ) {
 };
 
 export async function deleteOrderByAdminService(costumerID: string, orderID: string) {
+
     const convertedCostumerID = convertStringToObjectId(costumerID);
     const convertedOrderID = convertStringToObjectId(orderID);
 
@@ -99,9 +84,9 @@ export async function getOrderByIdService(userID: string, orderID: string): Prom
 };
 
 // GET ALL ORDERS FOR A USER
-export async function getAllOrdersService(ID: string): Promise<Order[]>{
+export async function getAllOrdersService(id: string): Promise<Order[]>{
 
-    const userID = convertStringToObjectId(ID);
+    const userID = convertStringToObjectId(id);
 
     const db = await getDb();
 

@@ -1,13 +1,13 @@
 import getDb from "../../lib/mongodb";
-import { ObjectId } from "mongodb";
-import { CategoryFactory } from "../../factories/category.factory";
+import { convertStringToObjectId } from '../../utils/convertData';
 import { NotFoundError, ValidationError } from "../../classes/ErrorHandling";
 import { validateCategory } from "../../validators/product/category.validate";
+import { CategoryFactory } from "../../factories/category.factory";
 import type { Category } from "../../types/product/Category";
-import { convertStringToObjectId } from '../../utils/convertData';
 
-// CREATE A CATEGORY (CONFIRMED WORKING WITH INSOMNIA)
-export async function createCategoryService(categoryData: Category): Promise<Category> {
+// CREATE A CATEGORY
+export async function createCategoryService(
+    categoryData: Category): Promise<Category> {
     
     const db = await getDb();
     const categoryCollection = db.collection<Category>('categories');
@@ -34,11 +34,14 @@ export async function createCategoryService(categoryData: Category): Promise<Cat
     return { _id: result.insertedId, ...newCategory  }
 };
 
-// DELETE A CATEGORY (CONFIRMED WORKING WITH INSOMNIA)
-export async function deleteCategoryService(id: ObjectId) {
+// DELETE A CATEGORY
+export async function deleteCategoryService(
+    id: string) {
+
+    const categoryID = convertStringToObjectId(id);
 
     const db = await getDb();
-    const response = await db.collection('categories').deleteOne({ _id: id });;
+    const response = await db.collection('categories').deleteOne({ _id: categoryID });;
 
     if(response.deletedCount === 0) {
         throw new NotFoundError('Dokumentet kunde inte tas bort');
@@ -47,8 +50,9 @@ export async function deleteCategoryService(id: ObjectId) {
     return response;
 };
 
-// UPDATE A CATEGORY (CONFIRMED WORKING WITH INSOMNIA)
-export async function updateCategoryService(categoryID: string, categoryData: Category): Promise<Category> {
+// UPDATE A CATEGORY
+export async function updateCategoryService(
+    categoryID: string, categoryData: Category): Promise<Category> {
 
     const validatedCategoryID = convertStringToObjectId(categoryID);
     const validatedData = await validateCategory(categoryData);
@@ -69,8 +73,9 @@ export async function updateCategoryService(categoryID: string, categoryData: Ca
     return result;
 };
 
-// GET A CATEGORY BY ITS ID (CONFIRMED WORKING WITH INSOMNIA)
-export async function getCategoryByIdService(id: string): Promise<Category> {
+// GET A CATEGORY BY ITS ID
+export async function getCategoryByIdService(
+    id: string): Promise<Category> {
 
     const categoryID = convertStringToObjectId(id);
 
@@ -86,7 +91,7 @@ export async function getCategoryByIdService(id: string): Promise<Category> {
     return response;
 };
 
-// GET ALL CATEGORIES IN DATABASE (CONFIRMED WORKING WITH INSOMNIA)
+// GET ALL CATEGORIES IN DATABASE
 export async function getAllCategoriesService(): Promise<Category[]> {
 
     const db = await getDb();

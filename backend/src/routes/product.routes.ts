@@ -5,7 +5,7 @@ import {
     compareProducts,
     createProduct, 
     deleteProduct, 
-    getArrayOfProducts, 
+    getAllProducts, 
     getProductById, 
     updateProduct,
     rateProduct } from '../controllers/product.controller';
@@ -13,7 +13,7 @@ import {
 const productRouter: Router = express.Router();
 
 productRouter.get('/index', 
-    getArrayOfProducts);
+    getAllProducts);
 
 productRouter.get('/show', 
     getProductById)
@@ -23,7 +23,7 @@ productRouter.post('/new',
     requireRole('admin', 'sales'), 
     createProduct);
 
-productRouter.delete('/delete', 
+productRouter.delete('/delete/:id', 
     verifyToken, 
     requireRole('admin', 'sales'), 
     deleteProduct);

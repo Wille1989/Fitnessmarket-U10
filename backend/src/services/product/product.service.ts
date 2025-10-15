@@ -1,53 +1,42 @@
 import getDb from "../../lib/mongodb";
 import { ObjectId } from "mongodb";
-import { ProductFactory } from "../../factories/product.factory";
-import { validateProduct } from "../../validators/product/product.validate";
-import type { 
-    CreateProduct, 
-    Product 
-} from "../../types/product/Products";
-import { NotFoundError, ValidationError } from "../../classes/ErrorHandling";
-import { NutritionalContent } from "../../types/product/NutritionalContent";
-import { ProductRating } from "../../types/product/ProductRating";
 import { convertStringToObjectId } from '../../utils/convertData';
+import { validateProduct } from "../../validators/product/product.validate";
+import { ProductFactory } from "../../factories/product.factory";
 import { ProductRatingFactory } from "../../factories/productRating.factory";
+import { NotFoundError, ValidationError } from "../../classes/ErrorHandling";
+import type { CreateProduct, Product } from "../../types/product/Products";
+import type { NutritionalContent } from "../../types/product/NutritionalContent";
+import type { ProductRating } from "../../types/product/ProductRating";
 
-// CREATE PRODUCT (CONFIRMED WORKING WITH INSOMNIA)
+// CREATE PRODUCT
 export async function createProductService(
-    fromBody: CreateProduct): Promise<Product> {
+    product: CreateProduct): Promise<Product> {
 
     const db = await getDb();
-    const productCollection = db.collection<Product>('products');
-
-    // Validate the product
-    const validatedProduct = await validateProduct(fromBody);
+    const validatedProduct = await validateProduct(product);
+    
     const rating: ProductRating = {
         average: 0,
         sum: 0,
         totalRatings: 0
     };
     
-    // Create object
-    const product = ProductFactory.create(validatedProduct, rating);
+    const createProduct = ProductFactory.create(validatedProduct, rating);
+    const newProduct = await db.collection<Product>('products').insertOne(createProduct); 
 
-    // send to database
-    const newProduct = await productCollection.insertOne(product); 
-
-    // inlucde the object id
-    return { ...product, _id: newProduct.insertedId };
+    return { ...createProduct, _id: newProduct.insertedId };
 
 };
 
-// SPECIFIC PRODUCT ON ID (CONFIRMED WORKING WITH INSOMNIA)
+// SPECIFIC PRODUCT ON ID
 export async function getProductByIdService(
     id: string): Promise<Product> {
 
-    const validatedProductID = convertStringToObjectId(id);
-
     const db = await getDb();
-    const productCollection = db.collection<Product>('products');
 
-    const getProductById = await productCollection.findOne({ _id: validatedProductID });
+    const productID = convertStringToObjectId(id);
+    const getProductById = await db.collection<Product>('products').findOne({ _id: productID });
 
     if(!getProductById) {
         throw new Error('Kan inte hitta produkten');
@@ -56,29 +45,26 @@ export async function getProductByIdService(
     return getProductById;
 };
 
-// ALL PRODUCTS (CONFIRMED WORKING WITH INSOMNIA)
+// ALL PRODUCTS
 export async function getAllProductsService(): Promise<Product[]> {
 
     const db = await getDb();
-    const productCollection = db.collection<Product>('products');
+    const products = db.collection<Product>('products').find({}).toArray();
 
-    const allProducts = productCollection.find({}).toArray();
-
-    if(!allProducts) {
+    if(!products) {
         throw new Error('Kunde inte hitta array of products');
     };
 
-    return allProducts;
+    return products;
 };
 
-// DELETE A PRODUCT (CONFIRMED WORKING WITH INSOMNIA)
+// DELETE A PRODUCT
 export async function deleteProductService(id: string) {
 
-    const validatedProductID = convertStringToObjectId(id)
-
     const db = await getDb();
-    const productCollection = db.collection<Product>('products');
-    const response = await productCollection.deleteOne({ _id: validatedProductID });
+
+    const productID = convertStringToObjectId(id);
+    const response = await db.collection<Product>('products').deleteOne({ _id: productID });
 
     if(response.deletedCount === 0){
         throw new NotFoundError('Produkten togs inte bort');
@@ -87,22 +73,16 @@ export async function deleteProductService(id: string) {
     return response;
 };
 
-// UPDATE PRODUCT (CONFIRMED WORKING WITH INSOMNIA)
+// UPDATE PRODUCT
 export async function updateProductService(
     productData: Product, id: string): Promise<Product> {
 
-    const productID = convertStringToObjectId(id);
-
     const db = await getDb();
-    const productCollection = db.collection<Product>('products');
 
-    // Validate the product changes
+    const productID = convertStringToObjectId(id);
     const validatedProduct = await validateProduct(productData);
 
-    console.log('👉 Innehåll i validatedProduct:', validatedProduct);
-    console.log('👉 Uppdaterar produkt med ID:', productID);
-
-    const response = await productCollection.findOneAndUpdate(
+    const response = await db.collection<Product>('products').findOneAndUpdate(
         { _id: productID }, 
         { $set: validatedProduct }, 
         { returnDocument: 'after' } 
@@ -115,7 +95,7 @@ export async function updateProductService(
     return response;
 };
 
-// COMPARE PRODUCTS (CONFIRMED WORKING WITH INSOMNIA)
+// COMPARE PRODUCTS
 export async function compareProductsService(productIDs: string[] ) {
 
     if(!productIDs || productIDs.length === 0) {
@@ -160,7 +140,7 @@ export async function compareProductsService(productIDs: string[] ) {
     };
 };
 
-// PRODUCT RATING (CONFIRMED WORKING WITH INSOMNIA)
+// PRODUCT RATING
 export async function rateProductService(
     id: string, ratingValue: string): Promise<Product>{
 

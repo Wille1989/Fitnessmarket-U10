@@ -1,9 +1,9 @@
-import type { User } from '../../types/user/User';
-import { validateUser } from '../../validators/user/user.validate';
-import { NotFoundError } from '../../classes/ErrorHandling';
 import getDb from '../../lib/mongodb';
 import jwt from 'jsonwebtoken';
 import { jwtConfig } from '../../config/jwt.config';
+import { validateUser } from '../../validators/user/user.validate';
+import { NotFoundError } from '../../classes/ErrorHandling';
+import type { User } from '../../types/user/User';
 
 // LOG IN USER
 export async function loginUserService(data: User): Promise<{ user: User, token: string }> {
@@ -11,7 +11,9 @@ export async function loginUserService(data: User): Promise<{ user: User, token:
     validateUser(data);
 
     const db = await getDb();
-    const existingUser = await db.collection<User>('users').findOne({ email: data.email });
+    const existingUser = await db.collection<User>('users')
+    .findOne({ email: data.email });
+
     const secret: string = jwtConfig.secret;
 
     if(!existingUser) {

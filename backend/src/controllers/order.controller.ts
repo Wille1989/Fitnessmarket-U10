@@ -1,6 +1,8 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { ValidationError, AppError } from '../classes/ErrorHandling';
 import type { ApiResponse } from "../types/ApiResponse";
 import type { Order } from "../types/product/Order";
+import type { AuthenticatedRequest } from '../types/user/UserAuth';
 import { 
     createOrderService,
     deletOrderService, 
@@ -8,9 +10,6 @@ import {
     getAllOrdersService,
     deleteOrderByAdminService
 } from '../services/order/order.service';
-import { AuthenticatedRequest } from '../types/user/UserAuth';
-import { ValidationError } from '../classes/ErrorHandling';
-import { AppError } from '../classes/ErrorHandling';
 
 // CREATE ORDER
 export async function createOrder(
@@ -36,8 +35,6 @@ export async function createOrder(
         const err = error as AppError;
         
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK ORDER:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -55,33 +52,29 @@ export async function createOrder(
 export async function deleteOrder(
     req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> { 
     try {
-        const userRole = req.user!.role;
-        const orderID = req.body.order;
+        const user = req.user;
+        
+        if(user?.role === 'admin') {
+            const customerOrderID = req.params.id;
+            const customerID = req.body;
 
-        if(userRole === 'admin') {
-            const costumerID = req.body.user;
+            await deleteOrderByAdminService(customerOrderID, customerID);
 
-            await deleteOrderByAdminService(costumerID, orderID);
+            res.status(200).json({ message: 'Tog bort kundens order', data: null });
 
-            res.status(200).json({ message: 'Tog bort kundens order!', data: null });
+        } else if (user?.role === 'customer'){
+            const orderID = req.params.id;
 
-        } else if (userRole === 'costumer'){
-            const costumerID = req.body._id;
-            const userID = req.user!.userID;
-            const userName = req.body.name;
-
-            await deletOrderService(userID, costumerID);
+            await deletOrderService(orderID);
 
             res.status(200).json({ 
-                message: `${userName.name}, din order har tagits bort`, data: null });
+                message: `din order har tagits bort`, data: null });
         }
         
     } catch (error) {
         const err = error as AppError;
         
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK ORDER:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -95,16 +88,15 @@ export async function deleteOrder(
     };
 };
 
-// GET ORDER OR ORDERS
+// GET ORDER BY ID
 export async function getOrderByID(
     req: AuthenticatedRequest, res: Response<ApiResponse<Order>>): Promise<void> {
     try {
         const user = req.user;
-        const order = req.body;
 
         if(user?.role === 'costumer'){
             const userID = user.userID;
-            const orderID = order.orderID;
+            const orderID = req.params.id;
 
             const result = await getOrderByIdService(userID, orderID);
 
@@ -113,7 +105,7 @@ export async function getOrderByID(
 
         } else if (user?.role === 'admin'){
             const costumerID = req.body.id;
-            const orderID = order.orderID;
+            const orderID = req.body.orderID;
 
             const result = await getOrderByIdService(costumerID, orderID);
 
@@ -127,8 +119,6 @@ export async function getOrderByID(
         const err = error as AppError;
         
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK ORDER:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -142,6 +132,7 @@ export async function getOrderByID(
     };
 };
 
+// GET ALL ORDERS FOR A USER
 export async function getAllOrders(
     req: AuthenticatedRequest, res: Response<ApiResponse<Order[]>>): Promise<void> {
         try {
@@ -167,8 +158,6 @@ export async function getAllOrders(
             const err = error as AppError;
         
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK ORDER:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
