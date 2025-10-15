@@ -25,3 +25,11 @@ export class ConflictError extends Error {
         this.status = status;
     }
 }
+
+export class AuthorizationError extends Error {
+    status: number;
+    constructor(message: string, status = 401) {
+        super(message);
+        this.status = status;
+    }
+}

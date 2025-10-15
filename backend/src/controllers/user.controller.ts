@@ -1,43 +1,33 @@
 import { Request, Response } from 'express';
 import { UserMapper } from '../mappers/user.mapper';
-import { PrivateUserDTO } from '../types/dto/UserDTO';
-import { ValidationError, NotFoundError, AppError } from '../classes/ErrorHandling';
+import type { AdminUserDTO, PrivateUserDTO } from '../types/dto/UserDTO';
+import type { AuthenticatedRequest } from '../types/user/UserAuth';
 import type { ApiResponse } from '../types/ApiResponse';
+import { AppError, AuthorizationError } from '../classes/ErrorHandling';
 import { CreateUserService, 
-        deleteUserService, 
+        deleteOwnAccountService, 
         getUserByIdService,
-        findAllUsersService,
-        findAndUpdateUserService,
+        updateOwnAccountService,
+        deleteUserAccountService,
+        getAllUsersService,
+        UpdateUserByAdmin,
+        CreateUserAsAdminService
         } from '../services/user/user.service';
-import { AuthenticatedRequest } from '../types/user/UserAuth';
-import { validateUserId } from '../validators/user/user.validate';
-import { User } from '../types/user/User';
-
 
 // CREATE USER
-export async function createUser(req: Request, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
+export async function createUser(
+    req: Request, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
     try {
-        const frontendData = req.body;
+        const userData = req.body;
+        const newUser = await CreateUserService(userData);
+        const filteredData = UserMapper.toPrivateDTO(newUser);
 
-        if(Object.values(frontendData).some(v => v === null || v === undefined || v === '')){
-            throw new ValidationError('Fälten får inte vara tomma', );
-        };
-
-        const newUser = await CreateUserService(frontendData);
-
-        if(!newUser) {
-            throw new NotFoundError('Användaren kunde inte hittas', 404);
-        };
-        const privateDTO = UserMapper.toPrivateDTO(newUser);
-
-        res.status(201).json({ data: privateDTO });
+        res.status(201).json({ message: 'Ny användare har skapats!', data: filteredData });
         
     } catch (error) {
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK USER:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -51,28 +41,73 @@ export async function createUser(req: Request, res: Response<ApiResponse<Private
     };
 };
 
-// DELETE YOUR OWN ACCOUNT
-export async function deleteUser(req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {   
+// CREATE USER AS ADMIN
+export async function createUserAsAdmin(
+    req: AuthenticatedRequest, res: Response<ApiResponse<AdminUserDTO>>): Promise<void> {
     try {
-        const userID = validateUserId(req.user!.userID);
-        const extractedEmail = req.user?.email;
+        const user = req.user;
+        const data = req.body;
 
-        if(!extractedEmail) {
-            throw new ValidationError('Kan inte validera Email för borttagning');
+        if(user?.role === 'admin'){
+            const userData = data.user;
+
+        const newUser = await CreateUserAsAdminService(userData);
+
+        const adminDTO = UserMapper.toAdminDTO(newUser);
+
+        res.status(201).json({ data: adminDTO });
+
+        } else {
+            throw new AuthorizationError('Du har inte behörighet för detta');
+        };
+        
+    } catch (error) {
+        const err = error as AppError;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
         };
 
-        await deleteUserService(userID, extractedEmail);
- 
-        res.status(200).json({ message: `användaren är borttagen!`, data: null });
-        console.log(`Användare ${extractedEmail} raderades (${userID}).`);
-        return;
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
+    };
+};
+
+// DELETE ACCOUNT
+export async function deleteUser(
+    req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {   
+    try {
+        const user = req.user;
+        const customer = req.params.id;
+
+        if(user?.role === 'customer'){
+            const userID = user.userID;
+            const userEmail = user.email;
+
+            await deleteOwnAccountService(userID, userEmail);
+
+            res.status(200).json({ message: `Du har tagit bort ditt konto!`, data: null });
+
+        } else if (user?.role === 'admin'){ // access a users account as admin
+            const customerID = customer;
+            
+            await deleteUserAccountService(customerID);
+
+            res.status(200).json({ 
+                message: `användaren med ID: ${customerID} är borttagen!`, data: null });
+        } else {
+            throw new AuthorizationError('Kontakta admin för borttagning av konto');
+        };
 
     } catch (error) {
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK USER:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -87,23 +122,32 @@ export async function deleteUser(req: AuthenticatedRequest, res: Response<ApiRes
     };
 };
 
-
 // GET THE USER
-export async function getUserById(req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
-    try {
-        const userID = validateUserId(req.user!.userID);
-        const user = await getUserByIdService(userID);
+export async function getUserById(
+    req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO | AdminUserDTO>>): Promise<void> {
+    try {   
+        const user = req.user;
 
-        if(!user) {
-            throw new NotFoundError('Kunde inte hitta användare');
-        };
+        if(user?.role === 'customer' || user?.role === 'sales'){
+            const userID = user.userID;
 
-        const DTO = UserMapper.toPrivateDTO(user);
+            const myUser = await getUserByIdService(userID);
 
-        res.status(200).json({ 
-            message: 'Användaren hittades!',
-            data: DTO
-        });
+            const filteredData: PrivateUserDTO = UserMapper.toPrivateDTO(myUser);
+
+            res.status(200).json({ message: `retunerar användaren:`, data: filteredData});
+
+        } else if(user?.role === 'admin'){
+            const customerID = req.params.id;
+
+            const customerData = await getUserByIdService(customerID);
+
+            const filteredAdminData: AdminUserDTO = UserMapper.toAdminDTO(customerData);
+
+            res.status(200).json({ message: `Användaren som Admin begärde`, data: filteredAdminData })
+        } else {
+            throw new AuthorizationError('Du saknar behörighet för att utföra detta');
+        }
 
     } catch (error) {
         const err = error as AppError;
@@ -124,26 +168,71 @@ export async function getUserById(req: AuthenticatedRequest, res: Response<ApiRe
     };
 };
 
-// GET ALL USERS
-export async function getAllUsers(_req: Request, res: Response<ApiResponse<User[]>>): Promise<void> {
+// UPDATE ACCOUNT
+export async function updateAccount(
+    req:AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO | AdminUserDTO>>): Promise<void>{
     try {
-        const getAllUsers = await findAllUsersService();
+        const user = req.user;
+        const data = req.body;
 
-        if(getAllUsers.length === 0) {
-            throw new NotFoundError('Inga användare hittades');
+    if(user?.role === 'customer' || user?.role === 'sales'){
+        const userID = user.userID;
+        const userData = data.changes;
+
+        const updatedData = await updateOwnAccountService(userID, userData);
+
+        const filteredData: PrivateUserDTO = UserMapper.toPrivateDTO(updatedData); 
+
+        res.status(200).json(({ 
+            message: 'Dina uppgifter har uppdaterats!', data: filteredData }));
+
+    } else if (user?.role === 'admin') {
+        const customerID = user.userID;
+        const customerData = data.changes;
+
+        const updatedData = await UpdateUserByAdmin(customerID, customerData);
+
+        const filteredAdminData: AdminUserDTO = UserMapper.toAdminDTO(updatedData);
+
+        res.status(200).json({ message: 'Användarens konto har uppdaterats', data: filteredAdminData });
+
+    } else {
+        throw new AuthorizationError('Du har inte behörighet att göra detta');
+    }
+    } catch (error) {
+        const err = error as AppError;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
         };
 
-        res.status(200).json({
-            message: `Retunerar ${getAllUsers.length} användare`,
-            data: getAllUsers
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
         });
+    }
+};
+
+// GET ALL USERS
+export async function getUsers(
+    _req: AuthenticatedRequest, res: Response<ApiResponse<AdminUserDTO[]>>): Promise<void> {
+    try {
+     
+        const users = await getAllUsersService();
+        const names = users.map(u => u.name);
+        const count = users.length;
+
+        res.status(200).json({ 
+            message: `retunerar ${count} användare: ${names}`, 
+            data: users });
         
     } catch (error) {
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK USER:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -154,34 +243,5 @@ export async function getAllUsers(_req: Request, res: Response<ApiResponse<User[
             ? 'Server fel'
             : err.message,
         });
-    };
+    }
 };
-
-// UPDATE USER
-export async function updateUser(req: AuthenticatedRequest, res: Response<ApiResponse<User>>): Promise<void> {
-    try {
-        const userID = validateUserId(req.user!.userID);
-        const frontendData = req.body;
-        const response = await findAndUpdateUserService(userID, frontendData)
-
-        res.status(200).json({ message: 'användaren uppdaterades', data: response });
-
-    } catch (error) {
-        const err = error as AppError;
-
-        if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK USER:');
-            console.error('Name:', err.name);
-            console.error('Message:', err.message);
-            console.error('Status:', err.status);
-            console.error('Stack:', err.stack);
-        };
-
-        res.status(err.status || 500).json({
-            message: process.env.NODE_ENV === 'production'
-            ? 'Server fel'
-            : err.message,
-        });
-    };
-};
-

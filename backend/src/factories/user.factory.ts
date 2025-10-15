@@ -1,37 +1,33 @@
 import { UserRole } from "../types/enums/UserRole";
-import type { CreateUser, UpdateUser, UpdateUserByAdmin } from "../types/user/User";
+import type { CreateUser, UpdateUser, UpdateUserByAdmin, User } from "../types/user/User";
 
 export const UserFactory = {   
 
-    create: (input: CreateUser ): CreateUser => {
+    create: (data: CreateUser, createdByAdmin = false ): User => {
         return {
-
-            name: input.name || 'Användare',
-            password: input.password,
-            email: input.email,
+            name: data.name || 'Användare',
+            password: data.password,
+            email: data.email,
+            createdByAdmin, 
             role: UserRole.customer,
             createdAt: new Date()
-
         }
     },
 
-    update: (changes: UpdateUser ): UpdateUser => {
+    update: (current: User, changes: UpdateUser ): User => {
         return {
-
+            ...current,
             ...changes,
             updatedAt: new Date()
-
         }
     },
 
-    updateByAdmin: (changes: UpdateUserByAdmin): UpdateUserByAdmin => {
+    updateByAdmin: (current: User, changes: UpdateUserByAdmin): User => {
         return {
-
+            ...current,
             ...changes,
             role: UserRole.customer || UserRole.sales || UserRole.admin,
             updatedAt: new Date()
-
         }
     }
-
 };

@@ -1,21 +1,20 @@
 import getDb from "../../lib/mongodb";
-import { ObjectId } from "mongodb";
-import { CategoryFactory } from "../../factories/category.factory";
+import { convertStringToObjectId } from '../../utils/convertData';
 import { NotFoundError, ValidationError } from "../../classes/ErrorHandling";
 import { validateCategory } from "../../validators/product/category.validate";
+import { CategoryFactory } from "../../factories/category.factory";
 import type { Category } from "../../types/product/Category";
 
 // CREATE A CATEGORY
-export async function createCategoryService(title: string, description: string): Promise<Category> {
-    // call database function
+export async function createCategoryService(
+    categoryData: Category): Promise<Category> {
+    
     const db = await getDb();
-
-    // define the collection
     const categoryCollection = db.collection<Category>('categories');
 
     // Validate category inputs
     const { title: validTitle, description: validDescription } = 
-    await validateCategory(title, description);
+    await validateCategory(categoryData);
 
     // Check if the titel already exists in database
     const existingCategory = await categoryCollection.findOne({ title: validTitle });
@@ -36,32 +35,33 @@ export async function createCategoryService(title: string, description: string):
 };
 
 // DELETE A CATEGORY
-export async function deleteCategoryService(id: ObjectId) {
-    // call database connection
+export async function deleteCategoryService(
+    id: string) {
+
+    const categoryID = convertStringToObjectId(id);
+
     const db = await getDb();
+    const response = await db.collection('categories').deleteOne({ _id: categoryID });;
 
-    // access collection and delete based on objectID
-    const response = await db.collection('categories').deleteOne({ _id: id });;
-
-    // check response from database has removed atleast one document
     if(response.deletedCount === 0) {
         throw new NotFoundError('Dokumentet kunde inte tas bort');
     };
 
-    // return response to controller
     return response;
 };
 
 // UPDATE A CATEGORY
-export async function updateCategoryService(id: ObjectId, title: string, description: string): Promise<Category> {
+export async function updateCategoryService(
+    categoryID: string, categoryData: Category): Promise<Category> {
+
+    const validatedCategoryID = convertStringToObjectId(categoryID);
+    const validatedData = await validateCategory(categoryData);
 
     const db = await getDb();
     const categoryCollection = db.collection<Category>('categories');
 
-    const validatedData = await validateCategory(title, description);
-
     const result = await categoryCollection.findOneAndUpdate(
-        { _id: id },
+        { _id: validatedCategoryID },
         { $set: validatedData },
         { returnDocument: 'after' }
     );
@@ -74,12 +74,15 @@ export async function updateCategoryService(id: ObjectId, title: string, descrip
 };
 
 // GET A CATEGORY BY ITS ID
-export async function getCategoryByIdService( id: ObjectId ): Promise<Category> {
+export async function getCategoryByIdService(
+    id: string): Promise<Category> {
+
+    const categoryID = convertStringToObjectId(id);
 
     const db = await getDb();
     const categoryCollection = db.collection<Category>('categories');
 
-    const response = await categoryCollection.findOne(id);
+    const response = await categoryCollection.findOne(categoryID);
 
     if(!response) {
         throw new NotFoundError('Kunde inte hitta kategorin');

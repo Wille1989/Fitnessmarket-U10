@@ -9,6 +9,7 @@ import userRouter from './routes/user.routes';
 import authRouter from './routes/auth.routes';
 import catRouter from './routes/category.routes';
 import orderRouter from './routes/order.routes';
+import productRouter from './routes/product.routes';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/user', userRouter);
 app.use('/auth', authRouter);
 app.use('/cat', catRouter);
 app.use('/order', orderRouter);
+app.use('/product', productRouter);
 
 app.get('/health', (_req: Request, res: Response): Response => {
     return res.status(200).json ({

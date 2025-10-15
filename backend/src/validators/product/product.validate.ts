@@ -1,25 +1,20 @@
-import type { CreateProduct, Product } from "../../types/product/Products";
+import type { CreateProduct } from "../../types/product/Products";
 import { validateNutritionalContent } from "./nutritionalContent.validate";
 import { ValidationError } from "../../classes/ErrorHandling";
 
-export async function validateProduct(productData: CreateProduct): Promise<Product> {
+export async function validateProduct(productData: CreateProduct): Promise<CreateProduct> {
 
     // Validate the object of nutritional content
     validateNutritionalContent(productData.nutritionalContent);
-
-    if(productData.customerGroup.length > 20) {
-        throw new ValidationError('fältet konsumentgrupp innehåller för många tecken');
-    };
 
     if(productData.originCountry.length > 25) {
         throw new ValidationError('fältet ursprungsland innehåller för många tecken');
     };
 
     // Ensure no special values are allowed
-    const inputRegex = /^[a-zA-Z0-9\s]+$/;
+    const inputRegex = /^[a-öA-Ö0-9\s]+$/;
     if(!inputRegex.test(
-        productData.originCountry && 
-        productData.customerGroup && 
+        productData.originCountry &&
         productData.title)) {
         throw new ValidationError('fälten innehåller otillåtna tecken');
     };
@@ -31,11 +26,7 @@ export async function validateProduct(productData: CreateProduct): Promise<Produ
     if(productData.weight <= 0) {
         throw new ValidationError('vikten måste vara ett positivt tal');
     };
-
-    if(productData.pricePerKilo != Math.round(productData.price / productData.weight * 1000)){
-        throw new ValidationError('Pris per kilo stämmer inte, granska din indata');
-    };
-
+   
     return productData;
 
 };

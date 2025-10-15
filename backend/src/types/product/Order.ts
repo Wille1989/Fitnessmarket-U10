@@ -4,17 +4,16 @@ import { ObjectId } from "mongodb"
 export type Order = {
     _id?: ObjectId
     customerID: ObjectId
-    orderNumber: OrderNumberCounter
+    orderNumber: Number
     content: ProductItem[]
-    createdAt: Date
+    sumOfOrder: Number
+    createdAt?: Date
     updatedAt?: Date
-
 }
 
 // CREATE
 export type CreateOrder = {
     content: ProductItem[]
-    createdAt: Date
 }
 
 // PRODUCT ITEM
@@ -22,9 +21,5 @@ export type ProductItem = {
     productID: ObjectId
     quantity: number
     price: number
-}
-
-export type OrderNumberCounter = {
-    currentOrderNumber: number
-    newOrderNumber: number
+    title: string
 }
