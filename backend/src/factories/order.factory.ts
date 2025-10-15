@@ -1,18 +1,19 @@
-import { ObjectId } from "mongodb"
-import type { CreateOrder, Order, OrderNumberCounter, ProductItem } from "../types/product/Order"
+import type { Order, CreateOrder } from "../types/product/Order"
+import { ObjectId } from "mongodb";
 
 export const Orderfactory = {
 
-    create: (input: { 
-        customerID: ObjectId
-        orderNumber: OrderNumberCounter
-        content: ProductItem[]
-        createdAt: Date
-        } ): Order => {
+    create: (data: CreateOrder, customerID: ObjectId, orderNumber: Number ): Order => {
+        
+        const sumOfOrder = data.content.reduce((total, item) => {
+            return total + item.price * item.quantity;
+        },0 );
+
         return {
-            customerID: input.customerID,
-            orderNumber: input.orderNumber,
-            content: input.content,
+            sumOfOrder: sumOfOrder,
+            customerID: customerID,
+            orderNumber: orderNumber,
+            content: data.content,
             createdAt: new Date()
         }
     },

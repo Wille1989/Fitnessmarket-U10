@@ -1,13 +1,45 @@
 import express from 'express';
 import { Router } from "express";
-import { deleteUser, getAllUsers, getUserById, updateUser } from '../controllers/user.controller';
 import { requireRole, verifyToken } from '../middleware/auth';
+import { 
+    deleteUser, 
+    getUsers, 
+    getUserById, 
+    updateUserByAdmin,
+    updateOwnAccount,
+    createUserAsAdmin } 
+    from '../controllers/user.controller';
 
 const userRouter: Router = express.Router();
 
-userRouter.patch('/update', verifyToken, requireRole('customer', 'admin'), updateUser);
-userRouter.delete('/delete', verifyToken, requireRole('customer', 'admin'), deleteUser);
-userRouter.get('/all', verifyToken, requireRole('admin'), getAllUsers);
-userRouter.get('/:id', verifyToken, requireRole('customer', 'admin'), getUserById);
+userRouter.patch('/update/myAccount', 
+    verifyToken, 
+    requireRole('customer', 'sales', 'admin'), 
+    updateOwnAccount);
+
+userRouter.patch('/update', 
+    verifyToken, 
+    requireRole('admin'), 
+    updateUserByAdmin);
+
+userRouter.post('/admin/register',
+    verifyToken,
+    requireRole('admin'),
+    createUserAsAdmin);
+
+userRouter.delete('/delete', 
+    verifyToken, 
+    requireRole('customer', 'sales', 'admin'), 
+    deleteUser);
+
+userRouter.get('/all', 
+    verifyToken, 
+    requireRole('admin'), 
+    getUsers);
+
+userRouter.get('/show', 
+    verifyToken, 
+    requireRole('customer', 'sales', 'admin'), 
+    getUserById);
 
 export default userRouter;

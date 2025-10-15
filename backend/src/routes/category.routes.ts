@@ -10,12 +10,12 @@ import {
 
 const catRouter: Router = express.Router();
 
-catRouter.post('/new', 
+catRouter.post('/create', 
     verifyToken, 
     requireRole('admin', 'sales'), 
     createCategory);
 
-catRouter.delete('/delete', 
+catRouter.delete('/delete/:id', 
     verifyToken, 
     requireRole('admin', 'sales'), 
     deleteCategory);

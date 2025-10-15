@@ -1,35 +1,29 @@
+import { ProductRating } from "../types/product/ProductRating";
 import type { CreateProduct, Product, UpdateProduct } from "../types/product/Products"
-import { CategoryFactory } from "./category.factory"
-import { NutritionalContentFactory } from "./nutritionalContent.factory"
-import { ProductRatingFactory } from "./ProductRating.factory";
-
+import { NutritionalContentFactory } from "./nutritionalContent.factory";
 
 export const ProductFactory = {
 
-    create: (input: CreateProduct): Product => {
+    create: (fromBody: CreateProduct, rating: ProductRating
+        ): Product => {
+            return {         
+                title: fromBody.title,
+                price: fromBody.price,
+                weight: fromBody.weight,
+                originCountry: fromBody.originCountry,
+                category: fromBody.category,
+                nutritionalContent: NutritionalContentFactory.create(
+                    fromBody.nutritionalContent),
+                rating: rating,
+                createdAt: new Date(),    
+            }
+        },
+
+    update: (current: Product, changes: UpdateProduct): Product => {
         return {
-            
-            title: input.title || '',
-            price: input.price || 0,
-            pricePerKilo: input.pricePerKilo || 0,
-            weight: input.weight || 0,
-            originCountry: input.originCountry || 'okänd',
-            customerGroup: input.customerGroup || 'alla',
-            rating: ProductRatingFactory.create(input.rating),
-            category: CategoryFactory.create(input.category),
-            nutritionalContent: NutritionalContentFactory.create(input.nutritionalContent),
-            createdAt: new Date(),
-
-        }
-    },
-
-    update: (changes: UpdateProduct): UpdateProduct => {
-        return {
-
+            ...current,
             ...changes,
             updatedAt: new Date,
-            
         }
     },
-
 };
