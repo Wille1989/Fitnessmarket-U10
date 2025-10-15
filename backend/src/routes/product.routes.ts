@@ -2,18 +2,20 @@ import express from 'express';
 import { Router } from 'express';
 import { requireRole, verifyToken } from '../middleware/auth';
 import { 
+    compareProducts,
     createProduct, 
     deleteProduct, 
     getArrayOfProducts, 
     getProductById, 
-    updateProduct } from '../controllers/product.controller';
+    updateProduct,
+    rateProduct } from '../controllers/product.controller';
 
 const productRouter: Router = express.Router();
 
 productRouter.get('/index', 
     getArrayOfProducts);
 
-productRouter.get('/show/:id', 
+productRouter.get('/show', 
     getProductById)
 
 productRouter.post('/new', 
@@ -31,10 +33,10 @@ productRouter.patch('/update',
     requireRole('admin', 'sales'), 
     updateProduct);
 
-/*// ADMIN ROUTES
-productRouter.get('/all/admin', 
-verifyToken, 
-requireRole('admin', 'sales'), 
-getProduct);*/
+productRouter.get('/compare',
+    compareProducts);
+
+productRouter.post('/rate',
+    rateProduct);
 
 export default productRouter;

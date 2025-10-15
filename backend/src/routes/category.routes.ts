@@ -10,7 +10,7 @@ import {
 
 const catRouter: Router = express.Router();
 
-catRouter.post('/new', 
+catRouter.post('/create', 
     verifyToken, 
     requireRole('admin', 'sales'), 
     createCategory);
@@ -25,7 +25,7 @@ catRouter.patch('/update',
     requireRole('admin', 'sales'),
     updateCategory);
 
-catRouter.get('/show/:id', 
+catRouter.get('/show', 
     verifyToken, 
     requireRole('admin', 'customer', 'sales'), 
     getCategoryById);

@@ -5,16 +5,27 @@ import {
     deleteUser, 
     getUsers, 
     getUserById, 
-    updateUser } 
+    updateUserByAdmin,
+    updateOwnAccount,
+    createUserAsAdmin } 
     from '../controllers/user.controller';
-
 
 const userRouter: Router = express.Router();
 
-userRouter.patch('/update', 
+userRouter.patch('/update/myAccount', 
     verifyToken, 
     requireRole('customer', 'sales', 'admin'), 
-    updateUser);
+    updateOwnAccount);
+
+userRouter.patch('/update', 
+    verifyToken, 
+    requireRole('admin'), 
+    updateUserByAdmin);
+
+userRouter.post('/admin/register',
+    verifyToken,
+    requireRole('admin'),
+    createUserAsAdmin);
 
 userRouter.delete('/delete', 
     verifyToken, 

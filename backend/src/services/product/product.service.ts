@@ -6,11 +6,13 @@ import type {
     CreateProduct, 
     Product 
 } from "../../types/product/Products";
-import { NotFoundError } from "../../classes/ErrorHandling";
+import { NotFoundError, ValidationError } from "../../classes/ErrorHandling";
 import { NutritionalContent } from "../../types/product/NutritionalContent";
 import { ProductRating } from "../../types/product/ProductRating";
+import { convertStringToObjectId } from '../../utils/convertData';
+import { ProductRatingFactory } from "../../factories/productRating.factory";
 
-// CREATE PRODUCT
+// CREATE PRODUCT (CONFIRMED WORKING WITH INSOMNIA)
 export async function createProductService(
     fromBody: CreateProduct): Promise<Product> {
 
@@ -18,15 +20,15 @@ export async function createProductService(
     const productCollection = db.collection<Product>('products');
 
     // Validate the product
-    validateProduct(fromBody);
+    const validatedProduct = await validateProduct(fromBody);
     const rating: ProductRating = {
         average: 0,
         sum: 0,
         totalRatings: 0
     };
-
+    
     // Create object
-    const product = ProductFactory.create(fromBody, rating);
+    const product = ProductFactory.create(validatedProduct, rating);
 
     // send to database
     const newProduct = await productCollection.insertOne(product); 
@@ -36,14 +38,16 @@ export async function createProductService(
 
 };
 
-// SPECIFIC PRODUCT ON ID
+// SPECIFIC PRODUCT ON ID (CONFIRMED WORKING WITH INSOMNIA)
 export async function getProductByIdService(
-    id: ObjectId): Promise<Product> {
+    id: string): Promise<Product> {
+
+    const validatedProductID = convertStringToObjectId(id);
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
 
-    const getProductById = await productCollection.findOne({ _id: id });
+    const getProductById = await productCollection.findOne({ _id: validatedProductID });
 
     if(!getProductById) {
         throw new Error('Kan inte hitta produkten');
@@ -52,7 +56,7 @@ export async function getProductByIdService(
     return getProductById;
 };
 
-// ALL PRODUCTS
+// ALL PRODUCTS (CONFIRMED WORKING WITH INSOMNIA)
 export async function getAllProductsService(): Promise<Product[]> {
 
     const db = await getDb();
@@ -67,13 +71,14 @@ export async function getAllProductsService(): Promise<Product[]> {
     return allProducts;
 };
 
-// DELETE A PRODUCT
-export async function deleteProductService(
-    id: ObjectId) {
+// DELETE A PRODUCT (CONFIRMED WORKING WITH INSOMNIA)
+export async function deleteProductService(id: string) {
+
+    const validatedProductID = convertStringToObjectId(id)
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
-    const response = await productCollection.deleteOne({ _id: id });
+    const response = await productCollection.deleteOne({ _id: validatedProductID });
 
     if(response.deletedCount === 0){
         throw new NotFoundError('Produkten togs inte bort');
@@ -82,38 +87,51 @@ export async function deleteProductService(
     return response;
 };
 
-// UPDATE PRODUCT
+// UPDATE PRODUCT (CONFIRMED WORKING WITH INSOMNIA)
 export async function updateProductService(
-    formBody: Product, id: ObjectId): Promise<Product> {
+    productData: Product, id: string): Promise<Product> {
+
+    const productID = convertStringToObjectId(id);
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
 
     // Validate the product changes
-    const validatedProduct = await validateProduct(formBody);
+    const validatedProduct = await validateProduct(productData);
+
+    console.log('👉 Innehåll i validatedProduct:', validatedProduct);
+    console.log('👉 Uppdaterar produkt med ID:', productID);
 
     const response = await productCollection.findOneAndUpdate(
-        { _id: id }, // filter
-        { $set: validatedProduct }, // update
-        { returnDocument: 'after' } // options
+        { _id: productID }, 
+        { $set: validatedProduct }, 
+        { returnDocument: 'after' } 
     );
 
     if(!response) {
-        throw new Error('Kunde inte uppdatera produkten')
+        throw new Error(`Kunde inte uppdatera produkten`)
     };
 
     return response;
 };
 
-// COMPARE PRODUCTS
-export async function compareProductsService(
-    productIDs: string[] ) {
+// COMPARE PRODUCTS (CONFIRMED WORKING WITH INSOMNIA)
+export async function compareProductsService(productIDs: string[] ) {
+
+    if(!productIDs || productIDs.length === 0) {
+        throw new NotFoundError('Välj två produkter att jämföra mellan');
+    };
+
+    if(!productIDs.every(id => ObjectId.isValid(id))){
+        throw new ValidationError('Minst ett ID bedöms vara ogiltligt');
+    }
 
     const db = await getDb();
     const productCollection = db.collection<Product>('products');
 
     const products = await productCollection.find(
-        { _id: { $in: productIDs.map(id => new ObjectId(id)) } }).toArray();
+        { _id: { $in: productIDs.map(id => new ObjectId(id)) } })
+        .toArray();
 
     if(products.length !== 2) {
         throw new NotFoundError(`Kunde inte jämföra, hittade ${products.length}`);
@@ -142,32 +160,34 @@ export async function compareProductsService(
     };
 };
 
-// PRODUCT RATING
+// PRODUCT RATING (CONFIRMED WORKING WITH INSOMNIA)
 export async function rateProductService(
-    id: ObjectId, ratingValue: number): Promise<Product>{
+    id: string, ratingValue: string): Promise<Product>{
+
+    const productID = convertStringToObjectId(id);
+
+    const RatingValueAsNumeric = Number(ratingValue);
+    if(isNaN(RatingValueAsNumeric)){
+        throw new ValidationError('Betygsformatet är ogiltligt');
+    };
 
     const db = await getDb();
-    const product = await db.collection<Product>('products').findOne({ _id: id });
+    const product = await db.collection<Product>('products').findOne({ _id: productID });
 
     if(!product) {
         throw new NotFoundError('Kunde inte hämta produkten');
     };
 
-    const newSum = product.rating.sum + ratingValue;
-    const newTotal = product.rating.totalRatings +1;
-
-    const newAverage = newSum / newTotal;
-
-    const updateProductRating = await db.collection<Product>('products').
+    const updatedProduct = await db.collection<Product>('products').
         findOneAndUpdate(
-            { _id: id }, 
-            { $set: { 'rating.sum': newSum, 'rating.totalRatings': newTotal, 'rating.average': newAverage } }, 
-            { returnDocument:'after' }
+            { _id: productID }, 
+            { $set: { rating: ProductRatingFactory.update(product.rating, RatingValueAsNumeric) } }, 
+            { returnDocument:'after' },
         );
 
-    if(!updateProductRating) {
+    if(!updatedProduct) {
         throw new NotFoundError('Produkten kunde inte uppdateras');
     };
 
-    return updateProductRating;
+    return updatedProduct;
 };

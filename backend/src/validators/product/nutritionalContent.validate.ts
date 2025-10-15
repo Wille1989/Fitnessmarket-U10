@@ -1,9 +1,9 @@
-import { CreateNutritionalContent, NutritionalContent } from "../../types/product/NutritionalContent";
+import { NutritionalContent } from "../../types/product/NutritionalContent";
 import { ValidationError } from "../../classes/ErrorHandling";
 
-export async function validateNutritionalContent(productData: CreateNutritionalContent): Promise<NutritionalContent> {
+export async function validateNutritionalContent(productData: NutritionalContent): Promise<NutritionalContent> {
 
-    if(!Object.values(productData).some(value => !value))
+    if(Object.values(productData).some(value => !value))
         {
             throw new Error('alla fält måste vara ifyllda');
         };
@@ -16,7 +16,7 @@ export async function validateNutritionalContent(productData: CreateNutritionalC
         String(productData.energy)
     ];
 
-    const onlyDigits = /^[0-9]+$/;
+    const onlyDigits = /^[0-9]+(\.[0-9]+)?$/;
 
     for(const value of inputValues) {
         if(!onlyDigits.test(value)) {
@@ -48,6 +48,5 @@ export async function validateNutritionalContent(productData: CreateNutritionalC
         throw new ValidationError(`${productData.salt} kan endast innehålla positiva värden`);
     };
 
-
     return productData;
-}
+};

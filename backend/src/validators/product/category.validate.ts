@@ -1,10 +1,10 @@
 import { Category } from "../../types/product/Category";
 import { ValidationError } from "../../classes/ErrorHandling";
 
-export async function validateCategory(title: string, description: string): Promise<Category> {
+export async function validateCategory(categoryData: Category): Promise<Category> {
 
-    const trimmedTitle = title.trim();
-    const trimmedDescription = description.trim();
+    const trimmedTitle = categoryData.title.trim();
+    const trimmedDescription = categoryData.description.trim();
 
     if(trimmedTitle.length >= 30) {
         throw new ValidationError('Titeln är för lång, max 30 tecken');
@@ -19,5 +19,8 @@ export async function validateCategory(title: string, description: string): Prom
         throw new ValidationError('inputfält innehåller otillåtna tecken');
     };
 
-    return { title: trimmedTitle, description: trimmedDescription };
+    const safeTitle = trimmedTitle;
+    const safeDescription = trimmedDescription;
+
+    return { title: safeTitle, description: safeDescription };
 };

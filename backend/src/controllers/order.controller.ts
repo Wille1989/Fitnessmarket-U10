@@ -5,11 +5,10 @@ import {
     createOrderService,
     deletOrderService, 
     getOrderByIdService,
-    getOrdersForUserService,
+    getAllOrdersService,
+    deleteOrderByAdminService
 } from '../services/order/order.service';
-import { ObjectId } from 'mongodb';
 import { AuthenticatedRequest } from '../types/user/UserAuth';
-import { validateUserId } from '../validators/user/user.validate';
 import { ValidationError } from '../classes/ErrorHandling';
 import { AppError } from '../classes/ErrorHandling';
 
@@ -17,23 +16,21 @@ import { AppError } from '../classes/ErrorHandling';
 export async function createOrder(
     req: AuthenticatedRequest, res: Response<ApiResponse<Order>>): Promise<void>{
     try {
-        // User validation with Token, 
-        // store userID for connection between order and user
-        const customerID = validateUserId(req.user!.userID);
+        const costumerRole = req.user!.role; 
 
-        // grab the entire order object from frontend
-        const orderData = req.body.order;
+        if(costumerRole === 'sales'){
+            throw new ValidationError('Endast admin och customer kan lägga en order');
 
-        // Check that inputs contains value
-        if(Object.values(orderData).some(v => v === null || v === undefined || v === '')){
-            res.status(400).json({ message: 'Valideringsfel, något fält är tomt' });
-            return;
-        };
+        } else if (costumerRole === 'admin' || costumerRole === 'customer'){   
 
-        // Sending the userID and the order object to service
-        const result = await createOrderService(customerID, orderData, orderData.orderNumberCounter);
+            // grab the entire order object sent from frontend
+            const { content } = req.body;
+            const customerID = req.user!.userID
+            // Sending the userID and the order object to service
+            const result = await createOrderService(customerID, content);
 
-        res.status(201).json({ message: 'Ordern har skapats' });
+            res.status(201).json({ message: 'Ordern har skapats', data: result });
+        }
 
     } catch (error) {
         const err = error as AppError;
@@ -58,18 +55,26 @@ export async function createOrder(
 export async function deleteOrder(
     req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> { 
     try {
-        const customerID = validateUserId(req.user!.userID);
-        const { _id } = req.body.order;
+        const userRole = req.user!.role;
+        const orderID = req.body.order;
 
-        if(!ObjectId.isValid(_id)) {
-        throw new Error('Kunde inte verifiera ID');
-        };
+        if(userRole === 'admin') {
+            const costumerID = req.body.user;
 
-        const orderID = new ObjectId(String(_id));
+            await deleteOrderByAdminService(costumerID, orderID);
 
-        await deletOrderService(customerID, orderID);
+            res.status(200).json({ message: 'Tog bort kundens order!', data: null });
 
-        res.status(200).json({ message: 'Ordern har tagits bort' });
+        } else if (userRole === 'costumer'){
+            const costumerID = req.body._id;
+            const userID = req.user!.userID;
+            const userName = req.body.name;
+
+            await deletOrderService(userID, costumerID);
+
+            res.status(200).json({ 
+                message: `${userName.name}, din order har tagits bort`, data: null });
+        }
         
     } catch (error) {
         const err = error as AppError;
@@ -94,20 +99,29 @@ export async function deleteOrder(
 export async function getOrderByID(
     req: AuthenticatedRequest, res: Response<ApiResponse<Order>>): Promise<void> {
     try {
-        const customerID = validateUserId(req.user!.userID);
-        const { _id } = req.body.order;
+        const user = req.user;
+        const order = req.body;
 
-        if(!ObjectId.isValid(_id)){
-            throw new ValidationError('Orderns ID är inte giltig');
-        };
+        if(user?.role === 'costumer'){
+            const userID = user.userID;
+            const orderID = order.orderID;
 
-        const orderID = new ObjectId(String(_id));
+            const result = await getOrderByIdService(userID, orderID);
 
-        const order = await getOrderByIdService(customerID, orderID);
+            res.status(200).json({ 
+                message: `order:${result.orderNumber} hittades och retuneras`, data: result });
 
-        res.status(200).json({ 
-            message: `order med ID:${orderID} hämtad`, 
-            data: order });
+        } else if (user?.role === 'admin'){
+            const costumerID = req.body.id;
+            const orderID = order.orderID;
+
+            const result = await getOrderByIdService(costumerID, orderID);
+
+            res.status(200).json(({ 
+                message: `order:${result.orderNumber} för kund ID:${result.customerID} hittades och retuneras`,
+                data: result }));
+        }
+  
   
     } catch (error) {
         const err = error as AppError;
@@ -128,20 +142,26 @@ export async function getOrderByID(
     };
 };
 
-export async function getOrdersForUser(
+export async function getAllOrders(
     req: AuthenticatedRequest, res: Response<ApiResponse<Order[]>>): Promise<void> {
         try {
-            const customerID = validateUserId(req.user!.userID);
-            const order = req.body.order;
-            
-            if(!ObjectId.isValid(order._id)){
-                throw new ValidationError('Orderns ID är inte giltig')};
+            const user = req.user;
+            const customer = req.body;
 
-            const orderID = new ObjectId(String(order._id));
+            if(user?.role === 'customer'){
+                const userID = user.userID;
 
-            const orders = await getOrdersForUserService(orderID, customerID);
+                const result = await getAllOrdersService(userID);
 
-            res.status(200).json({ message: `${orders.length} ordrar retunerades!`, data: orders });
+                res.status(200).json({ message: `Du har ${result.length} ordrar:`, data: result });
+
+            } else if(user?.role === 'admin'){
+                const customerID = customer.userID;
+
+                const result = await getAllOrdersService(customerID);
+
+                res.status(200).json({ message: `Kund har ${result.length} ordrar:`, data: result });
+            };          
 
         } catch (error) {
             const err = error as AppError;
@@ -159,5 +179,5 @@ export async function getOrdersForUser(
             ? 'Server fel'
             : err.message,
         });
-        }
+    }
 }

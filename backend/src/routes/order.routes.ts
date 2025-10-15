@@ -4,7 +4,7 @@ import {
     createOrder,
     deleteOrder,
     getOrderByID,
-    getOrdersForUser,
+    getAllOrders,
 } from '../controllers/order.controller';
 import { requireRole, verifyToken } from '../middleware/auth';
 
@@ -15,12 +15,12 @@ orderRouter.post('/checkout',
     requireRole('customer', 'admin'), 
     createOrder);
 
-orderRouter.delete('/delete/:id', 
+orderRouter.delete('/delete', 
     verifyToken, 
     requireRole('customer', 'admin'), 
     deleteOrder);
 
-orderRouter.get('/show/:id', 
+orderRouter.get('/show', 
     verifyToken, 
     requireRole('customer', 'admin'), 
     getOrderByID);
@@ -28,12 +28,6 @@ orderRouter.get('/show/:id',
 orderRouter.get('/index',
     verifyToken,
     requireRole('customer'),
-    getOrdersForUser);
-
-/* ADMIN SPECIFIK ROUTES
-orderRouter.get('/admin/order/all', 
-    verifyToken, 
-    requireRole('admin'), 
-    getOrder);*/
+    getAllOrders);
 
 export default orderRouter;

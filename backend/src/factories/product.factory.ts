@@ -9,7 +9,6 @@ export const ProductFactory = {
             return {         
                 title: fromBody.title,
                 price: fromBody.price,
-                pricePerKilo: fromBody.pricePerKilo,
                 weight: fromBody.weight,
                 originCountry: fromBody.originCountry,
                 category: fromBody.category,

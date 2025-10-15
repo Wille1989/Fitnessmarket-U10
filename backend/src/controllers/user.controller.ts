@@ -3,15 +3,16 @@ import { UserMapper } from '../mappers/user.mapper';
 import { AdminUserDTO, PrivateUserDTO } from '../types/dto/UserDTO';
 import { ValidationError, NotFoundError, AppError } from '../classes/ErrorHandling';
 import { AuthenticatedRequest } from '../types/user/UserAuth';
-import { validateUserId, validateUser } from '../validators/user/user.validate';
 import type { ApiResponse } from '../types/ApiResponse';
+import { convertStringToObjectId } from '../utils/convertData';
 import { CreateUserService, 
         deleteOwnAccountService, 
         getUserByIdService,
         updateOwnAccountService,
         deleteUserAccountService,
         getAllUsersService,
-        UpdateUserByAdmin
+        UpdateUserByAdmin,
+        CreateUserAsAdminService
         } from '../services/user/user.service';
 import { ObjectId } from 'mongodb';
 
@@ -53,6 +54,48 @@ export async function createUser(
     };
 };
 
+// CREATE USER AS ADMIN
+export async function createUserAsAdmin(
+    req: AuthenticatedRequest, res: Response<ApiResponse<AdminUserDTO>>): Promise<void> {
+    try {
+        const userDataRole = req.user!.role;
+        if(userDataRole === 'admin'){
+            const userData = req.body;
+
+            if(Object.values(userData).some(v => v === null || v === undefined || v === '')){
+            throw new ValidationError('Fälten får inte vara tomma', );
+        };
+
+        const newUser = await CreateUserAsAdminService(userData);
+
+        if(!newUser) {
+            throw new NotFoundError('Kan inte matcha och retunera användaren');
+        };
+        const adminDTO = UserMapper.toAdminDTO(newUser);
+
+        res.status(201).json({ data: adminDTO });
+
+        };
+        
+    } catch (error) {
+        const err = error as AppError;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('ERROR STACK USER:');
+            console.error('Name:', err.name);
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
+    };
+};
+
 // DELETE ACCOUNT
 export async function deleteUser(
     req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {   
@@ -60,7 +103,7 @@ export async function deleteUser(
         // OWN USER ACCOUNT
         const userData = req.user!;
         // Convert userID from string to ObjectId
-        const userID = validateUserId(userData.userID);
+        const userID = convertStringToObjectId(userData.userID);
 
         if(!userData.email) {
             throw new ValidationError('Kan inte validera din mailadress')};
@@ -75,12 +118,12 @@ export async function deleteUser(
 
             if(!ObjectId.isValid(_id)){
                 throw new ValidationError('Validering av ID misslyckades')};
-            new ObjectId(String(_id));
+            const userID = new ObjectId(String(_id));
 
             if(!email) {
                 throw new ValidationError('Kan inte validera användarens mail')};
 
-            await deleteUserAccountService(_id, email);
+            await deleteUserAccountService(userID, email);
             res.status(200).json({ message: `användaren med email ${email} är borttagen!`, data: email });
             console.log(`Användare ${email} raderade ID(${_id}).`);
         } else {
@@ -114,19 +157,25 @@ export async function getUserById(
         // OWN USER ACCOUNT
         const userData = req.user!;
         // Convert userID from string to ObjectId
-        const userID = validateUserId(userData.userID);
+        const userID = convertStringToObjectId(userData.userID);
+        
 
         if(userData.role === 'customer' || userData.role === 'sales'){
             const myUser = await getUserByIdService(userID);
             const myUserDTO: PrivateUserDTO = UserMapper.toPrivateDTO(myUser);
 
-            res.status(200).json({ message: `retunerar användaren med ID: ${userID}`, data: myUserDTO});
+            res.status(200).json({ message: `retunerar användaren:`, data: myUserDTO});
 
         } else if(userData.role === 'admin'){
-            const user = await getUserByIdService(userID);
+            const { _id } = req.body;
+            if(!ObjectId.isValid(_id)){
+                throw new ValidationError('Kunde inte validera ID sträng');
+            }
+            const theUserID = new ObjectId(String(_id));
+            const user = await getUserByIdService(theUserID);
             const userDTO: AdminUserDTO = UserMapper.toAdminDTO(user);
 
-            res.status(200).json({ message: `retunerar användaren: ${userDTO}`, data: userDTO })
+            res.status(200).json({ message: `Användaren som Admin begärde`, data: userDTO })
         };
 
     } catch (error) {
@@ -148,32 +197,39 @@ export async function getUserById(
     };
 };
 
-// UPDATE USER
-export async function updateUser(
-    req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO | AdminUserDTO>>): Promise<void> {
+// UPDATE OWN ACCOUNT
+export async function updateOwnAccount(
+    req:AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void>{
+
+    const userDataID = req.user!.userID;
+    const userData = req.body;
+    const updatedUserData = await updateOwnAccountService(userDataID, userData);
+
+    res.status(200).json({
+        message: `Användaren ${updatedUserData.name}`,
+        data: updatedUserData
+    });
+};
+
+// UPDATE USER AS ADMIN
+export async function updateUserByAdmin(
+    req: AuthenticatedRequest, res: Response<ApiResponse<AdminUserDTO>>): Promise<void> {
     try {
-        // OWN USER ACCOUNT
         const userData = req.user!;
-        // Convert userID from string to ObjectId
-        const userDataID = validateUserId(userData.userID);
-        
-        if(userData.role === 'customer' || userData.role === 'sales'){
-            const myUser = validateUser(req.body);
-            const response = await updateOwnAccountService(userDataID, myUser);
-            const privateDTO: PrivateUserDTO = UserMapper.toPrivateDTO(response);
 
-            res.status(200).json({ 
-                message: `Användaren ${privateDTO.name} har uppdaterats!`, data: privateDTO });
-
-        } else if(userData.role === 'admin') {
-            const user = validateUser(req.body);
-            const userID = req.body._id;
-            const response = await UpdateUserByAdmin(userID, user);
+        if(userData.role === 'admin'){
+            const { user } = req.body;
+            const userAccountID = user._id;
+            const userAccountData = { ...user };
+            
+            const response = await UpdateUserByAdmin(userAccountID, userAccountData);
             const adminDTO: AdminUserDTO = UserMapper.toAdminDTO(response);
 
-            res.status(200).json({ 
-                message: `användaren med ID:${adminDTO.name, adminDTO.email}` });
-        };
+            res.status(200).json({
+                message: `Användaren: ${adminDTO.name} har uppdaterats!`,
+                data: adminDTO
+            });
+        }
 
     } catch (error) {
         const err = error as AppError;
@@ -196,13 +252,16 @@ export async function updateUser(
 
 // GET ALL USERS
 export async function getUsers(
-    req: AuthenticatedRequest, res: Response<ApiResponse<AdminUserDTO[]>>): Promise<void> {
+    _req: AuthenticatedRequest, res: Response<ApiResponse<AdminUserDTO[]>>): Promise<void> {
     try {
      
-        const users = await getAllUsersService();
-        const adminDTOs: AdminUserDTO[] = users.map(u => UserMapper.toAdminDTO(u));
+        const adminDTOs = await getAllUsersService();
+        const names = adminDTOs.map(u => u.name);
+        const count = adminDTOs.length;
 
-        res.status(200).json({ message: `retunerar ${adminDTOs}`, data: adminDTOs })
+        res.status(200).json({ 
+            message: `retunerar ${count} användare: ${names}`, 
+            data: adminDTOs });
         
     } catch (error) {
         const err = error as AppError;

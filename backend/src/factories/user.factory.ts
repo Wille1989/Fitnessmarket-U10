@@ -3,11 +3,12 @@ import type { CreateUser, UpdateUser, UpdateUserByAdmin, User } from "../types/u
 
 export const UserFactory = {   
 
-    create: (data: CreateUser ): User => {
+    create: (data: CreateUser, createdByAdmin = false ): User => {
         return {
             name: data.name || 'Användare',
             password: data.password,
             email: data.email,
+            createdByAdmin, 
             role: UserRole.customer,
             createdAt: new Date()
         }

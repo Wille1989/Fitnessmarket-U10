@@ -5,9 +5,9 @@ import type { AuthenticatedRequest } from '../types/user/UserAuth';
 import { AppError, ValidationError } from '../classes/ErrorHandling';
 import { loginUserService } from '../services/user/auth.service';
 import { UserMapper } from '../mappers/user.mapper';
-import { validateUserId } from '../validators/user/user.validate';
+import { convertStringToObjectId } from '../utils/convertData';
 
-// LOG IN 
+// LOG IN (CONFIRMED WORKING WITH INSOMNIA)
 export async function loginUser(req: Request, res: Response<ApiResponse<LoginPayload>>): Promise<void> {
 
     try {
@@ -43,11 +43,9 @@ export async function loginUser(req: Request, res: Response<ApiResponse<LoginPay
     }
 };
 
-// LOG OUT
-export async function logoutUser(req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {
+// LOG OUT (CONFIRMED WORKING WITH INSOMNIA)
+export async function logoutUser(_req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {
     try {
-        // User valdiation for userID
-        validateUserId(req.user!.userID);
 
         res.status(200).json({ message: 'du är utloggad!', data: null });
 

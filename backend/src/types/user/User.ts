@@ -4,6 +4,7 @@ import { UserRole } from "../enums/UserRole"
 // MAIN OBJECT USER
 export type User = {
     _id?: ObjectId
+    createdByAdmin: boolean
     createdAt?: Date
     updatedAt?: Date
     role: UserRole

@@ -9,7 +9,6 @@ export type Product = {
     _id?: ObjectId
     title: string
     price: number
-    pricePerKilo: number
     weight: number
     originCountry: string
     rating: ProductRating
@@ -24,7 +23,6 @@ export type CreateProduct = {
     
     title: string
     price: number
-    pricePerKilo: number
     weight: number
     originCountry: string
     category: Category
@@ -37,7 +35,6 @@ export type UpdateProduct = Partial<{
     _id?: ObjectId
     title: string
     price: number
-    pricePerKilo: number
     weight: number
     originCountry: string
     rating: ProductRating
