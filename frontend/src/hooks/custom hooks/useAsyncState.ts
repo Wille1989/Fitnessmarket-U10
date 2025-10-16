@@ -4,13 +4,13 @@ export function useAsyncState< T >() {
 
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [errorMes, setErrorMes] = useState<string | null>(null);
-    const [successMes, setSuccessMes] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     return { 
         data, setData, 
         loading, setLoading, 
-        errorMes, setErrorMes, 
-        successMes, setSuccessMes 
+        errorMessage, setErrorMessage, 
+        successMessage, setSuccessMessage 
     };
 };

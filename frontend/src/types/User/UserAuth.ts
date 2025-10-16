@@ -1,6 +1,6 @@
 import type { User } from "./User"
 
-export type Logindata = {
+export type LoginData = {
     email: string
     password: string
 }
