@@ -3,12 +3,10 @@ import type { User, CreateUser } from "../types/User/User";
 
 export const userApi = {
 
-    registerProfile: async (data: CreateUser): Promise<User> => {
-        const result = await api.post<User>(`/user/$id`, data);
+    register: async (data: CreateUser): Promise<User> => {
+        const result = await api.post<User>(`/auth/register`, data);
 
         return result.data;
-    },
-
-    
+    },  
 
 }

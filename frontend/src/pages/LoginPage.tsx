@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Alert } from "../components/alert/Alert";
+import { useNavigate } from "react-router-dom";
 import '../css/message.css';
 
 function LoginPage() {
     const { login, loading, successMessage, errorMessage } = useAuth();
+    const navigate = useNavigate();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
-    async function handleSubmit(e: React.FormEvent ) {
-        e.preventDefault;
-        await login({ email, password })
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        if(await login({ email, password })) navigate('/profile')
+
     }
 
     return (
