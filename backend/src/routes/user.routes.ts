@@ -16,7 +16,7 @@ userRouter.patch('/update/myAccount',
     requireRole('customer', 'sales', 'admin'), 
     updateAccount);
 
-userRouter.patch('/update', 
+userRouter.patch('/update/userAccount', 
     verifyToken, 
     requireRole('admin'), 
     updateAccount);

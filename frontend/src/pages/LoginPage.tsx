@@ -1,19 +1,42 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Alert } from "../components/alert/Alert";
-import { useNavigate } from "react-router-dom";
+import { getDecodedToken } from "../middleware/JwtDecode";
 import '../css/message.css';
 
 function LoginPage() {
     const { login, loading, successMessage, errorMessage } = useAuth();
-    const navigate = useNavigate();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [decodeError, setDecodeError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if(await login({ email, password })) navigate('/profile')
+        const success = (await login({ email, password }))
 
+            await new Promise((resolve) => setTimeout(resolve, 800))
+
+            if(success) {
+                const decoded = getDecodedToken();
+
+                if(!decoded) {
+                    setDecodeError('Kunde inte läsa token');
+                    return;
+                }
+
+                if(decoded.role === 'customer'){
+                    navigate('/profile')
+
+                } else if (decoded.role === 'admin'){
+                    navigate('/admin')
+
+                } else if(decoded.role === 'sales'){
+                    navigate('/sales')
+                }
+            }
+                 
     }
 
     return (
@@ -37,10 +60,13 @@ function LoginPage() {
                 disabled={loading}>{ loading ? 'Loggar in' : 'Logga in' }
                 </button>
 
-                { successMessage && <Alert type="success" message={successMessage} />}
-                { errorMessage && <Alert type="error" message={errorMessage} />}
-
+                
             </form>
+
+            { successMessage && <Alert type="success" message={successMessage} />}
+            { errorMessage && <Alert type="error" message={errorMessage} />}
+            { decodeError && <Alert type="error" message={decodeError} /> }
+
         </div>
     )
 

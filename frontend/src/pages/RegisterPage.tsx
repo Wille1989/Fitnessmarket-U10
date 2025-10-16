@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../hooks/useUser';
+import { useUserManager } from '../hooks/useUserManager';
 import { Alert } from '../components/alert/Alert';
 
 function RegisterPage() {
-    const { register, loading, errorMessage, successMessage } = useUser();
+    const { register, loading, errorMessage, successMessage } = useUserManager();
         const [email, setEmail] = useState<string>('');
         const [password, setPassword] = useState<string>('');
         const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -62,6 +62,7 @@ function RegisterPage() {
             { successMessage && <Alert type='success' message={successMessage}/> }
             { errorMessage && <Alert type='error' message={errorMessage}/> }
             { formError && <Alert type='error' message={formError}/> }
+            
         </div>
     )
 }
