@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUserManager } from '../hooks/useUserManager';
 import { Alert } from '../components/alert/Alert';
+import { useMessage } from '../context/MessageProvider';
+import { useUserManager } from '../hooks/useUserManager';
 
 function Register() {
-    const { register, loading, errorMessage, successMessage } = useUserManager();
+        // GLOBAL STATE
+        const { formSuccess, setFormSuccess, formError, setFormError, successMessage, errorMessage } = useMessage();
+        const { loading, register } = useUserManager();
+
+        // LOCAL STATE
         const [email, setEmail] = useState<string>('');
         const [password, setPassword] = useState<string>('');
         const [confirmPassword, setConfirmPassword] = useState<string>('');
-        const [formError, setFormError] = useState<string | null>(null);
-        const [formSuccess, setFormSuccess] = useState<string | null>(null);
         const navigate = useNavigate();
 
         async function handleSubmit(e: React.FormEvent) {

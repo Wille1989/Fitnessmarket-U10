@@ -1,16 +1,14 @@
-import { useAsyncState } from "./custom hooks/useAsyncState";
 import type { User } from "../types/User/User";
 import { adminApi } from "../api/adminApi";
 import { useState } from "react";
+import { useMessage } from "../context/MessageProvider";
 
 export function useAdminMangagement() {
-    const { 
-            data: userAccount , setData: setUserAccount, loading, setLoading,
-            errorMessage, setErrorMessage, successMessage, setSuccessMessage,
-            resetState } = useAsyncState<User>();
-
-            const [arrayError, setArrayError] = useState<string | null>(null);
-            const [userList, setUserList] = useState<User[] | null>(null);
+    const { setSuccessMessage, setErrorMessage, 
+            setArrayErrorMessage, setArraySuccessMessage } = useMessage();
+    const [userAccount, setUserAccount] = useState<User | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [userList, setUserList] = useState<User[] | null>(null);
 
     // DELETE A USER ACCOUNT
     async function deleteUserAccount(userAccount: User) {
@@ -23,17 +21,13 @@ export function useAdminMangagement() {
             }
             await adminApi.deleteUserAccount(userAccount);
 
-            setUserAccount(null);
             setSuccessMessage('Användaren har tagits bort');
-            await new Promise((resolve) => setTimeout(resolve,800));
-
-            resetState();
+            setTimeout(() => setUserAccount(null), 1500);
             return true;
             
         } catch (error) {
             setErrorMessage('Det gick inte att radera användaren');
-            setTimeout(() => resetState(), 1500);
-
+            setTimeout(() => setErrorMessage(null), 3000);
             return false;
 
         } finally {
@@ -49,15 +43,13 @@ export function useAdminMangagement() {
             const userData = await adminApi.updateUserAccount(userAccount);
             setUserAccount(userData);
 
-            setSuccessMessage('Användaren har uppdaterats!');
-            await new Promise((resolve) => setTimeout(resolve, 800));
-
-            resetState();
+            setArraySuccessMessage('Användaren har uppdaterats!');
+            setTimeout(() => setUserAccount(null), 1000);
             return true;
             
         } catch (error) {
             setErrorMessage('Användarens uppgifter kunde inte ändras');
-            setTimeout(resetState, 1500);
+            setTimeout(() => setErrorMessage(null), 1500);
             return false;
         } finally { 
             setLoading(false);
@@ -72,21 +64,22 @@ export function useAdminMangagement() {
             const userList = await adminApi.getUsersList();
 
             if(!Array.isArray(userList) || userList.length === 0){
-                setArrayError('Listan med användare kunde inte hämtas');
+                setArrayErrorMessage('Listan med användare kunde inte hämtas');
                 return;
             }
             
             setUserList(userList);
 
-            setSuccessMessage(`${userList.length} användare retuneras`);
-            await new Promise((resolve) => setTimeout(resolve, 800));
+            setTimeout(() => {
+                setSuccessMessage(`${userList.length} användare retuneras`);
+                setUserList(null);
+            }, 1000);
 
-            resetState();
             return true;
 
         } catch (error) {
             setErrorMessage('Det gick inte att hämta listan');
-            setTimeout(resetState, 1500);
+            setTimeout(() => setErrorMessage(null), 3000);
             return false;
 
         } finally {
@@ -96,14 +89,11 @@ export function useAdminMangagement() {
     }
 
     return { 
-        userAccount, 
-        errorMessage, 
-        loading, 
-        successMessage,
-        arrayError,
+        userAccount,  
+        loading,
         userList,
         deleteUserAccount,
         updateUserAccount,
         getUsersList
-            }
+        }
 }
