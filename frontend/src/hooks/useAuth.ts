@@ -2,7 +2,6 @@ import type { LoginData } from "../types/User/UserAuth";
 import type { User } from "../types/User/User";
 import { authApi } from "../api/authApi";
 import { useAsyncState } from "./custom hooks/useAsyncState";
-import { useNavigate } from "react-router-dom";
 
 export function useAuth() {
     const { 
@@ -12,7 +11,6 @@ export function useAuth() {
         successMessage, setSuccessMessage,
         resetState } 
         = useAsyncState<User>();
-        const navigate = useNavigate();
 
         // LOGIN
         async function login(data: LoginData) {
@@ -39,24 +37,26 @@ export function useAuth() {
         }
 
         // LOGOUT
-        async function logout() {
+        async function logout(): Promise<boolean | void> {
             
             try {
                 setLoading(true);
 
-                const success = await authApi.logout();
-                localStorage.removeItem('token');
-
-                if(success) {
+                const hadToken = localStorage.getItem('token');
+                console.log(hadToken);
+                if(hadToken) {
+                    localStorage.removeItem('token'); 
+                    await authApi.logout();          
+                }
+                    console.log('FÖRE SETUSER NULL:',setUser);
                     setUser(null);
+                    console.log('EFTER SETUSER NULL',setUser);
 
                     setSuccessMessage('Du loggas ut');
-                    await new Promise((resolve) => setTimeout(resolve, 1500));
-                    navigate('/');
-
+                    console.log(setSuccessMessage);
+                    
                     resetState();
                     return true;
-                }
 
             } catch (error) {
                 setErrorMessage('Användaren kunde inte loggas ut');

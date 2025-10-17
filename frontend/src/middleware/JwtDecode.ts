@@ -4,7 +4,6 @@ import type { AuthTokenPayload } from "../types/User/UserAuth";
 export function getDecodedToken(): AuthTokenPayload | null {
 
     const token = localStorage.getItem('token');
-    console.log("Token i localStorage:", token);
 
     if(!token) { return null; }
 
