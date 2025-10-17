@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useUserManager } from '../hooks/useUserManager';
 import { Alert } from '../components/alert/Alert';
 
-function RegisterPage() {
+function Register() {
     const { register, loading, errorMessage, successMessage } = useUserManager();
         const [email, setEmail] = useState<string>('');
         const [password, setPassword] = useState<string>('');
         const [confirmPassword, setConfirmPassword] = useState<string>('');
         const [formError, setFormError] = useState<string | null>(null);
+        const [formSuccess, setFormSuccess] = useState<string | null>(null);
         const navigate = useNavigate();
 
         async function handleSubmit(e: React.FormEvent) {
@@ -20,6 +21,7 @@ function RegisterPage() {
                 }
             if (await register({ email, password })) 
 
+                setFormSuccess('Ditt konto har skapats, omdirigerar dig till inloggnignssidan')
                 await new Promise((resolve) => setTimeout(resolve, 1500));
 
                 navigate('/login')
@@ -60,11 +62,13 @@ function RegisterPage() {
             </form>
 
             { successMessage && <Alert type='success' message={successMessage}/> }
+            { formSuccess && <Alert type='success' message={formSuccess}/> }
             { errorMessage && <Alert type='error' message={errorMessage}/> }
             { formError && <Alert type='error' message={formError}/> }
+            
             
         </div>
     )
 }
 
-export default RegisterPage;
+export default Register;

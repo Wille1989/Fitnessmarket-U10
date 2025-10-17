@@ -15,14 +15,8 @@ export const userApi = {
         return result.data;
     },
 
-    showMyAccount: async(id: string): Promise<User> => {
-        const result = await api.get(`/user/${id}`)
-
-        return result.data;
-    },
-
-    getUsers: async(): Promise<User[]> => {
-        const result = await api.get('/user/index')
+    showMyAccount: async(): Promise<User> => {
+        const result = await api.get('/user/show')
 
         return result.data;
     },
@@ -32,18 +26,5 @@ export const userApi = {
 
         return result.data;
     },
-
-    // ADMIN
-    deleteUserAccount: async (data: User): Promise<void> => {
-        const result = await api.delete('/user/delete', { data });
-
-        return result.data;
-    },
-
-    updateUser: async(data: User): Promise<User> => {
-        const result = await api.patch('/update/userAccount', data);
-
-        return result.data;
-    }
 
 }

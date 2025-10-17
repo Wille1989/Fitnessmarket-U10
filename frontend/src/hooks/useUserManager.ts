@@ -9,10 +9,9 @@ export function useUserManager() {
         loading, setLoading,
         errorMessage, setErrorMessage, 
         successMessage, setSuccessMessage,
-        resetState } 
-        = useAsyncState<User>();
+        resetState } = useAsyncState<User>();
     
-    // REGISTER
+    // REGISTER NEW ACCOUNT
     async function register(user: CreateUser) {
         try {
             setLoading(true);
@@ -25,13 +24,13 @@ export function useUserManager() {
                 setErrorMessage('Lösenordet är för kort');
             }
 
-            const response = await userApi.register(user);
+            const newUser = await userApi.register(user);
             
-            if(!response || !response.email) {
+            if(!newUser || !newUser.email) {
                 throw new Error('Svaret från servern ogillades');
             }
 
-            setUser(response);
+            setUser(newUser);
 
             setSuccessMessage('Ditt konto har skapats!');
             setTimeout(() => resetState(), 1500);
@@ -76,6 +75,72 @@ export function useUserManager() {
         }
     }
 
-    return { user, loading, errorMessage, successMessage, register, deleteOwnAccount };
-        
+    // SHOW OWN ACCOUNT
+    async function showMyAccount() {
+
+        try {
+            setLoading(true);
+
+            const userData = await userApi.showMyAccount();
+
+            if(userData) {
+                setUser(userData);
+
+                setSuccessMessage('Ditt ID hämtas');
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+
+                resetState();
+                return true;
+            }
+
+        } catch (error) {
+
+            setErrorMessage('Det gick inte att hämta användaren');
+            setTimeout(resetState, 1500);
+            return false;
+
+        } finally {
+            setLoading(false);
+
+        }
+    }
+
+    // UPDATE OWN ACCOUNT
+    async function updateMyAccount(data: User) {
+        try {
+            setLoading(true);
+            
+            const userData = await userApi.updateMyAccount(data);
+
+            if(userData) {
+                setUser(userData);
+
+                setSuccessMessage('Dina uppgifter har uppdaterats');
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+
+                resetState();
+                return true;
+
+            }
+        } catch (error) {
+            setErrorMessage('Det gick inte att uppdatera användaren');
+            setTimeout(resetState, 1500);
+            return false;
+        } finally {
+            setLoading(false);
+        }
+
+    }
+
+
+
+    return { 
+        user, 
+        loading, 
+        errorMessage, 
+        successMessage, 
+        register, 
+        deleteOwnAccount, 
+        showMyAccount,
+        updateMyAccount };
 }

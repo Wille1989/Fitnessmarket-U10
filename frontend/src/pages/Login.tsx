@@ -5,7 +5,7 @@ import { Alert } from "../components/alert/Alert";
 import { getDecodedToken } from "../middleware/JwtDecode";
 import '../css/message.css';
 
-function LoginPage() {
+function Login() {
     const { login, loading, successMessage, errorMessage } = useAuth();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -30,10 +30,10 @@ function LoginPage() {
                     navigate('/profile')
 
                 } else if (decoded.role === 'admin'){
-                    navigate('/admin')
+                    navigate('/adminDashboard')
 
                 } else if(decoded.role === 'sales'){
-                    navigate('/sales')
+                    navigate('/salesDashboard')
                 }
             }
                  
@@ -72,4 +72,4 @@ function LoginPage() {
 
 }
 
-export default LoginPage;
+export default Login;

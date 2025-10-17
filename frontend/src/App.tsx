@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ProfilePage from './pages/ProfilePage';
-import AdminPage from './pages/AdminPage';
-import SalesPage from './pages/SalesPage';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import CustomerDashboard from './pages/CustomerDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import SalesDashboard from './pages/SalesDashboard';
 
 function App() {
 
@@ -13,12 +13,19 @@ function App() {
     <Router>
       <Routes>
 
-        <Route path='/' element={< HomePage />}/>
-        <Route path='/login' element={< LoginPage />}/>
-        <Route path='register' element={< RegisterPage /> }/>
-        <Route path='profile' element={< ProfilePage />}/>
-        <Route path='admin' element={< AdminPage />}/>
-        <Route path='sales' element={< SalesPage />}/>
+        <Route path='/' element={< Home />}/>
+        <Route path='/login' element={< Login />}/>
+        <Route path='/register' element={< Register /> }/>
+
+        {/* CUSTOMER ROUTES */}
+        <Route path='profile' element={< CustomerDashboard />}/>
+
+        {/* SALES ROUTES */}
+        <Route path='salesDashboard' element={< SalesDashboard />}/>
+
+        {/* ADMIN ROUTES */}
+        <Route path='adminDashboard' element={< AdminDashboard />}/>
+        {/*<Route path='admin/updateUser' element={< AdminUpdateUser />} /> */}
         
 
       </Routes>
