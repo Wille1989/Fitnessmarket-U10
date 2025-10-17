@@ -7,10 +7,20 @@ export function useAsyncState< T >() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+    function resetState() {
+        setData(null);
+        setErrorMessage('');
+        setSuccessMessage('');
+        setLoading(false);
+    }
+
     return { 
         data, setData, 
         loading, setLoading, 
         errorMessage, setErrorMessage, 
-        successMessage, setSuccessMessage 
+        successMessage, setSuccessMessage,
+        resetState
     };
+
+
 };
