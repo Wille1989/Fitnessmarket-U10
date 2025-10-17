@@ -122,7 +122,7 @@ export async function deleteUser(
     };
 };
 
-// GET THE USER
+// SHOW USER
 export async function getUserById(
     req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO | AdminUserDTO>>): Promise<void> {
     try {   

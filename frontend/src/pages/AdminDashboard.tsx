@@ -1,4 +1,4 @@
-import Logout from "../components/logout";
+import Logout from "../components/navigation/button/Logout";
 
 function AdminDashboard() {
 

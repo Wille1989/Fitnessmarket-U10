@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { Alert } from "./alert/Alert";
-import { useMessage } from "../context/MessageProvider";
-import { useAuth } from "../hooks/useAuth";
+import { Alert } from "../../alert/Alert";
+import { useMessage } from "../../../context/MessageProvider";
+import { useAuth } from "../../../hooks/useAuth";
 
 function Logout() {
     // GLOBAL STATE
