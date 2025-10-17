@@ -9,7 +9,7 @@ export const authApi = {
     },
 
     logout: async (): Promise<{ message: string }> => {
-        const response = await api.post<{ message: string }>('/auth/logout');
+        const response = await api.get<{ message: string }>('/auth/logout');
         return response.data;
     }
     
