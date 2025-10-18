@@ -69,9 +69,8 @@ export function useAdminMangement() {
             }
 
             setUserList(userList);
-
             setSuccessMessage(`${userList.length} användare retuneras`);
-
+            setTimeout(() => setSuccessMessage(null), 800);
             return true;
 
         } catch (error) {
