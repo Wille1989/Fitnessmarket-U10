@@ -1,10 +1,14 @@
+import NavigateLogin from "../components/navigation/button/Login";
+
 function Home() {
 
     return (
-
-        <h1>HOME</h1>
+        <div>
+            <h1>HOME</h1>
+            <NavigateLogin />
+        </div>
+        
     )
-
 }
 
 export default Home;

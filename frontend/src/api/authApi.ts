@@ -8,8 +8,8 @@ export const authApi = {
         return response.data;
     },
 
-    logout: async (): Promise<{ message: string }> => {
-        const response = await api.get<{ message: string }>('/auth/logout');
+    logout: async (): Promise<{ value: boolean }> => {
+        const response = await api.get<{ value: boolean }>('/auth/logout');
         return response.data;
     }
     

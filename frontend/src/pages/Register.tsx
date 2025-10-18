@@ -1,27 +1,33 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUserManager } from '../hooks/useUserManager';
 import { Alert } from '../components/alert/Alert';
+import { useMessage } from '../context/MessageProvider';
+import { useUserManager } from '../hooks/useUserManager';
+import NavigateHome from '../components/navigation/button/Home';
 
 function Register() {
-    const { register, loading, errorMessage, successMessage } = useUserManager();
+        // GLOBAL STATE
+        const { formSuccessMessage, setFormSuccessMessage, 
+                formErrorMessage, setFormErrorMessage, 
+                successMessage, errorMessage } = useMessage();
+        const { loading, register } = useUserManager();
+
+        // LOCAL STATE
         const [email, setEmail] = useState<string>('');
         const [password, setPassword] = useState<string>('');
         const [confirmPassword, setConfirmPassword] = useState<string>('');
-        const [formError, setFormError] = useState<string | null>(null);
-        const [formSuccess, setFormSuccess] = useState<string | null>(null);
         const navigate = useNavigate();
 
         async function handleSubmit(e: React.FormEvent) {
             e.preventDefault();
 
             if(password !== confirmPassword){
-                    setFormError('Lösenorden matchar inte');
+                    setFormErrorMessage('Lösenorden matchar inte');
                     return;
                 }
             if (await register({ email, password })) 
 
-                setFormSuccess('Ditt konto har skapats, omdirigerar dig till inloggnignssidan')
+                setFormSuccessMessage('Ditt konto har skapats, omdirigerar dig till inloggnignssidan')
                 await new Promise((resolve) => setTimeout(resolve, 1500));
 
                 navigate('/login')
@@ -35,7 +41,7 @@ function Register() {
                 <input
                 type='email'
                 name='email'
-                placeholder='Fyll i e-post'
+                placeholder='fyll i e-post'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)} 
                 />
@@ -43,7 +49,7 @@ function Register() {
                 <input 
                 type='password'
                 name='password'
-                placeholder='Ange ett lösenord'
+                placeholder='välj ett lösenord'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 />
@@ -51,7 +57,7 @@ function Register() {
                 <input 
                 type='password'
                 name='confirmPassword'
-                placeholder='Upprepa lösenordet'
+                placeholder='upprepa lösenordet'
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}/>
 
@@ -62,11 +68,12 @@ function Register() {
             </form>
 
             { successMessage && <Alert type='success' message={successMessage}/> }
-            { formSuccess && <Alert type='success' message={formSuccess}/> }
+            { formSuccessMessage && <Alert type='success' message={formSuccessMessage}/> }
             { errorMessage && <Alert type='error' message={errorMessage}/> }
-            { formError && <Alert type='error' message={formError}/> }
-            
-            
+            { formErrorMessage && <Alert type='error' message={formErrorMessage}/> }
+
+            <NavigateHome />
+
         </div>
     )
 }

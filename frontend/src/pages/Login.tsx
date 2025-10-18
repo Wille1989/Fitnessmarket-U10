@@ -3,10 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Alert } from "../components/alert/Alert";
 import { getDecodedToken } from "../middleware/JwtDecode";
+import { useMessage } from "../context/MessageProvider";
+import NavigateHome from "../components/navigation/button/Home";
 import '../css/message.css';
 
 function Login() {
-    const { login, loading, successMessage, errorMessage } = useAuth();
+    // GLOBAL STATE
+    const { errorMessage, successMessage, } = useMessage();
+    const { loading, login } = useAuth();
+
+    // LOCAL STATE
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [decodeError, setDecodeError] = useState<string | null>(null);
@@ -67,9 +73,9 @@ function Login() {
             { errorMessage && <Alert type="error" message={errorMessage} />}
             { decodeError && <Alert type="error" message={decodeError} /> }
 
+            <NavigateHome />
         </div>
     )
-
 }
 
 export default Login;

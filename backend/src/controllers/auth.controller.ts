@@ -37,10 +37,10 @@ export async function loginUser(
 
 // LOG OUT
 export async function logoutUser(
-    _req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {
+    _req: AuthenticatedRequest, res: Response<ApiResponse<boolean>>): Promise<void> {
     try {
 
-        res.status(200).json({ message: 'du är utloggad!', data: null });
+        res.status(200).json({ message: 'du är utloggad!', data: true });
 
     } catch (error) {
         const err = error as AppError;

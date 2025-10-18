@@ -1,72 +1,68 @@
 import type { LoginData } from "../types/User/UserAuth";
 import type { User } from "../types/User/User";
 import { authApi } from "../api/authApi";
-import { useAsyncState } from "./custom hooks/useAsyncState";
+import { useMessage } from "../context/MessageProvider";
+import { useState } from "react";
 
 export function useAuth() {
-    const { 
-        data: user, setData: setUser, 
-        loading, setLoading,
-        errorMessage, setErrorMessage, 
-        successMessage, setSuccessMessage,
-        resetState } 
-        = useAsyncState<User>();
 
-        // LOGIN
-        async function login(data: LoginData) {
-            try {
-                setLoading(true);
+    const { setSuccessMessage, setErrorMessage} = useMessage();
+    const [user, setUser] = useState<User| null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
-                const result = await authApi.login(data);
+    // LOGIN
+    async function login(data: LoginData) {
+        try {
+            setLoading(true);
 
-                localStorage.setItem('token', result.data.token);
-                setUser(result.data.user);
+            const result = await authApi.login(data);
 
-                setSuccessMessage('Du har loggats in!');
-                setTimeout(() => resetState(), 1500);
-                return true;
-                
-            } catch (error) {
-                setErrorMessage('Fel användarnamn eller lösenord');
-                setTimeout(() => resetState(), 3000);
-                return false;
-
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        // LOGOUT
-        async function logout(): Promise<boolean | void> {
+            localStorage.setItem('token', result.data.token);
             
-            try {
-                setLoading(true);
+            setSuccessMessage('Du loggas in!');
+            setTimeout(()=> {
+                setUser(result.data.user),
+                setSuccessMessage(null);
+            },1500)
+            return true;
+            
+        } catch (error) {
+            setErrorMessage('Fel användarnamn eller lösenord');
+            setTimeout(() => setErrorMessage(null), 3000);
+            return false;
 
-                const hadToken = localStorage.getItem('token');
-                console.log(hadToken);
-                if(hadToken) {
-                    localStorage.removeItem('token'); 
-                    await authApi.logout();          
-                }
-                    console.log('FÖRE SETUSER NULL:',setUser);
-                    setUser(null);
-                    console.log('EFTER SETUSER NULL',setUser);
-
-                    setSuccessMessage('Du loggas ut');
-                    console.log(setSuccessMessage);
-                    
-                    resetState();
-                    return true;
-
-            } catch (error) {
-                setErrorMessage('Användaren kunde inte loggas ut');
-                setTimeout(() => resetState(), 3000);
-                return false;
-
-            } finally {
-                setLoading(false);
-            } 
+        } finally {
+            setLoading(false);
+        }
     }
-    return { user, loading, login, logout, successMessage, errorMessage }
+
+    // LOGOUT
+    async function logout(): Promise<boolean | void> {
+        
+        try {
+            setLoading(true);
+
+            const hadToken = localStorage.getItem('token');
+            if(hadToken) {
+                await authApi.logout();  
+                localStorage.removeItem('token'); 
+            }                
+            setSuccessMessage('Du loggas ut');
+            setTimeout(() => {
+                setSuccessMessage(null);
+                setUser(null);
+            },1500);
+            return true;
+
+        } catch (error) {
+            setErrorMessage('Användaren kunde inte loggas ut');
+            setTimeout(() => setErrorMessage(null), 1500);
+            return false;
+            
+        } finally {
+            setLoading(false);
+        } 
+    }
+    return { login, logout, loading, user, setUser }
 
 }
