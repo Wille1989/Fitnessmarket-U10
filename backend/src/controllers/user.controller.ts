@@ -13,7 +13,6 @@ import { CreateUserService,
         UpdateUserByAdmin,
         CreateUserAsAdminService
         } from '../services/user/user.service';
-import { Auth } from 'mongodb';
 
 // CREATE USER
 export async function createUser(
