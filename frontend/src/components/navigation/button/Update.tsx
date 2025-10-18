@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserManager } from "../../../hooks/useUserManager";
+import { useAdminMangement } from "../../../hooks/useAdminManagement";
 
-function NavigateUpdate() {
+function NavigateUpdate({ id }: { id: string }) {
     const [loading, setLoading] = useState<boolean>(false);
-    const { showMyAccount } = useUserManager();
+    const { showUserAccount } = useAdminMangement();
     const navigate = useNavigate();
 
 
     const handleNavigate = async() => { 
         setLoading(true);
 
-        showMyAccount();       
+        showUserAccount(id);       
 
-        setTimeout(() => navigate('/adminDashboard/update'), 1500);
+        setTimeout(() => navigate(`/adminDashboard/update/${id}`), 1500);
     
         setLoading(false);
 

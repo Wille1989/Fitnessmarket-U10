@@ -1,5 +1,5 @@
 import { api } from "./axios";
-import type { User } from "../types/User/User";
+import type { UpdateUser, User } from "../types/User/User";
 
 export const adminApi = {
     deleteUserAccount: async (data: User): Promise<void> => {
@@ -7,18 +7,18 @@ export const adminApi = {
         return result.data.data;
     },
 
-    updateUserAccount: async(data: User): Promise<User> => {
-        const result = await api.patch('/update/userAccount', data);
+    updateUserAccount: async(data: UpdateUser): Promise<User> => {
+        const result = await api.patch('/user/admin/updateUserAccount', data);
         return result.data.data;
     },
 
     getUsersList: async(): Promise<User[]> => {
-        const result = await api.get('/user/all')
+        const result = await api.get('/user/admin/all')
         return result.data.data;
     },
 
     showUserAccount: async(id: string): Promise<User> => {
-        const result = await api.get(`/admin/show/${id}`)
+        const result = await api.get(`/user/admin/show/${id}`)
 
         return result.data.data;
     }

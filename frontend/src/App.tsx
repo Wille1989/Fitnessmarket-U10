@@ -6,6 +6,7 @@ import CustomerDashboard from './pages/CustomerDashboard';
 import AdminDashboard from './pages/admin/Dashboard';
 import SalesDashboard from './pages/SalesDashboard';
 import GetUsersList from './pages/admin/UserList';
+import UserById from './pages/admin/UserById';
 
 function App() {
 
@@ -27,9 +28,8 @@ function App() {
         {/* ADMIN ROUTES */}
         <Route path='adminDashboard' element={< AdminDashboard />}/>
         <Route path='adminDashboard/users' element={< GetUsersList />}/>
-        {/*<Route path='admin/updateUser' element={< AdminUpdateUser />} /> */}
+        <Route path='/adminDashboard/update/:id' element={< UserById />}/>
         
-
       </Routes>
     </Router>
 

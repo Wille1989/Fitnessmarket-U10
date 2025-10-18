@@ -25,8 +25,8 @@ function GetUsersList() {
                 <ul>
                     {userList.map((u) => (
                         <li key={u.email}>
-                            <strong>{u.email}</strong> - {u.name};
-                            <NavigateUpdate />
+                            <strong>{u.email}</strong> - <strong>{u.name};</strong>
+                            <NavigateUpdate id={u.id} />
                         </li>
                     ))}
                 </ul>

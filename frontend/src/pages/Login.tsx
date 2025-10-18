@@ -20,7 +20,7 @@ function Login() {
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        const success = (await login({ email, password }))
+        const success = await login({ email, password })
 
             await new Promise((resolve) => setTimeout(resolve, 800))
 
