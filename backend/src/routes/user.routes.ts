@@ -6,7 +6,8 @@ import {
     getUsers, 
     getUserById,
     updateAccount,
-    createUserAsAdmin } 
+    createUserAsAdmin,
+    getUserByToken } 
     from '../controllers/user.controller';
 
 const userRouter: Router = express.Router();
@@ -16,29 +17,35 @@ userRouter.patch('/update/myAccount',
     requireRole('customer', 'sales', 'admin'), 
     updateAccount);
 
-userRouter.patch('/update/userAccount', 
-    verifyToken, 
-    requireRole('admin'), 
-    updateAccount);
-
-userRouter.post('/admin/register',
-    verifyToken,
-    requireRole('admin'),
-    createUserAsAdmin);
-
 userRouter.delete('/delete', 
     verifyToken, 
     requireRole('customer', 'sales', 'admin'), 
     deleteUser);
 
-userRouter.get('/all', 
+userRouter.get('/show', 
+    verifyToken, 
+    requireRole('customer', 'sales', 'admin'), 
+    getUserByToken);
+
+// ADMIN SPECIFIC ROUTES
+userRouter.post('/admin/register',
+    verifyToken,
+    requireRole('admin'),
+    createUserAsAdmin);
+
+userRouter.patch('/admin/updateUserAccount', 
+    verifyToken, 
+    requireRole('admin'), 
+    updateAccount);
+
+userRouter.get('/admin/all', 
     verifyToken, 
     requireRole('admin'), 
     getUsers);
 
-userRouter.get('/show', 
+userRouter.get('/admin/show/:id', 
     verifyToken, 
-    requireRole('customer', 'sales', 'admin'), 
+    requireRole('admin'), 
     getUserById);
 
 export default userRouter;
