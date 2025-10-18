@@ -1,7 +1,8 @@
-import type { User } from "../types/User/User";
+import type { UpdateUser, User } from "../types/User/User";
 import { adminApi } from "../api/adminApi";
 import { useState } from "react";
 import { useMessage } from "../context/MessageProvider";
+import { useCallback } from "react";
 
 export function useAdminMangement() {
     const { setSuccessMessage, setErrorMessage, 
@@ -36,7 +37,7 @@ export function useAdminMangement() {
     }
 
     // UPDATE A USER ACCOUNT (NOT OWN)
-    async function updateUserAccount(userAccount: User) {
+    async function updateUserAccount(userAccount: UpdateUser) {
         try {
             setLoading(true);
 
@@ -84,12 +85,38 @@ export function useAdminMangement() {
         }
     }
 
+    const showUserAccount = useCallback(async (id: string): Promise<User> => {
+
+        try {
+            setLoading(true);
+
+            const userAccount = await adminApi.showUserAccount(id)
+
+            setUserAccount(userAccount);
+
+            setSuccessMessage('Användaren hämtad!');
+            setTimeout(() => {
+                setSuccessMessage(null);
+            }, 1500);
+            
+            return userAccount;
+            
+        } catch (error) {
+            setErrorMessage('Kunde inte hämta användare');
+            setTimeout(() => setErrorMessage(null), 1500);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    },[]);
+
     return { 
         userAccount,  
         loading,
         userList,
         deleteUserAccount,
         updateUserAccount,
+        showUserAccount,
         getUsersList
         }
 }
