@@ -1,11 +1,11 @@
-import Login from "./Login";
+import NavigateLogin from "../components/navigation/button/Login";
 
 function Home() {
 
     return (
         <div>
             <h1>HOME</h1>
-            <Login />
+            <NavigateLogin />
         </div>
         
     )

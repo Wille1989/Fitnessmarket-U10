@@ -1,4 +1,5 @@
-import Logout from "../components/navigation/button/Logout";
+import Logout from "../../components/navigation/button/Logout";
+import NavigateUsers from "../../components/navigation/button/Users";
 
 function AdminDashboard() {
 
@@ -6,6 +7,7 @@ function AdminDashboard() {
         <div>
         <h1>AdminDashboard</h1>
         <Logout />
+        <NavigateUsers />
         </div>
     )
 }

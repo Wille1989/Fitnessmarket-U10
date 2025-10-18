@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Alert } from '../components/alert/Alert';
 import { useMessage } from '../context/MessageProvider';
 import { useUserManager } from '../hooks/useUserManager';
+import NavigateHome from '../components/navigation/button/Home';
 
 function Register() {
         // GLOBAL STATE
@@ -70,7 +71,9 @@ function Register() {
             { formSuccessMessage && <Alert type='success' message={formSuccessMessage}/> }
             { errorMessage && <Alert type='error' message={errorMessage}/> }
             { formErrorMessage && <Alert type='error' message={formErrorMessage}/> }
-            
+
+            <NavigateHome />
+
         </div>
     )
 }

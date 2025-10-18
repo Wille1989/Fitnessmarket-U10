@@ -19,8 +19,11 @@ export function useAuth() {
 
             localStorage.setItem('token', result.data.token);
             
-            setSuccessMessage('Du har loggats in!');
-            setTimeout(() => setUser(result.data.user), 1500);
+            setSuccessMessage('Du loggas in!');
+            setTimeout(()=> {
+                setUser(result.data.user),
+                setSuccessMessage(null);
+            },1500)
             return true;
             
         } catch (error) {
@@ -44,9 +47,11 @@ export function useAuth() {
                 await authApi.logout();  
                 localStorage.removeItem('token'); 
             }                
-
             setSuccessMessage('Du loggas ut');
-            setTimeout(() => setUser(null), 800);
+            setTimeout(() => {
+                setSuccessMessage(null);
+                setUser(null);
+            },1500);
             return true;
 
         } catch (error) {

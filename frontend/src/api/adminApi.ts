@@ -16,7 +16,9 @@ export const adminApi = {
     },
 
     getUsersList: async(): Promise<User[]> => {
-        const result = await api.get('/user/index')
+        const result = await api.get('/user/all')
+
+        console.log('FRONTEND HANTERING:', result.data);
 
         return result.data;
     },

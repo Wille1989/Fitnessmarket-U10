@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { useState } from "react";
 
-function Login() {
+function NavigateLogin() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
     
@@ -17,9 +17,9 @@ function Login() {
 
     return (
         <button onClick={handleOnClick} disabled={loading}>
-            {loading ? 'Logga in' : 'Omdirigerar'}
+            {loading ? 'Omdirigerar' : 'Logga In'}
         </button>
     )
 }
 
-export default Login;
+export default NavigateLogin;

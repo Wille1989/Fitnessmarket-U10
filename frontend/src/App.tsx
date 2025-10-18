@@ -3,8 +3,9 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CustomerDashboard from './pages/CustomerDashboard';
-import AdminDashboard from './pages/AdminDashboard';
+import AdminDashboard from './pages/admin/Dashboard';
 import SalesDashboard from './pages/SalesDashboard';
+import GetUsersList from './pages/admin/UserList';
 
 function App() {
 
@@ -14,7 +15,7 @@ function App() {
       <Routes>
 
         <Route path='/' element={< Home />}/>
-        <Route path='/login' element={< Login />}/>
+        <Route path='login' element={< Login />}/>
         <Route path='/register' element={< Register /> }/>
 
         {/* CUSTOMER ROUTES */}
@@ -25,6 +26,7 @@ function App() {
 
         {/* ADMIN ROUTES */}
         <Route path='adminDashboard' element={< AdminDashboard />}/>
+        <Route path='adminDashboard/users' element={< GetUsersList />}/>
         {/*<Route path='admin/updateUser' element={< AdminUpdateUser />} /> */}
         
 

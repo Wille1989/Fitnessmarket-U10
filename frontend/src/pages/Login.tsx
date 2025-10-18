@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 import { Alert } from "../components/alert/Alert";
 import { getDecodedToken } from "../middleware/JwtDecode";
 import { useMessage } from "../context/MessageProvider";
+import NavigateHome from "../components/navigation/button/Home";
 import '../css/message.css';
 
 function Login() {
@@ -72,9 +73,9 @@ function Login() {
             { errorMessage && <Alert type="error" message={errorMessage} />}
             { decodeError && <Alert type="error" message={decodeError} /> }
 
+            <NavigateHome />
         </div>
     )
-
 }
 
 export default Login;

@@ -3,7 +3,7 @@ import { adminApi } from "../api/adminApi";
 import { useState } from "react";
 import { useMessage } from "../context/MessageProvider";
 
-export function useAdminMangagement() {
+export function useAdminMangement() {
     const { setSuccessMessage, setErrorMessage, 
             setArrayErrorMessage, setArraySuccessMessage } = useMessage();
     const [userAccount, setUserAccount] = useState<User | null>(null);
@@ -67,13 +67,10 @@ export function useAdminMangagement() {
                 setArrayErrorMessage('Listan med användare kunde inte hämtas');
                 return;
             }
-            
+
             setUserList(userList);
 
-            setTimeout(() => {
-                setSuccessMessage(`${userList.length} användare retuneras`);
-                setUserList(null);
-            }, 1000);
+            setSuccessMessage(`${userList.length} användare retuneras`);
 
             return true;
 

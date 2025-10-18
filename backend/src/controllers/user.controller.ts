@@ -222,11 +222,9 @@ export async function getUsers(
     try {
      
         const users = await getAllUsersService();
-        const names = users.map(u => u.name);
-        const count = users.length;
 
         res.status(200).json({ 
-            message: `retunerar ${count} användare: ${names}`, 
+            message: `BACKEND SVAR: ${users.length} användare hämtas`, 
             data: users });
         
     } catch (error) {
