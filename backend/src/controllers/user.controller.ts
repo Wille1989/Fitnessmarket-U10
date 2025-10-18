@@ -13,6 +13,7 @@ import { CreateUserService,
         UpdateUserByAdmin,
         CreateUserAsAdminService
         } from '../services/user/user.service';
+import { Auth } from 'mongodb';
 
 // CREATE USER
 export async function createUser(
@@ -124,37 +125,20 @@ export async function deleteUser(
 
 // SHOW USER
 export async function getUserById(
-    req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO | AdminUserDTO>>): Promise<void> {
-    try {   
-        const user = req.user;
-
-        if(user?.role === 'customer' || user?.role === 'sales'){
-            const userID = user.userID;
-
-            const myUser = await getUserByIdService(userID);
-
-            const filteredData: PrivateUserDTO = UserMapper.toPrivateDTO(myUser);
-
-            res.status(200).json({ message: `retunerar användaren:`, data: filteredData});
-
-        } else if(user?.role === 'admin'){
+    req: AuthenticatedRequest, res: Response<ApiResponse<AdminUserDTO>>): Promise<void> {
+    try {
             const customerID = req.params.id;
 
             const customerData = await getUserByIdService(customerID);
 
             const filteredAdminData: AdminUserDTO = UserMapper.toAdminDTO(customerData);
 
-            res.status(200).json({ message: `Användaren som Admin begärde`, data: filteredAdminData })
-        } else {
-            throw new AuthorizationError('Du saknar behörighet för att utföra detta');
-        }
+            res.status(200).json({ message: `Användaren som admin begärde`, data: filteredAdminData })
 
     } catch (error) {
         const err = error as AppError;
 
         if(process.env.NODE_ENV !== 'production') {
-            console.error('ERROR STACK USER:');
-            console.error('Name:', err.name);
             console.error('Message:', err.message);
             console.error('Status:', err.status);
             console.error('Stack:', err.stack);
@@ -167,6 +151,36 @@ export async function getUserById(
         }); 
     };
 };
+
+export async function getUserByToken(
+    req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
+    
+    try {
+        const user = req.user!;
+
+            const userID = user.userID;
+
+            const myUser = await getUserByIdService(userID);
+
+            const filteredData: PrivateUserDTO = UserMapper.toPrivateDTO(myUser);
+
+            res.status(200).json({ message: `retunerar användaren:`, data: filteredData});
+    } catch (error) {
+         const err = error as AppError;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        }); 
+    }
+}
 
 // UPDATE ACCOUNT
 export async function updateAccount(
