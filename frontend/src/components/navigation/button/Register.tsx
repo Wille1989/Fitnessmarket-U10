@@ -15,7 +15,7 @@ function NavigateRegister(){
     }
 
     return (
-        <button onClick={handleNavigate} disabled={loading}>
+        <button type="submit" onClick={handleNavigate} disabled={loading}>
             { loading ? 'Registrera' : 'Omdirigerar' }
         </button>
     )

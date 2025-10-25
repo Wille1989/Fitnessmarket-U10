@@ -3,6 +3,7 @@ import { useMessage } from "../../context/MessageProvider";
 import { Alert } from "../../components/alert/Alert";
 import { useEffect } from "react";
 import NavigateUpdate from "../../components/navigation/button/Update";
+import { CreateUserAccount } from "./AdminCreate";
 
 function GetUsersList() {
     const { successMessage, errorMessage, arrayErrorMessage } = useMessage();
@@ -18,7 +19,7 @@ function GetUsersList() {
     if(!userList) return <p>{arrayErrorMessage && < Alert type="error" message={arrayErrorMessage} />}</p>
 
     return (
-        <div>
+        <>
             <h1>ANVÄNDARE</h1>
             {successMessage && < Alert type="success" message={successMessage} />}
 
@@ -32,7 +33,9 @@ function GetUsersList() {
                 </ul>
 
             {errorMessage && < Alert type="error" message={errorMessage} /> }
-        </div>
+
+            < CreateUserAccount />
+        </>
     )
 }
 

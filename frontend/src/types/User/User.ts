@@ -13,7 +13,7 @@ export type UpdateUser = Partial<{
     name: string
     email: string
     password: string
-    role: UserRole
+    role: string
 }>
 
 export type CreateUser = {

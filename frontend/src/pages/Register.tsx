@@ -7,35 +7,43 @@ import NavigateHome from '../components/navigation/button/Home';
 
 function Register() {
         // GLOBAL STATE
-        const { formSuccessMessage, setFormSuccessMessage, 
-                formErrorMessage, setFormErrorMessage, 
-                successMessage, errorMessage } = useMessage();
+        const { successMessage, errorMessage, setSuccessMessage, setErrorMessage } = useMessage();
         const { loading, register } = useUserManager();
 
         // LOCAL STATE
         const [email, setEmail] = useState<string>('');
         const [password, setPassword] = useState<string>('');
         const [confirmPassword, setConfirmPassword] = useState<string>('');
+        const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null);
+        const [formSuccessMessage, setFormSuccessMessage] = useState<string | null>(null);
         const navigate = useNavigate();
 
         async function handleSubmit(e: React.FormEvent) {
             e.preventDefault();
 
             if(password !== confirmPassword){
-                    setFormErrorMessage('Lösenorden matchar inte');
-                    return;
-                }
-            if (await register({ email, password })) 
+                setFormErrorMessage('Lösenorden matchar inte');
+                setTimeout(() => setFormErrorMessage(null), 1500);
+                return;
+            }
+            
+            const result = await register ({ email, password });
 
-                setFormSuccessMessage('Ditt konto har skapats, omdirigerar dig till inloggnignssidan')
+            if(result) {
+                setSuccessMessage(successMessage);
+                setFormSuccessMessage('Ditt konto har skapats, omdirigerar dig till inloggningssidan');
+                
                 await new Promise((resolve) => setTimeout(resolve, 1500));
 
                 navigate('/login')
-    
+            } else {
+                setFormErrorMessage(formErrorMessage);
+                setErrorMessage(errorMessage);
+            }
         }
 
     return (
-        <div>
+        <>
             <form onSubmit={handleSubmit}>
 
                 <input
@@ -69,12 +77,12 @@ function Register() {
 
             { successMessage && <Alert type='success' message={successMessage}/> }
             { formSuccessMessage && <Alert type='success' message={formSuccessMessage}/> }
-            { errorMessage && <Alert type='error' message={errorMessage}/> }
             { formErrorMessage && <Alert type='error' message={formErrorMessage}/> }
+            { errorMessage && <Alert type='error' message={errorMessage}/> }
 
             <NavigateHome />
 
-        </div>
+        </>
     )
 }
 

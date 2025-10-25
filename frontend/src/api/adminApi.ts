@@ -1,9 +1,10 @@
 import { api } from "./axios";
-import type { UpdateUser, User } from "../types/User/User";
+import type { CreateUser, UpdateUser, User } from "../types/User/User";
 
 export const adminApi = {
-    deleteUserAccount: async (data: User): Promise<void> => {
-        const result = await api.delete('/user/delete', { data });
+    deleteUserAccount: async (id: string): Promise<void> => {
+        const result = await api.delete(`/user/delete/${id}`);
+        console.log(result.data.data);
         return result.data.data;
     },
 
@@ -20,6 +21,13 @@ export const adminApi = {
     showUserAccount: async(id: string): Promise<User> => {
         const result = await api.get(`/user/admin/show/${id}`)
 
+        return result.data.data;
+    },
+
+    createUserAccount: async(data: CreateUser): Promise<User> => {
+
+        const result = await api.post('/user/admin/register', data);
+        console.log(result.data.data);
         return result.data.data;
     }
 

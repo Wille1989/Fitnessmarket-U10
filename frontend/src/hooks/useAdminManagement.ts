@@ -1,4 +1,4 @@
-import type { UpdateUser, User } from "../types/User/User";
+import type { UpdateUser, User, CreateUser } from "../types/User/User";
 import { adminApi } from "../api/adminApi";
 import { useState } from "react";
 import { useMessage } from "../context/MessageProvider";
@@ -6,29 +6,25 @@ import { useCallback } from "react";
 
 export function useAdminMangement() {
     const { setSuccessMessage, setErrorMessage, 
-            setArrayErrorMessage, setArraySuccessMessage } = useMessage();
+            setArrayErrorMessage } = useMessage();
     const [userAccount, setUserAccount] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [userList, setUserList] = useState<User[] | null>(null);
 
     // DELETE A USER ACCOUNT
-    async function deleteUserAccount(userAccount: User) {
+    async function deleteUserAccount(id: string) {
         try {
             setLoading(true);
+            console.log(id, typeof id);
             
-            const hadToken = localStorage.getItem('token');
-            if(hadToken) {
-                localStorage.removeItem('token');
-            }
-            await adminApi.deleteUserAccount(userAccount);
+            await adminApi.deleteUserAccount(id);
 
-            setSuccessMessage('Användaren har tagits bort');
             setTimeout(() => setUserAccount(null), 1500);
+
             return true;
             
         } catch (error) {
-            setErrorMessage('Det gick inte att radera användaren');
-            setTimeout(() => setErrorMessage(null), 3000);
+
             return false;
 
         } finally {
@@ -42,9 +38,9 @@ export function useAdminMangement() {
             setLoading(true);
 
             const userData = await adminApi.updateUserAccount(userAccount);
+
             setUserAccount(userData);
 
-            setArraySuccessMessage('Användaren har uppdaterats!');
             setTimeout(() => setUserAccount(null), 1000);
             return true;
             
@@ -110,6 +106,36 @@ export function useAdminMangement() {
         }
     },[]);
 
+    async function createUserAccount(userAccount: CreateUser): Promise<User | null> {
+
+        try {
+            setLoading(true);
+
+            const response = await adminApi.createUserAccount(userAccount)
+
+            if(!response) {
+                console.error(response, typeof response);
+                throw new Error('Svaret ogillades');
+            }
+
+            setUserAccount(response);
+
+            return response;
+
+        } catch (error: any) { // Kolla upp om det går att arbeta sig runt för att slippa en ANY type
+            console.error('REGISTER ERROR:', error);
+
+            const message: string = error?.message || 'ett oväntat fel uppstod';
+
+            setErrorMessage(message);
+
+            return null;
+        } finally {
+            setLoading(false);
+        }
+
+    }
+
     return { 
         userAccount,  
         loading,
@@ -117,6 +143,7 @@ export function useAdminMangement() {
         deleteUserAccount,
         updateUserAccount,
         showUserAccount,
-        getUsersList
+        getUsersList,
+        createUserAccount
         }
 }
