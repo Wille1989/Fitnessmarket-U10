@@ -1,7 +1,7 @@
 import { CategoryApi } from "../api/categoryApi";
 import { useMessage } from "../context/MessageProvider";
 import { Category, CreateCategory } from "../types/Products/Category";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useCategory() {
     const { setErrorMessage } = useMessage();
@@ -13,7 +13,6 @@ export function useCategory() {
         try {
 
             setLoading(true);
-
             const result = await CategoryApi.index();
 
             if(!result) {
@@ -33,8 +32,11 @@ export function useCategory() {
         } finally {
             setLoading(false);
         }
-
     }, [])
+
+    useEffect(() => {
+        indexCategory();
+    },[indexCategory])
 
     async function createCategory(data: CreateCategory) {
         try {

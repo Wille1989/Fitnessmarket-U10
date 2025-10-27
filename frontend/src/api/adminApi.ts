@@ -1,5 +1,6 @@
 import { api } from "./axios";
 import type { CreateUser, UpdateUser, User } from "../types/User/User";
+import type { Order } from "../types/Order/Order";
 
 export const adminApi = {
     deleteUserAccount: async (id: string): Promise<void> => {
@@ -29,6 +30,13 @@ export const adminApi = {
         const result = await api.post('/user/admin/register', data);
         console.log(result.data.data);
         return result.data.data;
-    }
+    },
+
+    // ORDER
+    index: async(id: string): Promise<Order[]> => {
+            const result = await api.get(`/order/${id}`);
+            console.log(result.data.data);
+            return result.data.data;
+        },
 
 }

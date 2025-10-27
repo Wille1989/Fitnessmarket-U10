@@ -9,7 +9,7 @@ export function useUserManager() {
     const [userAccount, setUserAccount] = useState<User |null>(null);
 
     // REGISTER NEW ACCOUNT
-    async function register(user: CreateUser) {
+    async function register(user: CreateUser, confirmPassword: string) {
         try {
             setLoading(true);
 
@@ -18,25 +18,23 @@ export function useUserManager() {
             }
 
             if(user.password.length < 8){
-                throw new Error('Lösenordet är för kort');
+                throw new Error('Lösenordet måste vara minst 8 tecken');
             }
 
+            if(user.password !== confirmPassword){
+                throw new Error('Lösenordet matchar inte');
+            }
+            
             const newUser = await userApi.register(user);
 
+            setUserAccount(newUser);
             return newUser;
             
         } catch (error: any) {
-            console.error('Register error:', error);
-
-            const message: string = error?.message || 'ett oväntat fel uppstod';
- 
+            console.error(error);
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
-
-            setTimeout(() => {
-                setUserAccount(null),
-                setErrorMessage(null)
-            }, 1500);
-
+            setTimeout(() => setErrorMessage(null), 2000);
             return null;
 
         } finally {

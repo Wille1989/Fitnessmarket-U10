@@ -20,7 +20,6 @@ export function DeleteUserAsAdmin() {
 
         if(id) {
             deleteUserAccount(id);
-            console.log(deleteUserAccount, typeof deleteUserAccount);
         }
 
         setSuccessMessage('Användaren har raderats!')
@@ -29,7 +28,7 @@ export function DeleteUserAsAdmin() {
             setErrorMessage(null)
         }, 1500)
 
-        navigate('adminDashboard/users');
+        navigate('/admin/users');
 
         setLoading(false);
 
@@ -42,8 +41,6 @@ export function DeleteUserAsAdmin() {
                 {loading ? 'Raderar användaren' : 'Radera användaren'}
             </button>
 
-            {successMessage && < Alert type="success" message={successMessage} />}
-            {errorMessage && < Alert type="error" message={errorMessage} />}
         </>
     )
 }

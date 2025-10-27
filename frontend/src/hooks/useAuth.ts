@@ -3,33 +3,56 @@ import type { User } from "../types/User/User";
 import { authApi } from "../api/authApi";
 import { useMessage } from "../context/MessageProvider";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getDecodedToken } from "../middleware/JwtDecode";
 
 export function useAuth() {
 
-    const { setSuccessMessage, setErrorMessage} = useMessage();
+    const {setErrorMessage,setSuccessMessage} = useMessage();
     const [user, setUser] = useState<User| null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const navigate = useNavigate();
 
     // LOGIN
-    async function login(data: LoginData) {
+    async function login(data: LoginData): Promise<User | null> {
         try {
             setLoading(true);
 
             const result = await authApi.login(data);
-
             localStorage.setItem('token', result.data.token);
-            
-            setSuccessMessage('Du loggas in!');
-            setTimeout(()=> {
-                setUser(result.data.user),
-                setSuccessMessage(null);
-            },1500)
-            return true;
-            
-        } catch (error) {
-            setErrorMessage('Fel användarnamn eller lösenord');
-            setTimeout(() => setErrorMessage(null), 3000);
-            return false;
+
+            if(result) {
+                const decoded = getDecodedToken();     
+                setUser(result.data.user);
+
+                if(!decoded) {
+                    throw new Error('Kunde inte avläsa token');
+                }
+
+                setTimeout(() => setSuccessMessage('Du loggas in!'), 1500);
+
+                if(decoded.role === 'customer'){
+                    navigate('/myprofile')
+                    navigate(0);
+
+                } else if (decoded.role === 'admin'){
+                    navigate('/admin')
+                    navigate(0);
+
+                } else if(decoded.role === 'sales'){
+                    navigate('/sales')
+                    navigate(0);
+                }
+            }
+
+            return result.data.user;
+
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
+            setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
+            return null;
 
         } finally {
             setLoading(false);
@@ -46,23 +69,24 @@ export function useAuth() {
             if(hadToken) {
                 await authApi.logout();  
                 localStorage.removeItem('token'); 
-            }                
-            setSuccessMessage('Du loggas ut');
-            setTimeout(() => {
-                setSuccessMessage(null);
-                setUser(null);
-            },1500);
+            }
+
+            setSuccessMessage('Du loggades ut');
+            setTimeout(() => setSuccessMessage(null), 800);
+            
+            setUser(null);
             return true;
 
-        } catch (error) {
-            setErrorMessage('Användaren kunde inte loggas ut');
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error?.message || 'Oväntat fel';
+            setErrorMessage(message);
             setTimeout(() => setErrorMessage(null), 1500);
-            return false;
             
         } finally {
             setLoading(false);
         } 
     }
-    return { login, logout, loading, user, setUser }
+    return { login, logout, loading, user }
 
 }

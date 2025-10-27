@@ -3,6 +3,7 @@ import { adminApi } from "../api/adminApi";
 import { useState } from "react";
 import { useMessage } from "../context/MessageProvider";
 import { useCallback } from "react";
+import type { Order } from "../types/Order/Order";
 
 export function useAdminMangement() {
     const { setSuccessMessage, setErrorMessage, 
@@ -10,6 +11,7 @@ export function useAdminMangement() {
     const [userAccount, setUserAccount] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [userList, setUserList] = useState<User[] | null>(null);
+    const [customerOrder, setCustomerOrder] = useState<Order[]>([])
 
     // DELETE A USER ACCOUNT
     async function deleteUserAccount(id: string) {
@@ -106,29 +108,38 @@ export function useAdminMangement() {
         }
     },[]);
 
-    async function createUserAccount(userAccount: CreateUser): Promise<User | null> {
+    async function createUserAccount(userAccount: CreateUser, confirmPassword: string): Promise<User | null> {
 
         try {
             setLoading(true);
 
-            const response = await adminApi.createUserAccount(userAccount)
-
-            if(!response) {
-                console.error(response, typeof response);
-                throw new Error('Svaret ogillades');
+            if(!userAccount.email.includes('@')){
+                throw new Error('Email är skriven i ett felaktigt format')
             }
 
+            if(userAccount.password.length < 8) {
+                throw new Error('Lösenordet är för kort');
+            }
+
+            if(userAccount.password !== confirmPassword) {
+                throw new Error('Lösenorden matachar inte')
+            }
+
+            setSuccessMessage('Användaren har skapats!');
+            setTimeout(() => setSuccessMessage(null), 1500);
+
+            const response = await adminApi.createUserAccount(userAccount)
             setUserAccount(response);
 
             return response;
 
-        } catch (error: any) { // Kolla upp om det går att arbeta sig runt för att slippa en ANY type
-            console.error('REGISTER ERROR:', error);
-
-            const message: string = error?.message || 'ett oväntat fel uppstod';
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error.response?.data?.message || 
+            error.message || 'Oväntat fel';
 
             setErrorMessage(message);
-
+            setTimeout(() => setErrorMessage(null), 2000);
             return null;
         } finally {
             setLoading(false);
@@ -136,14 +147,41 @@ export function useAdminMangement() {
 
     }
 
+    const indexCustomerOrder = useCallback(async(id: string): Promise<Order[] | null> => {
+
+        try {
+            setLoading(true);
+
+            const result = await adminApi.index(id);
+
+            if(!result) {
+                throw new Error('Inga ordrar hittades');
+            }
+
+            setCustomerOrder(result);
+            return result;
+
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error?.message || 'Oväntat fel'
+            setErrorMessage(message);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+
+    }, [setErrorMessage, setLoading])
+
     return { 
         userAccount,  
         loading,
         userList,
+        customerOrder,
         deleteUserAccount,
         updateUserAccount,
         showUserAccount,
         getUsersList,
-        createUserAccount
+        createUserAccount,
+        indexCustomerOrder
         }
 }

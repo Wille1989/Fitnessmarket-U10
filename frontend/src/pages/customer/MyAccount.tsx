@@ -2,7 +2,7 @@ import { useUserManager } from "../../hooks/useUserManager";
 import { useMessage } from "../../context/MessageProvider";
 import { Alert } from "../../components/alert/Alert";
 import { useEffect } from "react";
-import Logout from "../../components/navigation/button/Logout";
+import Logout from "../auth/Logout";
 
 
 export function MyAccount() {

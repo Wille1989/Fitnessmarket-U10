@@ -8,3 +8,14 @@ export type NutritionalContent = {
     createdAt?: Date
     updatedAt?: Date
 }
+
+export type UpdateNutritionalContent = Partial<{
+    _id?: string
+    energy: string
+    fat: string
+    saturatedfat: string
+    protein: string
+    salt: string
+    createdAt?: Date
+    updatedAt?: Date
+}>

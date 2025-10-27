@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useAdminMangement } from "../../hooks/useAdminManagement";
 import { useParams } from "react-router-dom";
-import { UpdateUser } from "../../types/User/User";
 import { useMessage } from "../../context/MessageProvider";
+import { useAdminMangement } from "../../hooks/useAdminManagement";
+import type{ UpdateUser } from "../../types/User/User";
 import { Alert } from "../../components/alert/Alert";
 import { DeleteUserAsAdmin } from "./AdminDelete";
 
@@ -41,11 +41,12 @@ function UserById() {
 
     return (
         <>
-        <h1>UserById</h1>
+        <h2>Användare</h2>
 
         {successMessage && <Alert type="success" message={successMessage}/>}
 
-        <form onSubmit={handleSubmit}>
+        <form className="form" onSubmit={handleSubmit}>
+            <label htmlFor="email">Ändra Mejladress:</label>
             <input 
                 type="email"
                 name="email"
@@ -53,15 +54,18 @@ function UserById() {
                 value={formData?.email}
                 onChange={(e) => setFormData((prev) => prev ? {...prev, email: e.target.value}: prev)}
             />
-            <input
+            <label htmlFor="name">Ändra Namn:</label>
+            <input className="input"
                 type="text"
                 name="name"
                 placeholder="namn"
                 value={formData?.name}
                 onChange={(e) => setFormData((prev) => prev ? {...prev, name: e.target.value}: prev)} 
             />
+            <label htmlFor="role">Ändra användarens roll:</label>
             {roles.map((r) => (
                 <label key={r} >
+                    <label htmlFor=""></label>
                     <input
                         type="radio"
                         name="role"

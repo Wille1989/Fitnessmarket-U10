@@ -2,73 +2,48 @@ import { useState } from "react";
 import { useAdminMangement } from "../../hooks/useAdminManagement";
 import { useMessage } from "../../context/MessageProvider";
 import { Alert } from "../../components/alert/Alert";
+import { CreateUser } from "../../types/User/User";
+import '../../components/layout/admin/UserList.css'
+import { useNavigate } from "react-router-dom";
 
 export function CreateUserAccount() {
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
+    const { createUserAccount, loading } = useAdminMangement();
+    const { successMessage, errorMessage } = useMessage();
+    const [form, setForm] = useState<CreateUser>({
+        email: '',
+        password: '',
+    });
     const [confirmPassword, setConfirmPassword] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
-    const { createUserAccount } = useAdminMangement();
-    const { setSuccessMessage, successMessage, errorMessage, setErrorMessage } = useMessage();
+    const navigate = useNavigate();
 
     const handleSubmit = async(e: React.FormEvent) => {
         e.preventDefault();
 
-        setLoading(true);
+        await createUserAccount(form, confirmPassword);
 
-        if(password !== confirmPassword) {
-            setTimeout(() => {
-                setLoading(false);
-            }, 1500)
-            throw new Error('Lösenorden matachar inte');
-        }
+        navigate('/admin/users');
 
-        if(password.length < 8) {
-            setTimeout(() => {
-                setLoading(false);
-            }, 1500)
-            throw new Error('Lösenordet är för kort');
-        }
-
-        if(!email.includes('@')){
-            setTimeout(() => {
-                setLoading(false);
-            }, 1500)
-            throw new Error('Email är skriven i ett felaktigt format');
-        }
-
-        const success = await createUserAccount({ email, password });
-
-        if(success) {
-            setSuccessMessage('Användaren har skapats!');
-            setTimeout(() => 1500);
-        } else {
-            setErrorMessage('Användaren har inte kunnat skapas');
-        }
-
-        setLoading(false);
     }
 
     return (
         <>
-
-            <form onSubmit={handleSubmit}>
+            <form className="form" onSubmit={handleSubmit}>
                 <input
                 type="email"
                 name="email"
                 placeholder="Ange en unik e-post"
-                value={email}
-                onChange={(e) => setEmail(e.target.value) }
+                value={form.email}
+                onChange={(e) => setForm({...form, email: e.target.value})}
                 />
-                <input
+                <input className="input"
                 type="password"
                 name="password"
                 placeholder="Ange lösenord"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={form.password}
+                onChange={(e) => setForm({...form, password: e.target.value})}
                 />
-                <input
-                type="confirmPassword"
+                <input className="input"
+                type="password"
                 name="confirmPassword"
                 placeholder="Upprepa lösenordet"
                 value={confirmPassword}
