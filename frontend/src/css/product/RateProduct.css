@@ -1,0 +1,16 @@
+.rating-container {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.rating-container button {
+    all: unset;
+    cursor: pointer;
+    font-size: 2rem;
+    color: #ccc;
+}
+
+.rating-container button:hover,
+.rating-container button.active {
+  color: #ffd900bb;
+}

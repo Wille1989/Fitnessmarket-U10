@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
 import useProduct from "../../hooks/useProduct";
-import { useCategory } from "../../hooks/useCategory";
 import type { UpdateProduct } from "../../types/Products/Products";
 import { useParams } from "react-router-dom";
-import '../../components/layout/product/UpdateProduct.css';
+import '../../css/product/UpdateProduct.css'
 import HandleDeleteProduct from "../../components/navigation/button/HandleDeleteProduct";
 
 function EditProduct() {
   const { id } = useParams();
   const { update, show } = useProduct();
-  const { categoryArray } = useCategory();
   const [formData, setFormData] = useState<UpdateProduct>({
-    category: "",
     title: "",
     price: "",
     weight: "",
+    imageUrl: '',
     originCountry: "",
     nutritionalContent: {
       energy: "",
@@ -32,10 +30,10 @@ function EditProduct() {
     const currentData = await show(id);
     if (currentData) {
       setFormData({
-        category: String(currentData.category || ""),
         title: currentData.title || "",
         price: String(currentData.price || ""),
         weight: String(currentData.weight || ""),
+        imageUrl: String(currentData.imageUrl || ""),
         originCountry: currentData.originCountry || "",
         nutritionalContent: {
           energy: String(currentData.nutritionalContent?.energy || ""),
@@ -66,21 +64,14 @@ function EditProduct() {
   return (
     <>
       <form className="form" onSubmit={handleUpdate}>
-        <select
-          aria-label="Kategori"
-          id="categories"
-          value={formData.category}
-          onChange={(e) =>
-            setFormData({ ...formData, category: e.target.value })
-          }
-        >
-          <option value="">Kategori</option>
-          {categoryArray.map((c) => (
-            <option key={c._id} value={c._id}>
-              {c.title}
-            </option>
-          ))}
-        </select>
+
+        <input
+          type="url"
+          name="imageUrl"
+          placeholder="Klistra in bildens URL"
+          value={formData.imageUrl || ''}
+          onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value})}
+        />
 
         <input
           type="text"

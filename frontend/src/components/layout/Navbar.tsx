@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./Navbar.css";
+import '../../css/layout/Navbar.css';
 import { getDecodedToken } from "../../middleware/JwtDecode";
 
 function Navbar() {
@@ -26,7 +26,6 @@ function Navbar() {
           <>
             <li><Link to="/order">Ordrar</Link></li>
             <li><Link to="/admin/users">Användare</Link></li>
-            <li><Link to="/category/create">Skapa Kategori</Link></li>
             <li><Link to="/product/create">Skapa Produkt</Link></li>
             <li><Link to="/logout">Logga ut</Link></li>
           </>

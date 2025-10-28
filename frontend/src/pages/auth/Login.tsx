@@ -3,11 +3,10 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { Alert } from "../../components/alert/Alert";
 import { useMessage } from "../../context/MessageProvider";
-import '../../components/layout/auth/Form.css'
 import { CreateUser } from "../../types/User/User";
+import '../../css/global/Form.css';
 
 function Login() {
-    // GLOBAL STATE
     const { errorMessage, successMessage} = useMessage();
     const { loading, login } = useAuth();
     const [form, setForm] = useState<CreateUser>({

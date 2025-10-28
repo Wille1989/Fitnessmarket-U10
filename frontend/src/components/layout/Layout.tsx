@@ -1,6 +1,6 @@
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import "./Layout.css"; // 👈 importera stilen
+import '../../css/layout/Layout.css';
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,4 +1,3 @@
-import { Category } from "./Category"
 import type { NutritionalContent, UpdateNutritionalContent } from "./NutritionalContent"
 
 export type Product = {
@@ -7,9 +6,9 @@ export type Product = {
     title: string
     price: number
     weight: number
+    imageUrl: string
     originCountry: string
     rating: ProductRating
-    category: Category
     nutritionalContent: NutritionalContent
     createdAt?: Date
     updatedAt?: Date
@@ -17,10 +16,10 @@ export type Product = {
 }
 
 export type CreateProduct = {
-  category: string;
   title: string;
   price: string;
   weight: string;
+  imageUrl: string
   originCountry: string;
   nutritionalContent: {
     energy: string;
@@ -37,9 +36,9 @@ export type UpdateProduct = Partial<{
     title: string
     price: string
     weight: string
+    imageUrl: string
     originCountry: string
     rating: ProductRating
-    category: string
     nutritionalContent: UpdateNutritionalContent
     createdAt?: Date
     updatedAt?: Date

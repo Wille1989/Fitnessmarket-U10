@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useProduct from "../../hooks/useProduct";
+import '../../css/product/RateProduct.css';
 
 type RateProductProps = {
   id: string;
@@ -7,33 +8,24 @@ type RateProductProps = {
 
 function RateProduct({ id }: RateProductProps) {
   const { rate, loading } = useProduct();
-  const [value, setValue] = useState<string>("");
-
-  const handleRate = async () => {
-    if (!value) return alert("Välj ett betyg först!");
-    await rate(id, value);
-  };
+  const [value, setValue] = useState<string>('');
 
   return (
     <>
-        <label htmlFor={`rating-${id}`}>Betygsätt:</label>
-      <select
-        id={`rating-${id}`}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        disabled={loading}
-      >
-        <option value="">Välj...</option>
-        {[1, 2, 3, 4, 5].map((n) => (
-          <option key={n} value={n}>
-            {n} stjärna{n > 1 ? "r" : ""}
-          </option>
-        ))}
-      </select>
+      <label htmlFor={`rating-${id}`}>Betygsätt:</label>
 
-      <button type="button" onClick={handleRate} disabled={loading}>
-        {loading ? "Sparar..." : "Spara"}
-      </button>
+      <div className="rating-container">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+          key={n}
+          type="button"
+          onClick={async () => {setValue(String(n)); await rate(id, String(n))}}
+          disabled={loading}
+          >
+            ★
+        </button>
+        ))}
+      </div>
     </>
       
   );

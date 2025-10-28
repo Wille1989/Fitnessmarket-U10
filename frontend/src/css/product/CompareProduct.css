@@ -1,0 +1,113 @@
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+}
+
+.comparison-result {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.comparison-grid-h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.comparison-grid {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.product-left-side,
+.product-right-side {
+  background: #dfdbdb;
+  padding: 0.5rem;
+  width: 30%;
+  max-width: 250px;
+  border: 1px solid #413e3e;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.1rem;
+  text-align: center;
+}
+.product-left-side {
+    justify-content: center;
+}
+
+.product-left-side h4,
+.product-right-side h4 {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: black;
+}
+
+.product-difference {
+  background: #dfdbdb;
+  padding: 0.5rem;
+  width: 30%;
+  max-width: 80px;
+  border: 1px solid #413e3e;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-top: 3.5rem;
+}
+
+.diff-positive {
+  color: green;
+}
+
+.diff-negative {
+  color: red;
+}
+
+.diff-neutral {
+  color: gray;
+}
+
+.button {
+    margin-left: 23rem;
+    max-width: 500px;
+}
+
+
+@media (max-width: 900px) {
+  .product-left-side,
+  .product-right-side {
+    width: 45%;
+  }
+}
+
+@media (max-width: 600px) {
+  .comparison-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .product-left-side,
+  .product-right-side {
+    width: 90%;
+  }
+
+  .product-difference {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+  }
+}

@@ -4,6 +4,7 @@ import { Alert } from "../../components/alert/Alert";
 import { useEffect } from "react";
 import NavigateEdit from "../../components/navigation/button/EditUser";
 import { useNavigate } from "react-router-dom";
+import '../../css/user/admin/UserList.css'
 
 function GetUsersList() {
     const { successMessage, errorMessage, arrayErrorMessage } = useMessage();

@@ -1,20 +1,18 @@
 import { useState } from "react";
 import { useMessage } from "../../context/MessageProvider";
 import { Alert } from "../../components/alert/Alert";
-import { useCategory } from "../../hooks/useCategory";
 import useProduct from "../../hooks/useProduct";
 import type { CreateProduct } from '../../types/Products/Products'
-import '../../components/layout/product/CreateProduct.css'
+import '../../css/product/CreateProduct.css';
 
 function CreateProduct() {
     const { setSuccessMessage, successMessage, errorMessage } = useMessage();
     const { create } = useProduct();
-    const { categoryArray } = useCategory();
     const [form,setForm] = useState<CreateProduct>({
-        category: '',
         title: '',
         price: '',
         weight: '',
+        imageUrl: '',
         originCountry: '',
         nutritionalContent: {
             energy: '',
@@ -34,10 +32,10 @@ function CreateProduct() {
         setTimeout(() => {
             setSuccessMessage(null),
             setForm({
-                category: "",
                 title: "",
                 price: "",
                 weight: "",
+                imageUrl: '',
                 originCountry: "",
                 nutritionalContent: {
                     energy: "",
@@ -54,25 +52,17 @@ function CreateProduct() {
     return (
         <>
             <form className="form-create-product" onSubmit={handleSubmit}>
-                <section className="form-section">
-                    <h3>Kategori:</h3>
-                    <select
-                    aria-label="categories"
-                    id='categories' 
-                    value={form.category} 
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                        <option value=''> Välj kategori </option>
-                        {categoryArray.length > 0 ? (categoryArray.map((c) => (
-                            <option 
-                                key={c._id} 
-                                value={c._id}>{c.title}</option> ))
-                        ) : ( <option disabled>Laddar kategorier...</option> )}
-                    </select>
-                </section>
-        
+            
                 <section className="form-section">
                     <h3>Produkt</h3>
 
+                    <input
+                        type="url"
+                        name="imageUrl"
+                        placeholder="Klistra in bildens URL"
+                        value={form.imageUrl || ''}
+                        onChange={(e) => setForm({ ...form, imageUrl: e.target.value})}
+                    />
                     <input
                         type="text"
                         name="title"

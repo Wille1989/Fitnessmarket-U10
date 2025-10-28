@@ -4,7 +4,7 @@ import { Alert } from '../../components/alert/Alert';
 import { useMessage } from '../../context/MessageProvider';
 import { useUserManager } from '../../hooks/useUserManager';
 import { CreateUser } from '../../types/User/User';
-import '../../components/layout/auth/Form.css'
+import '../../css/global/Form.css';
 
 function Register() {
         const navigate = useNavigate();

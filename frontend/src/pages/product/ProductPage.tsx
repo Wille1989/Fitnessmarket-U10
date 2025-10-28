@@ -1,13 +1,16 @@
 import useProduct from "../../hooks/useProduct";
 import { useState, useEffect } from "react";
-import '../../components/layout/product/ProductPage.css'
+import '../../css/product/ProductPage.css';
 import RateProduct from "./RateProduct";
 import { useNavigate } from "react-router-dom";
+import { getDecodedToken } from "../../middleware/JwtDecode";
 
 function ProductPage() {
     const { index, loading, productArray } = useProduct();
     const [search, setSearch] = useState('');
     const navigate = useNavigate();
+    const decoded = getDecodedToken();
+    const role = decoded?.role || 'guest'
 
     useEffect(() => {
         index();
@@ -17,7 +20,6 @@ function ProductPage() {
 
     const filteredProducts = productArray.filter((product) =>
             product.title.toLowerCase().includes(search.toLowerCase()) ||
-            (product.category?.title ?? '').toLowerCase().includes(search.toLowerCase()) ||
             product.originCountry.toLowerCase().includes(search.toLowerCase()), 
         );
 
@@ -34,6 +36,7 @@ function ProductPage() {
 
                 {filteredProducts.map((p) => (
                 <li className="product-card" key={p._id}>
+                    <img src={p.imageUrl} alt={p.title} className="product-image" />
                     <h2>{p.title}</h2>
                     <span><strong>Land:</strong> {p.originCountry}</span>
                     <span><strong>Vikt/kg:</strong> {p.weight}</span>
@@ -46,11 +49,17 @@ function ProductPage() {
                         <span><strong>Mättat fett:</strong>{p.nutritionalContent.saturatedfat}</span>
                         <span><strong>Salt: </strong>{p.nutritionalContent.salt}</span>
                         <span><strong>Protein: </strong>{p.nutritionalContent.protein}</span>
-                        <RateProduct id={p._id} />
+                        <RateProduct id={p._id} />  
+                    </div>
 
-                        <button type="button" onClick={() => navigate(`/admin/product/${p._id}`)}>
-                            Redigera
-                        </button>
+                    <div className="product-edit-card">
+                        {role === 'admin' && (
+                        <>
+                            <button type="button" onClick={() => navigate(`/admin/product/${p._id}`)}>
+                                &#128393;
+                            </button>
+                        </>
+                        )}
                     </div>
                 </li>
                 ))}
