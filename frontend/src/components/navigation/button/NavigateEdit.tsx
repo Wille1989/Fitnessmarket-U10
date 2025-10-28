@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAdminMangement } from "../../../hooks/useAdminManagement";
+import { useAdminManagement } from "../../../hooks/useAdminManagement";
 
 function NavigateEdit({ id }: { id: string }) {
     const [loading, setLoading] = useState<boolean>(false);
-    const { showUserAccount } = useAdminMangement();
+    const { showUserAccount } = useAdminManagement();
     const navigate = useNavigate();
 
 

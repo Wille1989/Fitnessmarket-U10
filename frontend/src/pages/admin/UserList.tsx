@@ -1,14 +1,15 @@
-import { useAdminMangement } from "../../hooks/useAdminManagement";
+import { useAdminManagement } from "../../hooks/useAdminManagement";
 import { useMessage } from "../../context/MessageProvider";
 import { Alert } from "../../components/alert/Alert";
 import { useEffect } from "react";
-import NavigateEdit from "../../components/navigation/button/EditUser";
+import NavigateEdit from "../../components/navigation/button/NavigateEdit";
 import { useNavigate } from "react-router-dom";
 import '../../css/user/admin/UserList.css'
+import NavigateCustomerOrders from "../../components/navigation/button/NavigateCustomerOrders";
 
 function GetUsersList() {
     const { successMessage, errorMessage, arrayErrorMessage } = useMessage();
-    const { getUsersList, loading, userList } = useAdminMangement();
+    const { getUsersList, loading, userList } = useAdminManagement();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -39,6 +40,7 @@ function GetUsersList() {
                                 <strong>{u.email}</strong>
                             </div>
                             <NavigateEdit id={u.id} />
+                            <NavigateCustomerOrders id={u.id} />
                         </li>
                     ))}
                 </ul>

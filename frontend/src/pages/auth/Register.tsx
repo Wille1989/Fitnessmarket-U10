@@ -8,7 +8,7 @@ import '../../css/global/Form.css';
 
 function Register() {
         const navigate = useNavigate();
-        const { successMessage, errorMessage } = useMessage();
+        const { successMessage, errorMessage,setSuccessMessage } = useMessage();
         const { loading, register } = useUserManager();
         const [form,setForm] = useState<CreateUser>({
             email: '', 
@@ -19,9 +19,16 @@ function Register() {
         async function handleSubmit(e: React.FormEvent) {
             e.preventDefault();
 
-            await register (form, confirmPassword);
+            const success = await register (form, confirmPassword);
 
-            navigate('/login')
+            if(success) {
+                setSuccessMessage('Konto skapat, omdirigerar för inloggning');
+                setTimeout(()=> {
+                    setSuccessMessage(null);
+                    navigate('/login');
+                },2000)
+            }
+            
         }
 
     return (

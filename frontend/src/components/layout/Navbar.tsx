@@ -33,7 +33,14 @@ function Navbar() {
 
         {role === "sales" && (
           <>
-            <li><Link to="/order">Skapa Produkt</Link></li>
+            <li><Link to="/product/create">Skapa Produkt</Link></li>
+            <li><Link to="/logout">Logga ut</Link></li>
+          </>
+        )}
+
+        {role === "customer" && (
+          <>
+            <li><Link to="/myOrders">Mina ordrar</Link></li>
             <li><Link to="/logout">Logga ut</Link></li>
           </>
         )}

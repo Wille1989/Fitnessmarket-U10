@@ -4,9 +4,11 @@ import '../../css/product/ProductPage.css';
 import RateProduct from "./RateProduct";
 import { useNavigate } from "react-router-dom";
 import { getDecodedToken } from "../../middleware/JwtDecode";
+import useCart from "../../hooks/useCart";
 
 function ProductPage() {
     const { index, loading, productArray } = useProduct();
+    const { addToCart, removeFromCart, handleCheckout, cart, total} = useCart();
     const [search, setSearch] = useState('');
     const navigate = useNavigate();
     const decoded = getDecodedToken();
@@ -49,7 +51,14 @@ function ProductPage() {
                         <span><strong>Mättat fett:</strong>{p.nutritionalContent.saturatedfat}</span>
                         <span><strong>Salt: </strong>{p.nutritionalContent.salt}</span>
                         <span><strong>Protein: </strong>{p.nutritionalContent.protein}</span>
-                        <RateProduct id={p._id} />  
+                        <RateProduct id={p._id} />
+
+                        {role === 'customer' && (
+                            <>
+                                <button type="button" onClick={() => removeFromCart(p)}>-</button>
+                                <button type="button" onClick={() => addToCart(p)}>+</button>
+                            </>
+                        )}
                     </div>
 
                     <div className="product-edit-card">
@@ -64,6 +73,19 @@ function ProductPage() {
                 </li>
                 ))}
             </ul>
+
+            <h3>Kundvagn</h3>
+            <ul>
+                {cart.map((item) => (
+                <li key={item.productID}>
+                    {item.title} x {item.quantity} = {item.price * item.quantity} kr
+                </li>
+                ))}
+            </ul>
+
+            <p><strong>Totalt:</strong> {total.toFixed(1)} kr</p>
+
+            <button type="submit" onClick={handleCheckout}>Lägg beställning</button>
         </div>
         </>
     )

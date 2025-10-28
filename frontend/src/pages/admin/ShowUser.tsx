@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMessage } from "../../context/MessageProvider";
-import { useAdminMangement } from "../../hooks/useAdminManagement";
+import { useAdminManagement } from "../../hooks/useAdminManagement";
 import type{ UpdateUser } from "../../types/User/User";
 import { Alert } from "../../components/alert/Alert";
 import { DeleteUserAsAdmin } from "./AdminDelete";
 
 function UserById() {
     const { successMessage, setSuccessMessage } = useMessage();
-    const { showUserAccount, userAccount, updateUserAccount } = useAdminMangement();
+    const { showUserAccount, userAccount, updateUserAccount } = useAdminManagement();
     const { id }= useParams();
     const [formData, setFormData] = useState<UpdateUser | null>();
     const roles = ['admin', 'sales', 'customer']

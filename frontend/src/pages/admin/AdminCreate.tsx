@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAdminMangement } from "../../hooks/useAdminManagement";
+import { useAdminManagement } from "../../hooks/useAdminManagement";
 import { useMessage } from "../../context/MessageProvider";
 import { Alert } from "../../components/alert/Alert";
 import { CreateUser } from "../../types/User/User";
@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import '../../css/global/Form.css';
 
 export function CreateUserAccount() {
-    const { createUserAccount, loading } = useAdminMangement();
+    const { createUserAccount, loading } = useAdminManagement();
     const { successMessage, errorMessage } = useMessage();
     const [form, setForm] = useState<CreateUser>({
         email: '',

@@ -25,6 +25,7 @@ function RateProduct({ id }: RateProductProps) {
             ★
         </button>
         ))}
+        {value && <p>Du gav {value} stjärna{value !== "1" && "r"}!</p>}
       </div>
     </>
       

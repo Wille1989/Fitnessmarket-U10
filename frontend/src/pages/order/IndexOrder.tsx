@@ -1,31 +1,36 @@
 import { useOrder } from "../../hooks/useOrder"
-import HandleDeleteOrder from "../../components/navigation/button/HandleDeleteOrder";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useAdminMangement } from "../../hooks/useAdminManagement";
+import { useAdminManagement } from "../../hooks/useAdminManagement";
+import { useState } from "react";
 
 function IndexOrder() {
-    const { index, orderArray, loading } = useOrder();
+    const { index, orderArray, loading: orderLoading } = useOrder();
     const { id } = useParams();
-    const { indexCustomerOrder } = useAdminMangement()
+    const { indexCustomerOrder, loading: adminLoading } = useAdminManagement()
+    const [orders, setOrders] = useState(orderArray);
 
     useEffect(() => {
-        if(id) {
-            indexCustomerOrder(id);
+        async function fetchData() {
+             if(id) {
+            const result = await indexCustomerOrder(id);
+            if (result) setOrders(result);
         } else {
-            index();
+            const result = await index();
+            if(result) setOrders(result);
         }
-    },[id, indexCustomerOrder, index]);
+        } fetchData(); },[id, indexCustomerOrder, index]);
+
+        console.log(orders);
     
-    if(loading) return <p><strong>Laddar ordrar...</strong></p>
-    if(orderArray.length === 0) return <p><strong>Inga ordrar hittades...</strong></p>
+    if(orderLoading || adminLoading) return <p><strong>Laddar ordrar...</strong></p>
+    if(orderArray.length === 0) return <p><strong>Inga ordrar hittades tyvärr</strong></p>
 
     return (
         <>
             <ul>
-                {orderArray.map((order) => (
+                {orders.map((order) => (
                     <li key={order._id}>{`${order.orderNumber}`}
-                    <HandleDeleteOrder id={order._id!}/>
                     </li>
                 ))}
             </ul>

@@ -5,7 +5,7 @@ import { useMessage } from "../context/MessageProvider";
 import { useCallback } from "react";
 import type { Order } from "../types/Order/Order";
 
-export function useAdminMangement() {
+export function useAdminManagement() {
     const { setSuccessMessage, setErrorMessage, 
             setArrayErrorMessage } = useMessage();
     const [userAccount, setUserAccount] = useState<User | null>(null);
@@ -153,7 +153,7 @@ export function useAdminMangement() {
             setLoading(true);
 
             const result = await adminApi.index(id);
-
+            console.log('RAD 156',result);
             if(!result) {
                 throw new Error('Inga ordrar hittades');
             }

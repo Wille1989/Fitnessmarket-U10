@@ -29,18 +29,16 @@ export function useAuth() {
                     throw new Error('Kunde inte avläsa token');
                 }
 
-                setTimeout(() => setSuccessMessage('Du loggas in!'), 1500);
-
                 if(decoded.role === 'customer'){
-                    navigate('/myprofile')
+                    navigate('/')
                     navigate(0);
 
                 } else if (decoded.role === 'admin'){
-                    navigate('/admin')
+                    navigate('/')
                     navigate(0);
 
                 } else if(decoded.role === 'sales'){
-                    navigate('/sales')
+                    navigate('/')
                     navigate(0);
                 }
             }

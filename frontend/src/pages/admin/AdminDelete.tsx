@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useMessage } from "../../context/MessageProvider";
-import { Alert } from "../../components/alert/Alert";
-import { useAdminMangement } from "../../hooks/useAdminManagement";
+import { useAdminManagement } from "../../hooks/useAdminManagement";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 export function DeleteUserAsAdmin() {
     const [loading, setLoading] = useState<boolean>(false);
-    const { successMessage, setSuccessMessage, errorMessage, setErrorMessage } = useMessage();
-    const { deleteUserAccount } = useAdminMangement();
+    const { setSuccessMessage, errorMessage, setErrorMessage } = useMessage();
+    const { deleteUserAccount } = useAdminManagement();
     const { id } = useParams();
     const navigate = useNavigate();
 

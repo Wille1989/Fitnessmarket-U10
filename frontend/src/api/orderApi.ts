@@ -5,7 +5,7 @@ import type { Order } from "../types/Order/Order";
 export const orderApi = {
 
     index: async(): Promise<Order[]> => {
-        const result = await api.get('/order');
+        const result = await api.get('/order/myOrders');
         console.log(result.data.data);
         return result.data.data;
     },

@@ -1,13 +1,12 @@
 import { useState } from "react";
-import { useAdminMangement } from "../../hooks/useAdminManagement";
+import { useAdminManagement } from "../../hooks/useAdminManagement";
 import { Alert } from "../../components/alert/Alert";
 import { useMessage } from "../../context/MessageProvider";
 
-
 function registerNewUser() {
     const [loading, setLoading] = useState<boolean>(false);
-    const { createUserAccount, userAccount } = useAdminMangement();
-    const { setSuccessMessage, successMessage, errorMessage, setErrorMessage } = useMessage();
+    const { createUserAccount, userAccount } = useAdminManagement();
+    const { setSuccessMessage, successMessage, errorMessage } = useMessage();
     const [confirmPassword, setConfirmPassword] = useState<string>('');
 
     const handleSubmit = async(e: React.FormEvent) => {
@@ -19,23 +18,10 @@ function registerNewUser() {
             throw new Error('ERROR');
         }
 
-        await createUserAccount(userAccount);
-
-        if(userAccount) {
-
-            if(userAccount.password !== confirmPassword) {
-                setErrorMessage('Lösenordet matcher inte');
-            }
-
+        await createUserAccount(userAccount,confirmPassword);
             
             setSuccessMessage('Användaren har skapats');
             setTimeout(() => setSuccessMessage(null), 1500);
-
-            console.log('ADMINREGISTER:', userAccount)
-        } else {
-            setErrorMessage(errorMessage);
-            setTimeout(() => setErrorMessage(null), 1500);
-        }
         
         setLoading(false);
 

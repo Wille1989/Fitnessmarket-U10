@@ -34,7 +34,7 @@ export const adminApi = {
 
     // ORDER
     index: async(id: string): Promise<Order[]> => {
-            const result = await api.get(`/order/${id}`);
+            const result = await api.get(`/order/admin/${id}`);
             console.log(result.data.data);
             return result.data.data;
         },
