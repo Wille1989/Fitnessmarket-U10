@@ -1,34 +1,32 @@
-import type { UpdateUser, User } from "../types/User/User";
+import type { UpdateUser, User, CreateUser } from "../types/User/User";
 import { adminApi } from "../api/adminApi";
 import { useState } from "react";
 import { useMessage } from "../context/MessageProvider";
 import { useCallback } from "react";
+import type { Order } from "../types/Order/Order";
 
-export function useAdminMangement() {
+export function useAdminManagement() {
     const { setSuccessMessage, setErrorMessage, 
-            setArrayErrorMessage, setArraySuccessMessage } = useMessage();
+            setArrayErrorMessage } = useMessage();
     const [userAccount, setUserAccount] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [userList, setUserList] = useState<User[] | null>(null);
+    const [customerOrder, setCustomerOrder] = useState<Order[]>([])
 
     // DELETE A USER ACCOUNT
-    async function deleteUserAccount(userAccount: User) {
+    async function deleteUserAccount(id: string) {
         try {
             setLoading(true);
+            console.log(id, typeof id);
             
-            const hadToken = localStorage.getItem('token');
-            if(hadToken) {
-                localStorage.removeItem('token');
-            }
-            await adminApi.deleteUserAccount(userAccount);
+            await adminApi.deleteUserAccount(id);
 
-            setSuccessMessage('Användaren har tagits bort');
             setTimeout(() => setUserAccount(null), 1500);
+
             return true;
             
         } catch (error) {
-            setErrorMessage('Det gick inte att radera användaren');
-            setTimeout(() => setErrorMessage(null), 3000);
+
             return false;
 
         } finally {
@@ -42,9 +40,9 @@ export function useAdminMangement() {
             setLoading(true);
 
             const userData = await adminApi.updateUserAccount(userAccount);
+
             setUserAccount(userData);
 
-            setArraySuccessMessage('Användaren har uppdaterats!');
             setTimeout(() => setUserAccount(null), 1000);
             return true;
             
@@ -110,13 +108,80 @@ export function useAdminMangement() {
         }
     },[]);
 
+    async function createUserAccount(userAccount: CreateUser, confirmPassword: string): Promise<User | null> {
+
+        try {
+            setLoading(true);
+
+            if(!userAccount.email.includes('@')){
+                throw new Error('Email är skriven i ett felaktigt format')
+            }
+
+            if(userAccount.password.length < 8) {
+                throw new Error('Lösenordet är för kort');
+            }
+
+            if(userAccount.password !== confirmPassword) {
+                throw new Error('Lösenorden matachar inte')
+            }
+
+            setSuccessMessage('Användaren har skapats!');
+            setTimeout(() => setSuccessMessage(null), 1500);
+
+            const response = await adminApi.createUserAccount(userAccount)
+            setUserAccount(response);
+
+            return response;
+
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error.response?.data?.message || 
+            error.message || 'Oväntat fel';
+
+            setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+
+    }
+
+    const indexCustomerOrder = useCallback(async(id: string): Promise<Order[] | null> => {
+
+        try {
+            setLoading(true);
+
+            const result = await adminApi.index(id);
+            console.log('RAD 156',result);
+            if(!result) {
+                throw new Error('Inga ordrar hittades');
+            }
+
+            setCustomerOrder(result);
+            return result;
+
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error?.message || 'Oväntat fel'
+            setErrorMessage(message);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+
+    }, [setErrorMessage, setLoading])
+
     return { 
         userAccount,  
         loading,
         userList,
+        customerOrder,
         deleteUserAccount,
         updateUserAccount,
         showUserAccount,
-        getUsersList
+        getUsersList,
+        createUserAccount,
+        indexCustomerOrder
         }
 }

@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
-import { useAdminMangement } from "../../hooks/useAdminManagement";
 import { useParams } from "react-router-dom";
-import { UpdateUser } from "../../types/User/User";
+import { useMessage } from "../../context/MessageProvider";
+import { useAdminManagement } from "../../hooks/useAdminManagement";
+import type{ UpdateUser } from "../../types/User/User";
+import { Alert } from "../../components/alert/Alert";
+import { DeleteUserAsAdmin } from "./AdminDelete";
 
 function UserById() {
-    const { showUserAccount, userAccount, updateUserAccount } = useAdminMangement();
+    const { successMessage, setSuccessMessage } = useMessage();
+    const { showUserAccount, userAccount, updateUserAccount } = useAdminManagement();
     const { id }= useParams();
     const [formData, setFormData] = useState<UpdateUser | null>();
+    const roles = ['admin', 'sales', 'customer']
 
     // USER ID FROM URL
     useEffect(() => {
@@ -27,17 +32,21 @@ function UserById() {
         if(!formData) return;
 
         await updateUserAccount(formData);
-    }
 
-    const roles = ['admin', 'sales', 'customer']
+        setSuccessMessage('Användaren har uppdaterats!');
+        setTimeout(() => setSuccessMessage(null), 1500);
+    }
 
     if(!formData) return <p>Laddar användare...</p> 
 
     return (
-        <div>
-        <h1>UserById</h1>
+        <>
+        <h2>Användare</h2>
 
-        <form onSubmit={handleSubmit}>
+        {successMessage && <Alert type="success" message={successMessage}/>}
+
+        <form className="form" onSubmit={handleSubmit}>
+            <label htmlFor="email">Ändra Mejladress:</label>
             <input 
                 type="email"
                 name="email"
@@ -45,21 +54,24 @@ function UserById() {
                 value={formData?.email}
                 onChange={(e) => setFormData((prev) => prev ? {...prev, email: e.target.value}: prev)}
             />
-            <input
+            <label htmlFor="name">Ändra Namn:</label>
+            <input className="input"
                 type="text"
                 name="name"
                 placeholder="namn"
                 value={formData?.name}
                 onChange={(e) => setFormData((prev) => prev ? {...prev, name: e.target.value}: prev)} 
             />
+            <label htmlFor="role">Ändra användarens roll:</label>
             {roles.map((r) => (
                 <label key={r} >
+                    <label htmlFor=""></label>
                     <input
                         type="radio"
                         name="role"
                         checked={formData?.role === r}
                         value={r}
-                        onChange={(e) => setFormData((prev) => prev ? {...prev, r: e.target.value} : prev )}
+                        onChange={(e) => setFormData((prev) => prev ? {...prev, role: e.target.value} : prev )}
                     />
                 {r}
                 </label>
@@ -69,10 +81,11 @@ function UserById() {
                 Uppdatera
             </button>
          
-
         </form>
+
+        <DeleteUserAsAdmin /> 
            
-        </div>
+        </>
     )
 }
 

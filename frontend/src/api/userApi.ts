@@ -1,5 +1,5 @@
 import { api } from "./axios";
-import type { User, CreateUser } from "../types/User/User";
+import type { User, CreateUser, UpdateUser } from "../types/User/User";
 
 export const userApi = {
 
@@ -17,14 +17,12 @@ export const userApi = {
 
     showMyAccount: async(): Promise<User> => {
         const result = await api.get('/user/show')
-
-        return result.data;
+        return result.data.data;
     },
 
-     updateMyAccount: async(data: User): Promise<User> => {
+     updateMyAccount: async(data: UpdateUser): Promise<User | null> => {
         const result = await api.patch('/user/update/myAccount', data);
-
-        return result.data;
+        return result.data.data;
     },
 
 }

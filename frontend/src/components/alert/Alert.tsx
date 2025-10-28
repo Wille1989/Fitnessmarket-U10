@@ -1,4 +1,4 @@
-import './Alert.css';
+import '../../css/global/Alert.css';
 
 type AlertProps = {
     type: "success" | "error" | "info" | "warning";

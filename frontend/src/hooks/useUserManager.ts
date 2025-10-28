@@ -1,42 +1,41 @@
 import { userApi } from "../api/userApi";
 import { useMessage } from "../context/MessageProvider";
 import type { User, CreateUser } from "../types/User/User";
-import { useState } from "react";
+import { useCallback, useState} from "react";
 
 export function useUserManager() {
-    const { setErrorMessage, setSuccessMessage, } = useMessage();
+    const { setErrorMessage, setSuccessMessage } = useMessage();
     const [loading, setLoading] = useState<boolean>(false);
-    const [theUser, setTheUser] = useState<User |null>(null);
- 
+    const [userAccount, setUserAccount] = useState<User |null>(null);
+
     // REGISTER NEW ACCOUNT
-    async function register(theUser: CreateUser) {
+    async function register(user: CreateUser, confirmPassword: string) {
         try {
             setLoading(true);
 
-            if(!theUser.email.includes('@')) {
-                setErrorMessage('Ogiltig e-post');
+            if(!user.email.includes('@')) {
+                throw new Error('Ogiltig e-post');
             }
 
-            if(theUser.password.length < 8){
-                setErrorMessage('Lösenordet är för kort');
+            if(user.password.length < 8){
+                throw new Error('Lösenordet måste vara minst 8 tecken');
             }
 
-            const newUser = await userApi.register(theUser);
+            if(user.password !== confirmPassword){
+                throw new Error('Lösenordet matchar inte');
+            }
             
-            if(!newUser || !newUser.email) {
-                throw new Error('Svaret från servern ogillades');
-            }
+            const newUser = await userApi.register(user);
 
-            setTheUser(newUser);
-
-            setSuccessMessage('Ditt konto har skapats!');
-            setTimeout(() => setTheUser(null), 1500);
-            return true;
+            setUserAccount(newUser);
+            return newUser;
             
-        } catch (error) {
-            setErrorMessage('Det gick inte att skapa ditt konto, vänligen försök igen');
-            setTimeout(() => setErrorMessage(null), 3000);
-            return false;
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
+            setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
+            return null;
 
         } finally {
             setLoading(false);
@@ -58,13 +57,17 @@ export function useUserManager() {
                 setSuccessMessage('Du loggas ut och ditt konto tas bort');
                 await new Promise((resolve) => setTimeout(resolve, 1500));
 
-                setTheUser(null);
+                setUserAccount(null);
                 return true;
             }
 
-        } catch (error) {
-            setErrorMessage('Kunde inte ta bort kontot');
-            setTimeout(() => setErrorMessage(null),3000);
+        } catch (error: any) {
+            console.error('DELETE ACCOUNT:', error);
+
+            const message: string = error?.message || 'Oväntat fel';
+
+            setErrorMessage(message);
+            
             return false;
             
         } finally {
@@ -73,60 +76,31 @@ export function useUserManager() {
     }
 
     // SHOW OWN ACCOUNT
-    async function showMyAccount() {
+    const showMyAccount = useCallback(async () => {
+
         try {
             setLoading(true);
 
-            const userData = await userApi.showMyAccount();
-            setTheUser(userData);
+            const myUser = await userApi.showMyAccount();
 
-            setSuccessMessage('Ditt ID hämtas');
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            setUserAccount(myUser);
+        } catch (error: any) {
+            console.error('SHOW MY ACCOUNT', error);
 
-            setTheUser(null);
-            return true;
-            
-        } catch (error) {
-            setErrorMessage('Det gick inte att hämta användaren');
-            setTimeout(() => setErrorMessage(null), 1500);
-            return false;
+            const message: string = error?.message || 'Oväntat fel';
 
-        } finally {
-            setLoading(false);
-
-        }
-    }
-
-    // UPDATE OWN ACCOUNT
-    async function updateMyAccount(data: User) {
-        try {
-            setLoading(true);
-            
-            const userData = await userApi.updateMyAccount(data);   
-            setTheUser(userData);
-
-            setSuccessMessage('Dina uppgifter har uppdaterats');
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-
-            setTheUser(null);
-            return true;
-            
-        } catch (error) {
-            setErrorMessage('Det gick inte att uppdatera användaren');
-            setTimeout(() => setErrorMessage(null), 1500);
-            return false;
+            setErrorMessage(message);
 
         } finally {
             setLoading(false);
         }
-
-    }
+    }, []) 
 
     return { 
-        theUser, 
+        userAccount, 
         loading, 
         register, 
         deleteOwnAccount, 
         showMyAccount,
-        updateMyAccount };
+        };
 }

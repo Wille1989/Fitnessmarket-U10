@@ -1,12 +1,13 @@
-import NavigateLogin from "../components/navigation/button/Login";
+import ProductPage from "./product/ProductPage";
+import './Home.css'
+
 
 function Home() {
 
     return (
-        <div>
-            <h1>HOME</h1>
-            <NavigateLogin />
-        </div>
+        <>
+           <ProductPage/>
+        </>
         
     )
 }
