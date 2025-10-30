@@ -10,8 +10,8 @@ export const ProductFactory = {
                 title: fromBody.title,
                 price: fromBody.price,
                 weight: fromBody.weight,
+                imageUrl: fromBody.imageUrl,
                 originCountry: fromBody.originCountry,
-                category: fromBody.category,
                 nutritionalContent: NutritionalContentFactory.create(
                     fromBody.nutritionalContent),
                 rating: rating,
@@ -20,6 +20,7 @@ export const ProductFactory = {
         },
 
     update: (current: Product, changes: UpdateProduct): Product => {
+
         return {
             ...current,
             ...changes,

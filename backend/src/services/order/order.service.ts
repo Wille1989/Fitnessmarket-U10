@@ -4,6 +4,7 @@ import { generateOrderNumber } from '../../utils/generateOrderNumber';
 import { NotFoundError } from "../../classes/ErrorHandling";
 import { Orderfactory } from "../../factories/order.factory";
 import type { Order, ProductItem } from "../../types/product/Order";
+import { ValidationError } from "../../classes/ErrorHandling";
 
 // CREATE ORDER
 export async function createOrderService(id: string, content: ProductItem[] ): Promise<Order> {
@@ -12,7 +13,11 @@ export async function createOrderService(id: string, content: ProductItem[] ): P
     
     const customerID = convertStringToObjectId(id);
 
-    const newOrderNumber: Number = await generateOrderNumber()
+    const newOrderNumber: Number = await generateOrderNumber();
+
+    if (!Array.isArray(content) || content.length === 0) {
+        throw new ValidationError("Ordern måste innehålla minst en produkt");
+    }
 
     const newOrder = Orderfactory.create({ content }, customerID, newOrderNumber);
     const response = await db.collection<Order>('orders').insertOne(newOrder);
@@ -42,30 +47,7 @@ export async function deletOrderService(id: string ) {
 
 };
 
-export async function deleteOrderByAdminService(costumerID: string, orderID: string) {
-
-    const convertedCostumerID = convertStringToObjectId(costumerID);
-    const convertedOrderID = convertStringToObjectId(orderID);
-
-    const db = await getDb();
-    const theUser = await db.collection('orders')
-    .findOne(convertedCostumerID);
-
-    const theOrder = await db.collection('orders')
-    .findOneAndDelete({ costumerID: theUser, _id: convertedOrderID })
-
-    if(!theOrder) {
-        throw new NotFoundError('Något gick fel');
-    }
-
-    if(theOrder.deletecount === 0){
-        throw new NotFoundError('Dokumentet togs inte bort');
-    }
-
-    return theOrder;
-}
-
-// GET ORDER BY ID (CONFIRMED WOKRING WITH INSOMNIA)
+// GET ORDER BY ID
 export async function getOrderByIdService(userID: string, orderID: string): Promise<Order> {
 
     const convertedUserID = convertStringToObjectId(userID);
@@ -87,15 +69,11 @@ export async function getOrderByIdService(userID: string, orderID: string): Prom
 export async function getAllOrdersService(id: string): Promise<Order[]>{
 
     const userID = convertStringToObjectId(id);
-
     const db = await getDb();
 
-    const orders = await db.collection<Order>('users')
-    .find({ customerID: userID }).toArray();
 
-    if(orders.length === 0){
-        throw new NotFoundError('Inga dokument kunde retuneras');
-    }
+    const orders = await db.collection<Order>('orders')
+    .find({ customerID: userID }).toArray();
 
     return orders;
 };

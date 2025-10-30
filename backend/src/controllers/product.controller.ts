@@ -17,7 +17,7 @@ import {
 export async function createProduct(
     req: AuthenticatedRequest, res: Response<ApiResponse<Product>>): Promise<void> {
     try {
-        const product = req.body;
+        const product: Product = req.body;
 
         const newProduct = await createProductService(product);
 
@@ -50,7 +50,7 @@ export async function getProductById(
         const product: Product = await getProductByIdService(productID);
 
         res.status(200).json({ 
-            message: `retunerar ${product.title} i kategory ${product.category}`, data: product });
+            message: `retunerar ${product.title}`, data: product });
        
     } catch (error) {
         const err = error as any;
@@ -127,7 +127,9 @@ export async function deleteProduct(
 export async function updateProduct(
     req: AuthenticatedRequest, res: Response<ApiResponse<Product>>): Promise<void> {
     try {
-        const { product: { _id: productID, ...productData } } = req.body;
+        const productID = req.params.id;
+        const productData = req.body;
+        
         const result = await updateProductService(productData, productID);
 
         res.status(200).json({ message: 'Produkten har uppdaterats!', data: result })
@@ -155,6 +157,7 @@ export async function updateProduct(
 export async function compareProducts(
     req: Request, res: Response<ApiResponse<ComparedProducts>>): Promise<void> {
     try {
+        console.log('REQ BODY:', req.body);
         // Create an array of object
         const { products } = req.body;
 
@@ -163,6 +166,9 @@ export async function compareProducts(
         if(!products) {
             throw new NotFoundError('Det gick inte att jämföra produkterna');
         };
+
+        console.log(compareProducts);
+        console.log(comparison);
 
         res.status(200).json({ message: 'Jämförelse av datan genomförd, skickar vidare', data: { comparedProducts, comparison } });
 
@@ -190,11 +196,11 @@ export async function compareProducts(
 export async function rateProduct(
     req: Request, res: Response<ApiResponse<Product>>): Promise<void> {
     try {
-        const product = req.body;
-        const productID = product.id;
-        const productRating = product.productRating;
+        const {id, ratingValue} = req.body;
 
-        const response = await rateProductService(productID, productRating);
+        console.log(id, ratingValue)
+
+        const response = await rateProductService(id, ratingValue);
 
         res.status(200).json({ data: response });
 

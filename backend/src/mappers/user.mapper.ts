@@ -18,11 +18,11 @@ export const UserMapper = {
 
     toAdminDTO: (user: User): AdminUserDTO => ({
         id: user._id?.toString(),
-        updatedAt: user.updatedAt?.toISOString(),
-        createdAt: user.createdAt?.toISOString(),
+        updatedAt: user.updatedAt ?? undefined,
+        createdAt: user.createdAt ?? undefined,
         createdByAdmin: user.createdByAdmin ?? false,
         name: user.name,
         email: user.email,
-        userRole: user.role,
+        role: user.role,
     }),
 };

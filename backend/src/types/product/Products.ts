@@ -1,6 +1,5 @@
 import { ObjectId } from "mongodb"
 import { NutritionalContent } from "./NutritionalContent"
-import { Category } from "./Category"
 import type { NutritionalContentComparison } from "./NutritionalContent"
 import type { ProductRating } from "./ProductRating"
 
@@ -12,8 +11,8 @@ export type Product = {
     weight: number
     originCountry: string
     rating: ProductRating
-    category: Category
     nutritionalContent: NutritionalContent
+    imageUrl: string
     createdAt?: Date
     updatedAt?: Date
 
@@ -24,8 +23,8 @@ export type CreateProduct = {
     title: string
     price: number
     weight: number
+    imageUrl: string
     originCountry: string
-    category: Category
     nutritionalContent: NutritionalContent
 
 }
@@ -36,9 +35,9 @@ export type UpdateProduct = Partial<{
     title: string
     price: number
     weight: number
+    imageUrl: string
     originCountry: string
     rating: ProductRating
-    category: Category
     nutritionalContent: NutritionalContent
     updatedAt: Date
 

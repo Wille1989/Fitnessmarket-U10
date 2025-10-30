@@ -12,10 +12,10 @@ export type PrivateUserDTO = {
 
 export type AdminUserDTO = {
     id?: string
-    createdAt?: string,
-    updatedAt?: string
+    createdAt?: Date
+    updatedAt?: Date
     createdByAdmin: boolean
     name: string
     email: string
-    userRole: UserRole,
+    role: UserRole
 }

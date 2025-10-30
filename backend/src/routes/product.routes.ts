@@ -15,25 +15,25 @@ const productRouter: Router = express.Router();
 productRouter.get('/index', 
     getAllProducts);
 
-productRouter.get('/show', 
-    getProductById)
-
 productRouter.post('/new', 
     verifyToken, 
     requireRole('admin', 'sales'), 
     createProduct);
+
+productRouter.get('/show/:id', 
+    getProductById)
+
+productRouter.patch('/update/:id', 
+    verifyToken, 
+    requireRole('admin', 'sales'), 
+    updateProduct);
 
 productRouter.delete('/delete/:id', 
     verifyToken, 
     requireRole('admin', 'sales'), 
     deleteProduct);
 
-productRouter.patch('/update', 
-    verifyToken, 
-    requireRole('admin', 'sales'), 
-    updateProduct);
-
-productRouter.get('/compare',
+productRouter.post('/compare',
     compareProducts);
 
 productRouter.post('/rate',

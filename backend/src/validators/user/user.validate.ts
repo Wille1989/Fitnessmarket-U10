@@ -1,7 +1,7 @@
 import { CreateUser, UpdateUser } from "../../types/user/User";
 import { NotFoundError, ValidationError } from "../../classes/ErrorHandling"
 
-export function validateUser(data: CreateUser): CreateUser {
+export async function validateUser(data: CreateUser): Promise<CreateUser> {
 
     if(!data.email) {
         throw new NotFoundError('Ingen email är angiven');
@@ -11,12 +11,16 @@ export function validateUser(data: CreateUser): CreateUser {
         throw new NotFoundError('Inget lösenord angivet');
     };
 
-    function sanitizedInput(value: string): string {
-        return value.replace(/<[^>]*>?/gm,'').trim();
+    function sanitizeEmail(value: string): string {
+        return value.replace(/<[^>]*>?/gm, '').trim().toLowerCase();
     };
 
-    const cleanEmail = sanitizedInput(data.email).toLowerCase();
-    const cleanPassword = sanitizedInput(data.password);
+    function sanitizePassword(value: string): string {
+        return value.trim();
+    };
+
+    const cleanEmail = sanitizeEmail(data.email);
+    const cleanPassword = sanitizePassword(data.password);
 
     if(!cleanEmail){
         throw new ValidationError('Email innhöll otillåtna tecken');

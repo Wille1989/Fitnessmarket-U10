@@ -1,11 +1,11 @@
 import { NutritionalContent } from "../../types/product/NutritionalContent";
-import { ValidationError } from "../../classes/ErrorHandling";
+import { NotFoundError, ValidationError } from "../../classes/ErrorHandling";
 
 export async function validateNutritionalContent(productData: NutritionalContent): Promise<NutritionalContent> {
 
     if(Object.values(productData).some(value => !value))
         {
-            throw new Error('alla fält måste vara ifyllda');
+            throw new NotFoundError('Fälten för näringsinnehåll måste vara ifyllda');
         };
 
     const inputValues = [ 
@@ -20,11 +20,11 @@ export async function validateNutritionalContent(productData: NutritionalContent
 
     for(const value of inputValues) {
         if(!onlyDigits.test(value)) {
-            throw new ValidationError('inputfält innehåller otillåtna tecken');
+            throw new ValidationError('Fälten tillåter endast siffror');
         }
 
         if(inputValues.length > 5){
-            throw new ValidationError('Max antal tecken per input är 5');
+            throw new ValidationError('Max antal tecken per input är ');
         };
     };
 

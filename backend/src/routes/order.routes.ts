@@ -2,9 +2,9 @@ import express from 'express';
 import { Router } from 'express';
 import { 
     createOrder,
-    deleteOrder,
     getOrderByID,
-    getAllOrders,
+    getAllCustomerOrders,
+    getMyOrders
 } from '../controllers/order.controller';
 import { requireRole, verifyToken } from '../middleware/auth';
 
@@ -15,29 +15,19 @@ orderRouter.post('/checkout',
     requireRole('customer', 'admin'), 
     createOrder);
 
-orderRouter.delete('/delete/:id', 
-    verifyToken, 
-    requireRole('customer', 'admin'), 
-    deleteOrder);
+orderRouter.get('/admin/:id',
+    verifyToken,
+    requireRole('admin'),
+    getAllCustomerOrders);
 
-orderRouter.delete('/delete/:id', 
-    verifyToken, 
-    requireRole('admin'), 
-    deleteOrder);
-
-orderRouter.get('/show', 
+orderRouter.get('/show/:id', 
     verifyToken, 
     requireRole('customer'), 
     getOrderByID);
 
-orderRouter.get('/show/:id', 
-    verifyToken, 
-    requireRole('admin'), 
-    getOrderByID);
-
-orderRouter.get('/index',
+orderRouter.get('/myOrders',
     verifyToken,
     requireRole('customer'),
-    getAllOrders);
+    getMyOrders);
 
 export default orderRouter;
