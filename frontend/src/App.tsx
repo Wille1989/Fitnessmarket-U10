@@ -16,9 +16,11 @@ import EditProduct from './pages/product/EditProduct';
 import { CreateUserAccount } from './pages/admin/AdminCreate';
 import IndexOrder from './pages/order/IndexOrder';
 import AdminIndexOrder from './pages/order/AdminIndexOrder';
+import AuthError from './pages/auth/AuthError';
+import AboutUs from './pages/About';
 
 function App() {
-console.log("App.tsx is rendering");
+
   return (
   <MessageProvider>
     <Layout>
@@ -26,11 +28,13 @@ console.log("App.tsx is rendering");
 
           {/* HOME ROUTES */}
           <Route path='/' element={< Home />}/>
+          <Route path='/about' element={< AboutUs />}/>
 
           {/* AUTH ROUTES */}
           <Route path='/login' element={< Login />}/>
-          <Route path='/logout' element={< Logout />} />
+          <Route path='/logout' element={< Logout />}/>
           <Route path='/register' element={< Register /> }/>
+          <Route path='/auth-error' element={< AuthError />}/>
 
           {/* CUSTOMER & SALES ROUTES */}
           <Route path='myprofile' element={< MyAccount />}/>
@@ -51,6 +55,7 @@ console.log("App.tsx is rendering");
 
           {/* ORDER ROUTES */}
           <Route path='/myOrders' element={< IndexOrder />}/>
+
         </Routes>
     </Layout>
   </MessageProvider>

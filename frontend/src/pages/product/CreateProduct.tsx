@@ -26,27 +26,28 @@ function CreateProduct() {
     const handleSubmit = async(e: React.FormEvent) => {
         e.preventDefault();
 
-        await create(form);
+        const success = await create(form);
         
-        setSuccessMessage('Produkten har skapats');
-        setTimeout(() => {
-            setSuccessMessage(null),
-            setForm({
-                title: "",
-                price: "",
-                weight: "",
-                imageUrl: '',
-                originCountry: "",
-                nutritionalContent: {
-                    energy: "",
-                    fat: "",
-                    saturatedfat: "",
-                    salt: "",
-                    protein: "",
-                },
-            });
-        }, 1000)
-
+        if(success) {
+            setSuccessMessage('Produkten har skapats');
+            setTimeout(() => {
+                setSuccessMessage(null),
+                setForm({
+                    title: "",
+                    price: "",
+                    weight: "",
+                    imageUrl: '',
+                    originCountry: "",
+                    nutritionalContent: {
+                        energy: "",
+                        fat: "",
+                        saturatedfat: "",
+                        salt: "",
+                        protein: "",
+                    },
+                });
+            }, 1000)
+            }
     }
 
     return (
@@ -56,38 +57,43 @@ function CreateProduct() {
                 <section className="form-section">
                     <h3>Produkt</h3>
 
+                    <label htmlFor="imageUrl">Bild URL:</label>
                     <input
                         type="url"
                         name="imageUrl"
-                        placeholder="Klistra in bildens URL"
+                        placeholder="......"
                         value={form.imageUrl || ''}
                         onChange={(e) => setForm({ ...form, imageUrl: e.target.value})}
                     />
+                    <label htmlFor="title">Titel:</label>
                     <input
                         type="text"
                         name="title"
-                        placeholder="Titel"
+                        placeholder="......"
                         value={form.title}
                         onChange={(e) => setForm({ ...form, title: e.target.value })}
                     />
+                    <label htmlFor="price">Pris:</label>
                     <input
                         type="number"
                         name="price"
-                        placeholder="Pris"
+                        placeholder="......"
                         value={form.price}
                         onChange={(e) => setForm({ ...form, price: e.target.value })}
                     />
+                    <label htmlFor="weight">Vikt:</label>
                     <input
                         type="number"
                         name="weight"
-                        placeholder="Produktvikt"
+                        placeholder="......"
                         value={form.weight}
                         onChange={(e) => setForm({ ...form, weight: e.target.value })}
                     />
+                    <label htmlFor="originCountry">Ursprungsland:</label>
                     <input
                         type="text"
                         name="originCountry"
-                        placeholder="Ursprungsland"
+                        placeholder="......"
                         value={form.originCountry}
                         onChange={(e) => setForm({ ...form, originCountry: e.target.value })}
                     />
@@ -96,45 +102,44 @@ function CreateProduct() {
                 <section className="form-section">
 
                     <h3>Näringsinnehåll:</h3>
-
+                    <label htmlFor="energy">Kcal</label>
                     <input
-                    type=""
-                    name=""
-                    placeholder="Näringsinnehåll: Energi"
+                    type="text"
+                    name="energy"
+                    placeholder="......"
                     value={form.nutritionalContent.energy}
                     onChange={(e) => setForm({ ...form, nutritionalContent: { ...form.nutritionalContent, energy: e.target.value } })}
                     />
-
+                    <label htmlFor="fat">Fett:</label>
                     <input
-                    type=""
-                    name=""
-                    placeholder="Näringsinnehåll: Fett"
+                    type="text"
+                    name="fat"
+                    placeholder="......"
                     value={form.nutritionalContent.fat}
                     onChange={(e) => setForm({ ...form, nutritionalContent: { ...form.nutritionalContent, fat: e.target.value } })}
                     />
-
+                    <label htmlFor="saturatedfat">Mättat Fett:</label>
                     <input
-                    type=""
-                    name=""
-                    placeholder="Näringsinnehåll: Mättat fett"
+                    type="text"
+                    name="saturatedfat"
+                    placeholder="......"
                     value={form.nutritionalContent.saturatedfat}
                     onChange={(e) => setForm({ ...form, nutritionalContent: { ...form.nutritionalContent, saturatedfat: e.target.value } })}
                     />
-
-
+                    <label htmlFor="protein">Protein:</label>
                     <input
-                    type=""
-                    name=""
-                    placeholder="Näringsinnehåll: Protein"
+                    type="text"
+                    name="protein"
+                    placeholder="......"
                     value={form.nutritionalContent.protein}
                     onChange={(e) => setForm({ ...form, nutritionalContent: { ...form.nutritionalContent, protein: e.target.value } })}
                     />
 
-
+                    <label htmlFor="salt">Salt:</label>
                     <input
-                    type=""
-                    name=""
-                    placeholder="Näringsinnehåll: salt"
+                    type="text"
+                    name="salt"
+                    placeholder="......"
                     value={form.nutritionalContent.salt}
                     onChange={(e) => setForm({ ...form, nutritionalContent: { ...form.nutritionalContent, salt: e.target.value } })}
                     />

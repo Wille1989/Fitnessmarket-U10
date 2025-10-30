@@ -1,0 +1,25 @@
+.about-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    padding-top: 2rem;
+    align-items: center;
+}
+
+.about-container h2 {
+    font-size: clamp(2rem, 1vw + 1rem, 3rem);
+    margin-bottom: 0.2rem;
+}
+
+.about-container p {
+    display: flex;
+    flex-direction: row;
+    width: 50%;
+    box-sizing: border-box;
+    padding: 1rem;
+    background-color: #f7f7f7;
+    border: 1px solid #775555;
+    border-radius: 1rem;
+    font-size: clamp(1rem, 1vw + 1rem, 1.75rem );
+}

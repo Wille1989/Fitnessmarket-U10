@@ -1,54 +1,127 @@
-.navbar-logo {
-  font-weight: bold;
-  font-size: 4rem;
-  padding: 0.5rem;
-  margin-right: 1rem;
-
-}
-
 .navbar {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+  width: 100vw;
+  min-width: 320px;
+  box-sizing: border-box;
+  background: #658cbe52;
+  justify-content: center;
+  margin: 0 auto;
+  overflow-x: hidden;
+}
+
+.navbar-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  background: #111;
-  color: white;
-  flex-wrap: wrap;
+  max-width: 1600px;
+  padding: 0 2rem;
+  box-sizing: border-box;
+  align-items: flex-start;
+}
+
+.navbar-content h1 {
+  font-size: clamp(2.5rem, 1.5vw + 3rem, 4rem);
+  margin: 1rem;
+}
+
+.desktop-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .navbar-links {
   display: flex;
+  flex-wrap: nowrap;
+  flex: 1;
+  flex-shrink: 1;
   list-style: none;
-  gap: 1rem;
-  margin-top: 3.5rem;
-  padding: 10px;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+  .navbar-links li {
+  display: flex;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .navbar-links a {
+  display: flex;
+  font-size: clamp(0.875rem, 0.5vw + 0.75rem, 1.5rem);
+  margin-right: 1rem;
+  white-space: nowrap;
+  flex-wrap: nowrap;
   color: white;
   text-decoration: none;
-  font-size: 1rem;
   transition: 0.2s;
 }
 
-.navbar-links a:hover {
-  text-decoration: underline;
+.mobile-view {
+  display: none;
 }
 
-/* MOBIL */
-@media (max-width: 500px) {
-  .navbar {
-    flex-direction: column;
-    align-items: flex-start;
+@media (max-width: 768px) {
+
+.navbar-content h1 {
+  font-size: clamp(1.5rem, 1.5vw + 3rem, 3rem);
+  margin: 0;
+  margin-top: 0.5rem;
+}
+
+   .desktop-view {
+    display: none;
   }
+
+  .mobile-view {
+    display: block;
+  }
+
+  .navbar-links{
+    display: none;
+  }
+
+  .meny {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    margin: 1rem;
+    margin-bottom: 0.9rem;
+  }
+
+    .navbar-links.open {
+  display: flex;
+  flex-direction: column;
+  animation: slideDown 0.3s ease;
+  border: 2px solid black;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  background-color: #040949;
+  opacity: 90%;
+}
+
+
+
+  .navbar {
+    max-width: none;
+    margin: 0;
+    width: 100%;
+  }
+
 
   .navbar-links {
-    flex-direction: column;
-    width: 100%;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    display: none;
+    position: absolute;
   }
 
-  .navbar-links a {
-    font-size: 0.95rem;
-  }
 }

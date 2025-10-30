@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import useProduct from "../../hooks/useProduct";
 import type { UpdateProduct } from "../../types/Products/Products";
 import { useParams } from "react-router-dom";
-import '../../css/product/UpdateProduct.css'
 import HandleDeleteProduct from "../../components/navigation/button/HandleDeleteProduct";
+import '../../css/product/EditProduct.css'
+import { useMessage } from "../../context/MessageProvider";
+import { Alert } from "../../components/alert/Alert";
 
 function EditProduct() {
+  const [successMessage, setSuccessMessage] = useState<string | null>('');
   const { id } = useParams();
+  const { errorMessage } = useMessage();
   const { update, show } = useProduct();
   const [formData, setFormData] = useState<UpdateProduct>({
     title: "",
@@ -25,7 +29,7 @@ function EditProduct() {
 
   useEffect(() => {
   async function fetchProduct() {
-    if (!id) return; // skydd mot tomt id
+    if (!id) return;
 
     const currentData = await show(id);
     if (currentData) {
@@ -54,57 +58,78 @@ function EditProduct() {
     e.preventDefault();
 
     if(id) {
-      await update(id, formData);
+      const success = await update(id, formData);
+
+      if(success) {
+        setSuccessMessage('Produkten har uppdaterats!')
+        setTimeout(() => setSuccessMessage(null), 1500)
+      }
+
     } else {
       throw new Error('Produktens ID saknas')
     }
-
   };
 
   return (
     <>
-      <form className="form" onSubmit={handleUpdate}>
-
+      <form className="form-edit-product" onSubmit={handleUpdate}>
+       <section className="form-section">
+        <h3>Redigera Produkt</h3>
+        
+        <label htmlFor="imageUrl">Bild URL:</label>
         <input
           type="url"
           name="imageUrl"
-          placeholder="Klistra in bildens URL"
+          placeholder="......"
           value={formData.imageUrl || ''}
           onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value})}
         />
-
+        <label htmlFor="title">Titel:</label>
         <input
           type="text"
-          placeholder="Produkt Titel"
+          name="title"
+          placeholder="......"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
         />
-
+        <label htmlFor="price">Pris:</label>
         <input
-          type="number"
-          placeholder="Pris"
+          type="text"
+          name="price"
+          placeholder="......"
           value={formData.price}
           onChange={(e) => setFormData({ ...formData, price: e.target.value })}
         />
-
+        <label htmlFor="weight">Vikt:</label>
         <input
-          type="number"
-          placeholder="Produktvikt"
+          type="text"
+          name="weight"
+          placeholder="......"
           value={formData.weight}
           onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
         />
-
+        <label htmlFor="originCountry">Ursprungsland:</label>
         <input
           type="text"
-          placeholder="Ursprungsland"
+          name="originCountry"
+          placeholder="......"
           value={formData.originCountry}
           onChange={(e) =>
             setFormData({ ...formData, originCountry: e.target.value })
           }
         />
 
+        </section>
+
+      <section className="form-section">
+
+        <h3> Redigera Näringsinnehåll</h3>
+
+        <label htmlFor="energy">Energi:</label>
         <input
-          placeholder="Näringsinnehåll: Energi"
+          type="text"
+          name="energy"
+          placeholder="......"
           value={formData.nutritionalContent?.energy || ''}
           onChange={(e) =>
             setFormData({
@@ -116,9 +141,11 @@ function EditProduct() {
             })
           }
         />
-
+        <label htmlFor="fat">Fett:</label>
         <input
-          placeholder="Näringsinnehåll: Fett"
+          type="text"
+          name="fat"
+          placeholder="......"
           value={formData.nutritionalContent?.fat || ''}
           onChange={(e) =>
             setFormData({
@@ -130,9 +157,11 @@ function EditProduct() {
             })
           }
         />
-
+        <label htmlFor="saturatedfat">Mättat fett:</label>
         <input
-          placeholder="Näringsinnehåll: Mättat fett"
+          type="text"
+          name="saturatedfat"
+          placeholder="......"
           value={formData.nutritionalContent?.saturatedfat || ''}
           onChange={(e) =>
             setFormData({
@@ -144,9 +173,11 @@ function EditProduct() {
             })
           }
         />
-
+        <label htmlFor="protein">Protein:</label>
         <input
-          placeholder="Näringsinnehåll: Protein"
+          type="text"
+          name="protein"
+          placeholder="......"
           value={formData.nutritionalContent?.protein || ''}
           onChange={(e) =>
             setFormData({
@@ -158,9 +189,11 @@ function EditProduct() {
             })
           }
         />
-
+        <label htmlFor="salt">Salt:</label>
         <input
-          placeholder="Näringsinnehåll: Salt"
+          type="text"
+          name="salt"
+          placeholder="......"
           value={formData.nutritionalContent?.salt || ''}
           onChange={(e) =>
             setFormData({
@@ -172,10 +205,13 @@ function EditProduct() {
             })
           }
         />
-
+      </section>
         <button type="submit">Uppdatera</button>
+        <HandleDeleteProduct/>
+        {errorMessage && <Alert type="error" message={errorMessage}/>}
+        {successMessage && <Alert type="success" message={successMessage}/>}
       </form>
-      <HandleDeleteProduct/>
+      
     </>
   );
 }

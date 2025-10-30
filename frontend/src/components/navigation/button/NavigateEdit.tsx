@@ -13,7 +13,7 @@ function NavigateEdit({ id }: { id: string }) {
 
         showUserAccount(id);       
 
-        setTimeout(() => navigate(`/admin/user/${id}`), 1500);
+        setTimeout(() => navigate(`/admin/user/${id}`), 800);
     
         setLoading(false);
 

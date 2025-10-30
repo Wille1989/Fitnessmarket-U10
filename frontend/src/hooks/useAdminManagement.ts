@@ -6,8 +6,7 @@ import { useCallback } from "react";
 import type { Order } from "../types/Order/Order";
 
 export function useAdminManagement() {
-    const { setSuccessMessage, setErrorMessage, 
-            setArrayErrorMessage } = useMessage();
+    const { setSuccessMessage, setErrorMessage } = useMessage();
     const [userAccount, setUserAccount] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [userList, setUserList] = useState<User[] | null>(null);
@@ -25,9 +24,12 @@ export function useAdminManagement() {
 
             return true;
             
-        } catch (error) {
-
-            return false;
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
+            setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
+            return null;
 
         } finally {
             setLoading(false);
@@ -39,17 +41,29 @@ export function useAdminManagement() {
         try {
             setLoading(true);
 
+            if(!userAccount.name){
+                throw new Error('Kunden måste ha ett namn');
+            }
+
+            if(!userAccount.email) {
+                throw new Error('Email adress måste finnas');
+            }
+
+            if(!userAccount.email.includes('@')) {
+                throw new Error('Email adress måste vara giltig');
+            }
+
             const userData = await adminApi.updateUserAccount(userAccount);
 
             setUserAccount(userData);
-
-            setTimeout(() => setUserAccount(null), 1000);
             return true;
             
-        } catch (error) {
-            setErrorMessage('Användarens uppgifter kunde inte ändras');
-            setTimeout(() => setErrorMessage(null), 1500);
-            return false;
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
+            setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
+            return null;
         } finally { 
             setLoading(false);
         }
@@ -63,27 +77,25 @@ export function useAdminManagement() {
             const userList = await adminApi.getUsersList();
 
             if(!Array.isArray(userList) || userList.length === 0){
-                setArrayErrorMessage('Listan med användare kunde inte hämtas');
-                return;
+                throw new Error('Listan med användare kunde inte hämtas');
             }
 
             setUserList(userList);
-            setSuccessMessage(`${userList.length} användare retuneras`);
-            setTimeout(() => setSuccessMessage(null), 800);
             return true;
 
-        } catch (error) {
-            setErrorMessage('Det gick inte att hämta listan');
-            setTimeout(() => setErrorMessage(null), 3000);
-            return false;
-
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
+            setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
+            return null;
         } finally {
             setLoading(false);
 
         }
     }
 
-    const showUserAccount = useCallback(async (id: string): Promise<User> => {
+    const showUserAccount = useCallback(async (id: string): Promise<User | null> => {
 
         try {
             setLoading(true);
@@ -92,17 +104,14 @@ export function useAdminManagement() {
 
             setUserAccount(userAccount);
 
-            setSuccessMessage('Användaren hämtad!');
-            setTimeout(() => {
-                setSuccessMessage(null);
-            }, 1500);
-            
             return userAccount;
             
-        } catch (error) {
-            setErrorMessage('Kunde inte hämta användare');
-            setTimeout(() => setErrorMessage(null), 1500);
-            throw error;
+        } catch (error: any) {
+            console.error(error);
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
+            setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
+            return null;
         } finally {
             setLoading(false);
         }
@@ -135,9 +144,7 @@ export function useAdminManagement() {
 
         } catch (error: any) {
             console.error(error);
-            const message: string = error.response?.data?.message || 
-            error.message || 'Oväntat fel';
-
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
             setTimeout(() => setErrorMessage(null), 2000);
             return null;
@@ -152,8 +159,12 @@ export function useAdminManagement() {
         try {
             setLoading(true);
 
+            if(!Object.keys(id)) {
+                throw new Error('ID är inte korrekt');
+            }
+
             const result = await adminApi.index(id);
-            console.log('RAD 156',result);
+
             if(!result) {
                 throw new Error('Inga ordrar hittades');
             }
@@ -163,8 +174,13 @@ export function useAdminManagement() {
 
         } catch (error: any) {
             console.error(error);
-            const message: string = error?.message || 'Oväntat fel'
+
+            if(error.response && error.response.status === 404) {
+                setErrorMessage('Inga ordrar hittades för denna kund');
+            }
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
             return null;
         } finally {
             setLoading(false);

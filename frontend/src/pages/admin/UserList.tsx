@@ -27,10 +27,11 @@ function GetUsersList() {
     if(!userList) return <p>{arrayErrorMessage && < Alert type="error" message={arrayErrorMessage} />}</p>
 
     return (
-        <>
+        <div className="user-page">
             <h2>ANVÄNDARE</h2>
             {successMessage && < Alert type="success" message={successMessage} />}
 
+            <div className="user-list-card">
                 <ul className="user-list">
                     {userList.map((u) => (
                         <li key={u.email} className="user-key">
@@ -39,16 +40,18 @@ function GetUsersList() {
                                 <span>{u.role}</span>
                                 <strong>{u.email}</strong>
                             </div>
-                            <NavigateEdit id={u.id} />
-                            <NavigateCustomerOrders id={u.id} />
+                            <div className="user-navigation">
+                                <NavigateEdit id={u.id} />
+                                <NavigateCustomerOrders id={u.id} />
+                            </div>
                         </li>
                     ))}
+                    {errorMessage && < Alert type="error" message={errorMessage} /> }
                 </ul>
-
-            {errorMessage && < Alert type="error" message={errorMessage} /> }
-            
-            <button type="submit" onClick={handleClick}>Skapa ny användare</button>
-        </>
+                            
+                <button type="submit" onClick={handleClick}>Skapa ny användare</button>
+            </div>
+        </div>
     )
 }
 

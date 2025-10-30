@@ -4,36 +4,35 @@ import { Alert } from '../../components/alert/Alert';
 import { useMessage } from '../../context/MessageProvider';
 import { useUserManager } from '../../hooks/useUserManager';
 import { CreateUser } from '../../types/User/User';
-import '../../css/global/Form.css';
+import '../../css/auth/Register.css';
 
 function Register() {
-        const navigate = useNavigate();
-        const { successMessage, errorMessage,setSuccessMessage } = useMessage();
-        const { loading, register } = useUserManager();
-        const [form,setForm] = useState<CreateUser>({
-            email: '', 
-            password: '',
-        });
-        const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const navigate = useNavigate();
+    const { successMessage, errorMessage,setSuccessMessage } = useMessage();
+    const { loading, register } = useUserManager();
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const [form,setForm] = useState<CreateUser>({
+        email: '', 
+        password: '',
+    });
 
-        async function handleSubmit(e: React.FormEvent) {
-            e.preventDefault();
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
 
-            const success = await register (form, confirmPassword);
+        const success = await register (form, confirmPassword);
 
-            if(success) {
-                setSuccessMessage('Konto skapat, omdirigerar för inloggning');
-                setTimeout(()=> {
-                    setSuccessMessage(null);
-                    navigate('/login');
-                },2000)
-            }
-            
-        }
+        if(success) {
+            setSuccessMessage('Konto skapat, omdirigerar för inloggning');
+            setTimeout(()=> {
+                setSuccessMessage(null);
+                navigate('/login');
+            },2000)
+        }  
+    }
 
     return (
         <>
-            <form className='form' onSubmit={handleSubmit}>
+            <form className='form-register' onSubmit={handleSubmit}>
                 <label htmlFor="email">Mejladress:</label>
                 <input
                 type='email'
