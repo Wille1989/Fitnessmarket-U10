@@ -13,6 +13,7 @@ import { CreateUserService,
         UpdateUserByAdmin,
         CreateUserAsAdminService
         } from '../services/user/user.service';
+import { User } from '../types/user/User';
 
 // CREATE USER
 export async function createUser(
@@ -49,7 +50,7 @@ export async function createUserAsAdmin(
         const data = req.body;
 
         if(user?.role === 'admin'){
-            const userData = data.user;
+            const userData = data;
 
         const newUser = await CreateUserAsAdminService(userData);
 
@@ -78,31 +79,29 @@ export async function createUserAsAdmin(
     };
 };
 
+export async function deleteUserAccount(req: AuthenticatedRequest, res: Response<ApiResponse<User>>): Promise<void> {
+    const { id } = req.params;
+
+    await deleteUserAccountService(id);
+
+    res.status(200).json({ message: 'användaren har raderats' })
+}
+
 // DELETE ACCOUNT
 export async function deleteUser(
     req: AuthenticatedRequest, res: Response<ApiResponse<null>>): Promise<void> {   
     try {
-        const user = req.user;
-        const customer = req.params.id;
+        const user = req.user!;
 
-        if(user?.role === 'customer'){
+        if(user?.role !== 'admin') {
+
             const userID = user.userID;
             const userEmail = user.email;
 
             await deleteOwnAccountService(userID, userEmail);
 
             res.status(200).json({ message: `Du har tagit bort ditt konto!`, data: null });
-
-        } else if (user?.role === 'admin'){ // access a users account as admin
-            const customerID = customer;
-            
-            await deleteUserAccountService(customerID);
-
-            res.status(200).json({ 
-                message: `användaren med ID: ${customerID} är borttagen!`, data: null });
-        } else {
-            throw new AuthorizationError('Kontakta admin för borttagning av konto');
-        };
+        }
 
     } catch (error) {
         const err = error as AppError;
@@ -151,19 +150,18 @@ export async function getUserById(
     };
 };
 
+
 export async function getUserByToken(
     req: AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void> {
     
     try {
-        const user = req.user!;
 
-            const userID = user.userID;
-
+            const userID = req.user!.userID;
             const myUser = await getUserByIdService(userID);
-
             const filteredData: PrivateUserDTO = UserMapper.toPrivateDTO(myUser);
 
             res.status(200).json({ message: `retunerar användaren:`, data: filteredData});
+            
     } catch (error) {
          const err = error as AppError;
 
@@ -181,16 +179,45 @@ export async function getUserByToken(
     }
 }
 
+// ADMIN
+export async function updateUserAccount(
+    req: AuthenticatedRequest, res: Response<ApiResponse<AdminUserDTO>>): Promise<void> {
+    try {
+        const { id: userID, ...userData } = req.body;
+
+        const result = await UpdateUserByAdmin(userID, userData);
+
+        const filteredAdminData: AdminUserDTO = UserMapper.toAdminDTO(result);
+
+        res.status(200).json({ message:'Från Admin Update:', data: filteredAdminData });
+
+    } catch (error) {
+        const err = error as AppError;
+
+        if(process.env.NODE_ENV !== 'production') {
+            console.error('Message:', err.message);
+            console.error('Status:', err.status);
+            console.error('Stack:', err.stack);
+        };
+
+        res.status(err.status || 500).json({
+            message: process.env.NODE_ENV === 'production'
+            ? 'Server fel'
+            : err.message,
+        });
+    }
+}
+
 // UPDATE ACCOUNT
 export async function updateAccount(
-    req:AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO | AdminUserDTO>>): Promise<void>{
+    req:AuthenticatedRequest, res: Response<ApiResponse<PrivateUserDTO>>): Promise<void>{
     try {
-        const user = req.user;
+        const userID = req.user!.userID;
         const data = req.body;
+        console.log(data);
+        console.log(userID);
 
-    if(user?.role === 'customer' || user?.role === 'sales'){
-        const userID = user.userID;
-        const userData = data.changes;
+        const userData = data;
 
         const updatedData = await updateOwnAccountService(userID, userData);
 
@@ -199,19 +226,6 @@ export async function updateAccount(
         res.status(200).json(({ 
             message: 'Dina uppgifter har uppdaterats!', data: filteredData }));
 
-    } else if (user?.role === 'admin') {
-        const customerID = user.userID;
-        const customerData = data.changes;
-
-        const updatedData = await UpdateUserByAdmin(customerID, customerData);
-
-        const filteredAdminData: AdminUserDTO = UserMapper.toAdminDTO(updatedData);
-
-        res.status(200).json({ message: 'Användarens konto har uppdaterats', data: filteredAdminData });
-
-    } else {
-        throw new AuthorizationError('Du har inte behörighet att göra detta');
-    }
     } catch (error) {
         const err = error as AppError;
 

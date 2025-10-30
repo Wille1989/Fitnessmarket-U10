@@ -16,22 +16,22 @@ export async function CreateUserService(
     const userCollection = db.collection<User>('users');
 
     // validate the user, method runs in a seperate file
-    validateUser(formBody);
+    const validatedFormBody = await validateUser(formBody);
 
     // Check if user already exists
-    const existingUser = await userCollection.findOne({ email: formBody.email });
+    const existingUser = await userCollection.findOne({ email: validatedFormBody.email });
     if(existingUser) {
         throw new ConflictError('Det finns redan en användare med denna mejladress');
     };
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(formBody.password, 10);
+    const hashedPassword = await bcrypt.hash(validatedFormBody.password, 10);
 
     // Create new userobject
     const newUser = UserFactory.create(
         {
             ...formBody,
-            email: formBody.email,
+            email: validatedFormBody.email,
             password: hashedPassword
         }
     );
@@ -207,6 +207,7 @@ export async function UpdateUserByAdmin(
     const { _id, ...userWithoutID } = currentUserData;
 
     const updatedUserData = UserFactory.updateByAdmin(userWithoutID, validatedChanges);
+
     
     // Throw away the value of objectId 
     delete (updatedUserData)._id;

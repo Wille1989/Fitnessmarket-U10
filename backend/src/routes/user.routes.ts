@@ -7,6 +7,8 @@ import {
     getUserById,
     updateAccount,
     createUserAsAdmin,
+    updateUserAccount,
+    deleteUserAccount,
     getUserByToken } 
     from '../controllers/user.controller';
 
@@ -14,7 +16,7 @@ const userRouter: Router = express.Router();
 
 userRouter.patch('/update/myAccount', 
     verifyToken, 
-    requireRole('customer', 'sales', 'admin'), 
+    requireRole('customer', 'sales'), 
     updateAccount);
 
 userRouter.delete('/delete', 
@@ -24,7 +26,7 @@ userRouter.delete('/delete',
 
 userRouter.get('/show', 
     verifyToken, 
-    requireRole('customer', 'sales', 'admin'), 
+    requireRole('customer', 'sales'), 
     getUserByToken);
 
 // ADMIN SPECIFIC ROUTES
@@ -36,7 +38,7 @@ userRouter.post('/admin/register',
 userRouter.patch('/admin/updateUserAccount', 
     verifyToken, 
     requireRole('admin'), 
-    updateAccount);
+    updateUserAccount);
 
 userRouter.get('/admin/all', 
     verifyToken, 
@@ -47,5 +49,10 @@ userRouter.get('/admin/show/:id',
     verifyToken, 
     requireRole('admin'), 
     getUserById);
+
+userRouter.delete('/delete/:id',
+    verifyToken, 
+    requireRole('admin'), 
+    deleteUserAccount);
 
 export default userRouter;

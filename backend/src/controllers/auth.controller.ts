@@ -15,7 +15,7 @@ export async function loginUser(
         const { user, token } = await loginUserService(myUser);
 
         const filteredData = UserMapper.toPrivateDTO(user);
-
+        
         res.status(200).json({ message: 'Svar Från Databas:', data: { user: filteredData, token }})
         
     } catch (error) {

@@ -26,7 +26,6 @@ export const UserFactory = {
         return {
             ...current,
             ...changes,
-            role: UserRole.customer || UserRole.sales || UserRole.admin,
             updatedAt: new Date()
         }
     }

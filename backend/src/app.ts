@@ -7,7 +7,6 @@ import { env } from './config/env';
 import { Request, Response } from 'express';
 import userRouter from './routes/user.routes';
 import authRouter from './routes/auth.routes';
-import catRouter from './routes/category.routes';
 import orderRouter from './routes/order.routes';
 import productRouter from './routes/product.routes';
 
@@ -15,11 +14,15 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:4173'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use('/user', userRouter);
 app.use('/auth', authRouter);
-app.use('/cat', catRouter);
 app.use('/order', orderRouter);
 app.use('/product', productRouter);
 

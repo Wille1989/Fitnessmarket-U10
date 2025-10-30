@@ -78,9 +78,19 @@ export async function updateProductService(
     productData: Product, id: string): Promise<Product> {
 
     const db = await getDb();
-
     const productID = convertStringToObjectId(id);
-    const validatedProduct = await validateProduct(productData);
+
+    const currentData = await db.collection<Product>('products').findOne({ _id: productID });
+    if(!currentData) {
+        throw new Error('Produkten hittades inte');
+    }
+
+    console.log('CURRENTDATA:', currentData);
+    console.log('DATAN SOM SKICKAS IN FRÅN FRONTEND:', productData);
+
+    const mergedProduct = ProductFactory.update(currentData, productData, )
+
+    const validatedProduct = await validateProduct(mergedProduct);
 
     const response = await db.collection<Product>('products').findOneAndUpdate(
         { _id: productID }, 
@@ -143,6 +153,8 @@ export async function compareProductsService(productIDs: string[] ) {
 // PRODUCT RATING
 export async function rateProductService(
     id: string, ratingValue: string): Promise<Product>{
+
+        console.log(id, ratingValue);
 
     const productID = convertStringToObjectId(id);
 

@@ -16,12 +16,17 @@ export function verifyToken(req: AuthenticatedRequest, res: Response, next: Next
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
+        console.log(decoded);
         req.user = decoded;
-        console.log('Decoded token i verifyToken:', decoded);
         next();
 
-    } catch (error) {
-        console.error('JWT kunde inte verifiera', error);
+    } catch (error: any) {
+        console.error("JWT kunde inte verifieras:", error.name, error.message);
+        if(error.name === 'TokenExpiredError') {
+            res.status(401).json({ message: 'Token har gått ut' });
+            return;
+        }
+
         res.status(403).json({ message: 'Ogiltlig eller utgången token' });
         return;
     };
