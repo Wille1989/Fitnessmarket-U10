@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useProduct from "../../hooks/useProduct";
 import '../../css/product/RateProduct.css';
 
@@ -9,6 +9,13 @@ type RateProductProps = {
 function RateProduct({ id }: RateProductProps) {
   const { rate, loading } = useProduct();
   const [value, setValue] = useState<string>('');
+
+  useEffect(() => {
+    if(value) {
+      const timer = setTimeout(() => setValue(''), 1500);
+      return () => clearTimeout(timer);
+    }
+  })
 
   return (
     <>
@@ -25,10 +32,11 @@ function RateProduct({ id }: RateProductProps) {
             ★
         </button>
         ))}
-        {value && <p>Du gav {value} stjärna{value !== "1" && "r"}!</p>}
       </div>
+
+      {value && <p>Du gav en {value}a i betyg!</p>}
+
     </>
-      
   );
 }
 

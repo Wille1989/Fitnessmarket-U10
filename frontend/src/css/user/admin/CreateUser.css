@@ -1,0 +1,19 @@
+.form-register-customer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 2rem auto;
+  background: #bdbaba;
+  border-radius: 10px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-sizing: border-box;
+}
+
+label {
+  font-weight: 600;
+  flex-direction: column;
+  margin-bottom: 0.3rem;
+}

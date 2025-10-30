@@ -4,10 +4,10 @@ import { useAuth } from "../../hooks/useAuth";
 import { Alert } from "../../components/alert/Alert";
 import { useMessage } from "../../context/MessageProvider";
 import { CreateUser } from "../../types/User/User";
-import '../../css/global/Form.css';
+import '../../css/auth/Login.css';
 
 function Login() {
-    const { errorMessage, successMessage} = useMessage();
+    const { errorMessage, successMessage } = useMessage();
     const { loading, login } = useAuth();
     const [form, setForm] = useState<CreateUser>({
         email: '',
@@ -17,17 +17,17 @@ function Login() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         await login(form);
-    }
+    };
 
     return (
         <>
-            <form className="form" onSubmit={handleSubmit}>
+            <form className="form-login" onSubmit={handleSubmit}>
                 <label htmlFor="email">Mejladress:</label>
                 <input className="input"
                 type="email"
                 name="email"
                 placeholder="..."
-                value={form.email}
+                value={form.email.toLowerCase()}
                 onChange={(e) => setForm({...form, email: e.target.value})}
                 />
                 <label htmlFor="password">Lösenord:</label>

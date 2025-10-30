@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const api = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: 'https://fitnessmarket-u10.onrender.com',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -27,7 +27,7 @@ api.interceptors.response.use(
     (error) => {
         if(error.response?.status === 401) {
             localStorage.removeItem('token')
-            window.location.href = '/login'
+            window.location.href = '/auth-error'
         }
         return Promise.reject(error);
     }

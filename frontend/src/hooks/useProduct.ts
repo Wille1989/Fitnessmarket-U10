@@ -27,11 +27,10 @@ function useProduct() {
             return result;
             
         } catch (error: any) {
-            if (process.env.NODE_ENV !== "production") {
-                console.error("Fel vid hämtning av produkter:", error);
-            }
-            const message: string = error?.message || 'Oväntat fel'
+            console.error(error);
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
             return null;
         } finally {
             setLoading(false);
@@ -42,6 +41,14 @@ function useProduct() {
 
         try {
             setLoading(true);
+
+            if(!Object.keys(data)) {
+                throw new Error('Alla fälten måste vara ifyllda.')
+            };
+
+            if(!data.imageUrl.includes('https')){
+                throw new Error('Bilden måste vara en https bild')
+            }
 
             const result = await ProductApi.create(data);
 
@@ -54,11 +61,9 @@ function useProduct() {
 
         } catch (error: any) {
             console.error(error);
-            const message: string = error.response?.data?.message || 'Oväntat fel';
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
-            setTimeout(() => {
-                setErrorMessage(null)
-            }, 1000);
+            setTimeout(() => setErrorMessage(null), 2000);
             return null;
         } finally {
             setLoading(false);
@@ -80,8 +85,9 @@ function useProduct() {
             
         } catch (error: any) {
             console.error(error);
-            const message: string = error?.message || 'Oväntat fel';
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
             return null;
         } finally {
             setLoading(false);
@@ -92,19 +98,31 @@ function useProduct() {
         try {
             setLoading(true);
 
+            if(!Object.keys(data)){
+                throw new Error('Fält kan inte lämnas tomma');
+            }
+
+            if(data.imageUrl) {
+                if(!data.imageUrl.includes('https')){
+                    throw new Error('Bilden måste vara en https bild')
+                }
+            }
+
             const result = await ProductApi.update(id, data);
-            console.log(result);
 
             if(!result) {
                 throw new Error('Kunde inte uppdatera produkten');
             }
 
             setProduct(result);
+            return true;
 
         } catch (error: any) {
             console.error(error);
-            const message: string = error?.message || 'Oväntat fel';
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
+            return null;
         } finally {
             setLoading(false);
         }
@@ -120,8 +138,9 @@ function useProduct() {
 
         } catch (error: any) {
             console.error(error);
-            const message: string = error?.message || 'Oväntat fel';
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
         } setLoading(false);
     }
 
@@ -139,8 +158,9 @@ function useProduct() {
 
         } catch (error: any) {
             console.error(error);
-            const message: string = error?.message || 'Oväntat fel';
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
         } finally {
             setLoading(false);
         }
@@ -160,8 +180,9 @@ function useProduct() {
 
         } catch (error: any) {
             console.error(error);
-            const message: string = error?.message || 'Oväntat fel';
+            const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
+            setTimeout(() => setErrorMessage(null), 2000);
         } finally {
             setLoading(false);
         }

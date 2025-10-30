@@ -4,48 +4,57 @@ import { useMessage } from "../../context/MessageProvider";
 import { Alert } from "../../components/alert/Alert";
 import { CreateUser } from "../../types/User/User";
 import { useNavigate } from "react-router-dom";
-import '../../css/global/Form.css';
+import '../../css/user/admin/CreateUser.css';
 
 export function CreateUserAccount() {
+    const navigate = useNavigate();
     const { createUserAccount, loading } = useAdminManagement();
-    const { successMessage, errorMessage } = useMessage();
+    const { successMessage, setSuccessMessage, errorMessage } = useMessage();
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [form, setForm] = useState<CreateUser>({
         email: '',
         password: '',
     });
-    const [confirmPassword, setConfirmPassword] = useState<string>('');
-    const navigate = useNavigate();
-
+    
     const handleSubmit = async(e: React.FormEvent) => {
         e.preventDefault();
 
-        await createUserAccount(form, confirmPassword);
+        const success = await createUserAccount(form, confirmPassword);
 
-        navigate('/admin/users');
-
-    }
+        if(success) {
+            setSuccessMessage('Användare konto skapat!');
+            setTimeout(() => {
+                setSuccessMessage(null),
+                navigate('/admin/users')
+            }, 1000)
+        }
+        
+    };
 
     return (
         <>
-            <form className="form" onSubmit={handleSubmit}>
+            <form className="form-register-customer" onSubmit={handleSubmit}>
+                <label htmlFor="email">Email:</label>
                 <input
                 type="email"
                 name="email"
-                placeholder="Ange en unik e-post"
+                placeholder="....."
                 value={form.email}
                 onChange={(e) => setForm({...form, email: e.target.value})}
                 />
+                <label htmlFor="password">Lösenord:</label>
                 <input className="input"
                 type="password"
                 name="password"
-                placeholder="Ange lösenord"
+                placeholder="....."
                 value={form.password}
                 onChange={(e) => setForm({...form, password: e.target.value})}
                 />
+                <label htmlFor="confirmPassword">Upprepa lösenordet:</label>
                 <input className="input"
                 type="password"
                 name="confirmPassword"
-                placeholder="Upprepa lösenordet"
+                placeholder="....."
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 />

@@ -1,16 +1,26 @@
 .rating-container {
   display: flex;
+  justify-content: center;
+  flex-direction: row;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   gap: 0.4rem;
 }
 
+.to-cart-button-container p{
+  font-size: 1.5rem;
+  color: #1114b3bb;
+}
+
 .rating-container button {
-    all: unset;
-    cursor: pointer;
-    font-size: 2rem;
-    color: #ccc;
+  all: unset;
+  cursor: pointer;
+  font-size: clamp(1rem, 2vw + 1rem, 1.5rem);
+  color: #1114b3bb;
 }
 
 .rating-container button:hover,
 .rating-container button.active {
-  color: #ffd900bb;
+  color: #bace0abb;
 }

@@ -32,7 +32,9 @@ function CompareProducts() {
 
   return (
     <>
-      <h3>Välj två produkter att jämföra</h3>
+      <div className="compare-header">
+        <h2>Jämför produkter</h2>
+      </div>
 
       {comparison && (
       <div className="comparison-result">  
@@ -76,8 +78,6 @@ function CompareProducts() {
       </div>
       )}
 
-      <button type="submit" className="button" onClick={handleCompare}>Jämför</button>
-
       <div className="product-list">
       <ul className="product-list">
 
@@ -112,8 +112,11 @@ function CompareProducts() {
         </li>
         ))}
     </ul>
+    <div className="button-container">
+      <button type="submit" onClick={handleCompare}>Jämför</button>
     </div>
-
+    </div>
+    
         {errorMessage && <Alert type='error' message={errorMessage}/>}
         
     </>

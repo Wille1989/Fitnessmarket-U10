@@ -5,13 +5,16 @@ import { useAdminManagement } from "../../hooks/useAdminManagement";
 import type{ UpdateUser } from "../../types/User/User";
 import { Alert } from "../../components/alert/Alert";
 import { DeleteUserAsAdmin } from "./AdminDelete";
+import { useNavigate } from "react-router-dom";
+import '../../css/user/admin/EditUser.css'
 
 function UserById() {
-    const { successMessage, setSuccessMessage } = useMessage();
+    const { successMessage, setSuccessMessage, errorMessage } = useMessage();
     const { showUserAccount, userAccount, updateUserAccount } = useAdminManagement();
     const { id }= useParams();
     const [formData, setFormData] = useState<UpdateUser | null>();
     const roles = ['admin', 'sales', 'customer']
+    const navigate = useNavigate();
 
     // USER ID FROM URL
     useEffect(() => {
@@ -31,26 +34,27 @@ function UserById() {
         e.preventDefault();
         if(!formData) return;
 
-        await updateUserAccount(formData);
+        const success = await updateUserAccount(formData);
 
-        setSuccessMessage('Användaren har uppdaterats!');
-        setTimeout(() => setSuccessMessage(null), 1500);
+        if(success) {
+            setSuccessMessage('Användaren har uppdaterats!');
+            setTimeout(() => {
+                setSuccessMessage(null),
+                navigate('/admin/users')
+            }, 1500)
+        }
     }
 
     if(!formData) return <p>Laddar användare...</p> 
 
     return (
         <>
-        <h2>Användare</h2>
-
-        {successMessage && <Alert type="success" message={successMessage}/>}
-
-        <form className="form" onSubmit={handleSubmit}>
+        <form className="form-edit-user" onSubmit={handleSubmit}>
             <label htmlFor="email">Ändra Mejladress:</label>
             <input 
                 type="email"
                 name="email"
-                placeholder="e-post"
+                placeholder="....."
                 value={formData?.email}
                 onChange={(e) => setFormData((prev) => prev ? {...prev, email: e.target.value}: prev)}
             />
@@ -58,33 +62,30 @@ function UserById() {
             <input className="input"
                 type="text"
                 name="name"
-                placeholder="namn"
+                placeholder="....."
                 value={formData?.name}
                 onChange={(e) => setFormData((prev) => prev ? {...prev, name: e.target.value}: prev)} 
             />
-            <label htmlFor="role">Ändra användarens roll:</label>
-            {roles.map((r) => (
-                <label key={r} >
-                    <label htmlFor=""></label>
-                    <input
-                        type="radio"
-                        name="role"
-                        checked={formData?.role === r}
-                        value={r}
-                        onChange={(e) => setFormData((prev) => prev ? {...prev, role: e.target.value} : prev )}
-                    />
-                {r}
-                </label>
-            ))}
-            
+                <label htmlFor="role">Ändra användarens roll:</label>
+                {roles.map((r) => (
+                    <label key={r} className="radio-label">
+                        <input
+                            type="radio"
+                            name="role"
+                            checked={formData?.role === r}
+                            value={r}
+                            onChange={(e) => setFormData((prev) => prev ? {...prev, role: e.target.value} : prev )}
+                        />
+                    {r}
+                    </label>
+                ))}
             <button type="submit">
                 Uppdatera
             </button>
-         
-        </form>
-
-        <DeleteUserAsAdmin /> 
-           
+            <DeleteUserAsAdmin /> 
+            {successMessage && <Alert type="success" message={successMessage}/>}
+            {errorMessage && <Alert type="error" message={errorMessage}/>}
+        </form>     
         </>
     )
 }

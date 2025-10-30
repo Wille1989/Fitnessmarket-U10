@@ -5,6 +5,7 @@ import type { Product } from "../types/Products/Products";
 
 export function useCart() {
     const { checkout } = useOrder();
+    const [infoMessage, setInfoMessage] = useState<string | null>(null);
     const [cart, setCart] = useState<ProductItem[]>([]);
 
         function addToCart(product: Product) {
@@ -41,7 +42,9 @@ export function useCart() {
 
         async function handleCheckout() {
         if (cart.length === 0) {
-        return;
+            setInfoMessage('Det finns inga produkter i beställningen');
+            setTimeout(() => setInfoMessage(null), 1500);
+            return;
         }
 
         const order = {
@@ -57,7 +60,7 @@ export function useCart() {
         }
         }
   
-        return { addToCart, removeFromCart, handleCheckout, cart,total }
+        return { addToCart, removeFromCart, handleCheckout, cart, total, infoMessage }
 
 }
 

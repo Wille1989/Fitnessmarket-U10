@@ -1,0 +1,46 @@
+.form-edit-user {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 2rem auto;
+  background: #bdbaba;
+  border-radius: 10px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-sizing: border-box;
+}
+
+label {
+  font-weight: 600;
+  flex-direction: column;
+  margin-bottom: 0.3rem;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #bdbaba;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.radio-label:hover {
+  background: #e7e5e5;
+}
+
+.radio-label input[type="radio"] {
+  accent-color: #160808;
+  transform: scale(1.2);
+  cursor: pointer;
+}

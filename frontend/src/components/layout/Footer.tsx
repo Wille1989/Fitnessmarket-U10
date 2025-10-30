@@ -3,7 +3,7 @@ import '../../css/layout/footer.css';
 function Footer() {
   return (
     <footer className="footer">
-      <p>© {new Date().getFullYear()} FitnessMarket. Alla rättigheter förbehållna.</p>
+      <p>© {new Date().getFullYear()} <i>Food</i>Market. Alla rättigheter förbehållna.</p>
     </footer>
   );
 }

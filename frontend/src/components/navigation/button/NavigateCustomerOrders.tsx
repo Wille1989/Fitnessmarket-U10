@@ -9,15 +9,15 @@ function NavigateCustomerOrders({ id }: { id: string }) {
     const handleCustomerOrders = async() => { 
         setLoading(true);
 
-        setTimeout(() => navigate(`/admin/user/orders/${id}`), 1500);
+        setTimeout(() => navigate(`/admin/user/orders/${id}`), 800);
     
         setLoading(false);
 
     }
 
     return (
-        <button onClick={handleCustomerOrders} disabled={loading}>
-            {loading ? 'Omdirigerar' : 'Hämta ordrar'}
+        <button type="button" onClick={handleCustomerOrders} disabled={loading}>
+            {loading ? 'Omdirigerar' : 'Beställningar'}
         </button>
     )
 }

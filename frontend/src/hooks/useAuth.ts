@@ -30,14 +30,20 @@ export function useAuth() {
                 }
 
                 if(decoded.role === 'customer'){
+                    setSuccessMessage('Du loggas in!');
+                    setTimeout(() => setSuccessMessage(null), 1500);
                     navigate('/')
                     navigate(0);
 
                 } else if (decoded.role === 'admin'){
+                    setSuccessMessage('Du loggas in!');
+                    setTimeout(() => setSuccessMessage(null), 1500);
                     navigate('/')
                     navigate(0);
 
                 } else if(decoded.role === 'sales'){
+                    setSuccessMessage('Du loggas in!');
+                    setTimeout(() => setSuccessMessage(null), 1500);
                     navigate('/')
                     navigate(0);
                 }

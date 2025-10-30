@@ -1,39 +1,43 @@
 import { useOrder } from "../../hooks/useOrder"
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useAdminManagement } from "../../hooks/useAdminManagement";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Alert } from "../../components/alert/Alert";
+import '../../css/order/MyOrders.css';
 
 function IndexOrder() {
-    const { index, orderArray, loading: orderLoading } = useOrder();
-    const { id } = useParams();
-    const { indexCustomerOrder, loading: adminLoading } = useAdminManagement()
-    const [orders, setOrders] = useState(orderArray);
+    const { index, orderArray } = useOrder();
+    const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
     useEffect(() => {
-        async function fetchData() {
-             if(id) {
-            const result = await indexCustomerOrder(id);
-            if (result) setOrders(result);
+        index();
+    },[index])
+
+    useEffect(() => {
+        if(orderArray.length === 0) {
+            setInfoMessage('Oops det verkar som att du inte har några tidigare beställningar');
         } else {
-            const result = await index();
-            if(result) setOrders(result);
+            setInfoMessage(null);
         }
-        } fetchData(); },[id, indexCustomerOrder, index]);
-
-        console.log(orders);
+    })
     
-    if(orderLoading || adminLoading) return <p><strong>Laddar ordrar...</strong></p>
-    if(orderArray.length === 0) return <p><strong>Inga ordrar hittades tyvärr</strong></p>
-
     return (
         <>
-            <ul>
-                {orders.map((order) => (
-                    <li key={order._id}>{`${order.orderNumber}`}
+            {infoMessage && <Alert type="info" message={infoMessage} />}
+            
+            <div className="order-page">
+                <ul className="order-overview">
+                {orderArray.map((c) => (
+                    <li key={c._id}><span>Order #</span>{String(c.orderNumber)} - {String(c.sumOfOrder)}:- 
+                        <ul className="order-details">
+                            {c.content.map((productItem, item) => (
+                            <li key={item}>
+                                <span>{productItem.title}</span> - <span>{productItem.quantity}st</span> - <span>{productItem.price}:-</span>
+                            </li>
+                            ))}
+                        </ul>
                     </li>
                 ))}
-            </ul>
+                </ul>
+            </div>
         </>
     )
 }
