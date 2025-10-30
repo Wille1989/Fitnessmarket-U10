@@ -12,6 +12,7 @@ function ProductPage() {
     const { addToCart, removeFromCart, handleCheckout, cart, total, infoMessage: checkoutMessage} = useCart();
     const [infoMessage, setInfoMessage] = useState<string | null>(null);
     const [search, setSearch] = useState('');
+    const [expanded, setExpanded] = useState<boolean>(false);
     const navigate = useNavigate();
     const decoded = getDecodedToken();
     const role = decoded?.role || 'guest'
@@ -42,10 +43,10 @@ function ProductPage() {
             placeholder="Sök efter en produkt..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}/>
-            
-            <ul className="product-list">
 
             {infoMessage && <Alert type="info" message={infoMessage}/>}
+            
+            <ul className="product-list">
 
                 {filteredProducts.map((p) => (
                 <li className="product-card" key={p._id}>
@@ -94,26 +95,36 @@ function ProductPage() {
                     </div>
                 </li>
                 ))}
+            </ul>                
+            {role === "customer" && (
+            <>
+                <div className={`checkout-container ${expanded ? "expanded" : "collapsed"}`}>
+                    <button
+                        type="button"
+                        className="checkout-toggle"
+                        onClick={() => setExpanded(!expanded)}
+                        >
+                        {expanded ? "▼" : "▲"}
+                    </button>
 
-                 {role === "customer" && (
-                <>
-                    <div className="checkout-container">
-                    <ul>
+
+                    {checkoutMessage && <Alert type="info" message={checkoutMessage}/>}
+
+                    <ul className="checkout-content">
                         {cart.map((item) => (
                         <li key={item.productID}>
                             <p>{item.title} x{item.quantity} = {item.price * item.quantity}:-</p>
                         </li>
                         ))}
                     </ul>
-
+                    <div className="total-container"></div>
                     <p><strong>Totalt:</strong> {total.toFixed(1)} kr</p>
-                    {checkoutMessage && <Alert type="info" message={checkoutMessage}/>}
-                    <button type="submit" onClick={handleCheckout}>Lägg beställning</button>
-                    </div>    
-                </>
+                    <div className="button-container">
+                        <button type="submit" onClick={handleCheckout}>Lägg beställning</button>
+                    </div>
+                </div>    
+            </>
             )}
-
-            </ul>
         </div>
         </>
     )

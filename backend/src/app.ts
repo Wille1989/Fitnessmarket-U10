@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:4173'],
+  origin: ['https://u10-foodmarket.netlify.app/', 'http://localhost:5173', 'http://localhost:4173'],
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));

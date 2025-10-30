@@ -134,25 +134,31 @@
 .checkout-container {
   position: fixed;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  opacity: 90%;
-  width: 65%;
+  width: 80%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  max-width: 1280px;
   max-height: 6rem;
   box-sizing: border-box;
   bottom: 0;
   border: 2px solid rgb(29, 28, 27);
   background-color: rgb(238, 227, 213);
   display: flex;
-  padding: 0.5rem;
-  justify-content: space-between;
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
   z-index: 9999;
+  justify-content: space-between;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.checkout-container button{
+.checkout-container.expanded {
+
+  max-height: 15rem;
+}
+
+.button-container button{
     all: unset;
     cursor: pointer;
     font-size: clamp(1rem, 2vw + 1rem, 1.25rem);
@@ -164,10 +170,6 @@
 }
 
 .checkout-container li {
-  list-style: none;
-}
-
-.checkout-container ul {
   list-style: none;
 }
 
