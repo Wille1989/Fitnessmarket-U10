@@ -5,21 +5,33 @@
   width: 100%;
   max-width: 400px;
   margin: 2rem auto;
-  background: #bdbaba;
+  background: rgb(238, 227, 213);
   border-radius: 10px;
   padding: 2rem 2.5rem;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   box-sizing: border-box;
 }
 
-label {
+.form-register label {
   font-weight: 600;
   flex-direction: column;
   margin-bottom: 0.3rem;
 }
 
-input {
-    height: 1.5rem;
-    margin-bottom: 1rem;
-    padding-top: 1rem;
+.form-register input {
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: clamp(1rem, 2vw + 1rem, 1.25rem);
+  padding: 0;
 }
+
+.form-register button {
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+
+  .form-register {
+    width: 90%;
+  }
+} 

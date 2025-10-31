@@ -98,15 +98,19 @@ function useProduct() {
         try {
             setLoading(true);
 
-            if(!Object.keys(data)){
-                throw new Error('Fält kan inte lämnas tomma');
+            if (Object.values(data).some(v => v === "" || v === null || v === undefined)) {
+                throw new Error('ett eller flera fält är tomma')
+            }
+
+            if(data.nutritionalContent && Object.values(data.nutritionalContent).some(v => v === "" || v === null || v === undefined)) {
+                throw new Error('ett eller flera fält är tomma')
             }
 
             if(data.imageUrl) {
                 if(!data.imageUrl.includes('https')){
-                    throw new Error('Bilden måste vara en https bild')
+                    throw new Error('Bilden måste vara en https bild');
                 }
-            }
+            };
 
             const result = await ProductApi.update(id, data);
 
@@ -118,7 +122,6 @@ function useProduct() {
             return true;
 
         } catch (error: any) {
-            console.error(error);
             const message: string = error.response?.data?.message || error.message || 'Oväntat fel';
             setErrorMessage(message);
             setTimeout(() => setErrorMessage(null), 2000);

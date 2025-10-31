@@ -51,7 +51,8 @@
 @media (max-width: 768px) {
 
     .order-page {
-        padding: 1rem;
+        padding: 0.5rem;
+        width: 90%;
     }
 
     .order-overview {
@@ -61,5 +62,16 @@
     .order-details {
         font-size: clamp(0.75rem, 1vw + 1rem, 1rem);
     }
+
+    .user-info {
+         flex-direction: column;
+         gap: 0.5rem;
+    }
+
+    .user-info span, strong {
+        font-size: clamp(0.75rem, 2vw + 0.5rem, 1rem);
+    }
+
+    
 
 }

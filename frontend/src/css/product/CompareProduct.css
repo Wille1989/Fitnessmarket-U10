@@ -6,8 +6,8 @@
 }
 
 .comparison-result {
-  width: 100%;
   display: flex;
+  width: 100%;
   box-sizing: border-box;
   align-items: center;
 }
@@ -20,13 +20,14 @@
 
 .comparison-grid {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 1rem;
-  flex-wrap: wrap;
   width: 100%;
   max-width: 1200px;
+  box-sizing: border;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
   margin: 0 auto;
+  gap: 1rem;
 }
 
 .product-left-side,
@@ -53,17 +54,17 @@
 }
 
 .product-difference {
-  background: #dfdbdb;
-  width: 100%;
-  box-sizing: border-box;
-  max-width: 150px;
-  border: 1px solid #413e3e;
-  border-radius: 1rem;
   display: flex;
   flex-direction: column;
-  font-size: clamp(1rem, 2vw + 1rem, 1.25rem);
-  text-align: center;
+  width: 100%;
+  max-width: 150px;
+  box-sizing: border-box;
+  background: #dfdbdb;
+  border: 1px solid #413e3e;  
+  border-radius: 1rem;
   margin-top: 5.2rem;
+  text-align: center;
+  font-size: clamp(1rem, 2vw + 1rem, 1.25rem);
 }
 
 .diff-positive {
@@ -87,7 +88,6 @@
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  border: 1px solid black;
   padding: 1rem 2rem;
   box-sizing: border-box;
   z-index: 9999;
@@ -105,6 +105,20 @@
 }
 
 @media (max-width: 768px) {
+
+  .product-page {
+    padding: 0.5rem;
+  }
+
+  .product-card {
+    min-width: none;
+    padding: 0.2rem;
+  }
+
+  .product-list {
+    gap: 0.5rem;
+  }
+
   .comparison-grid {
     flex-direction: column;
     align-items: center;

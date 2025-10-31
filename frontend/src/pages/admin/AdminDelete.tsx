@@ -19,15 +19,15 @@ export function DeleteUserAsAdmin() {
 
         if(id) {
             deleteUserAccount(id);
+            setSuccessMessage('Användaren har raderats!');
+            setTimeout(() => {
+                setSuccessMessage(null),
+                navigate('/admin/users')
+            },1500);
+        } else {
+            setErrorMessage(errorMessage);
+            setTimeout(() => setErrorMessage(null),1500);
         }
-
-        setSuccessMessage('Användaren har raderats!')
-        setErrorMessage(errorMessage);
-        setTimeout(() => {
-            setErrorMessage(null)
-        }, 1500)
-
-        navigate('/admin/users');
 
         setLoading(false);
 

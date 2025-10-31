@@ -2,12 +2,13 @@
 .form-create-product {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  gap: 1rem;
   width: 100%;
   max-width: 600px;
-  margin: 2rem auto;
-  background: #bdbaba;
-  border-radius: 10px;
+  background: #eceaea;
+  border-radius: 1rem;
   padding: 2rem 2.5rem;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   box-sizing: border-box;
@@ -17,6 +18,13 @@ label {
   font-weight: 600;
   flex-direction: column;
   margin-bottom: 0.3rem;
+}
+
+.form-create-product input {
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: clamp(1rem, 2vw + 1rem, 1.25rem);
+  padding-left: 0.2rem;
 }
 
 .form-section {
@@ -37,4 +45,16 @@ label {
   margin-bottom: 0.5rem;
   font-size: 1.5rem;
   color: #000000;
+}
+
+@media (max-width: 768px) {
+
+  .form-create-product {
+    width: 90%;
+  }
+
+  .form-create-product h3 {
+    margin-top: 0;
+  }
+
 }
