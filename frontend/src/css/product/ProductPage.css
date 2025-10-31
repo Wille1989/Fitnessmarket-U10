@@ -184,6 +184,19 @@
 
 @media (max-width: 768px) {
 
+  .product-page {
+    padding: 0.5rem;
+  }
+
+  .product-card {
+    min-width: none;
+    padding: 0.2rem;
+  }
+
+  .product-list {
+    gap: 0.5rem;
+  }
+
   .checkout-container {
     width: 75%;
   }
@@ -199,14 +212,6 @@
   .product-search {
     font-size: clamp(0.75rem , 2vw + 0.5rem, 1rem);
     max-width: 100%;
-  }
-
-  .product-list {
-    gap: 1rem;
-  }
-
-  .product-card {
-    padding: 1rem;
   }
 
 }
