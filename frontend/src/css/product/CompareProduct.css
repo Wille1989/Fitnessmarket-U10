@@ -5,20 +5,11 @@
   justify-content: center;
 }
 
-.product-list {
-    display: flex;
-    flex-wrap: wrap;
-    list-style: none;
-    padding: 0;
-}
-
 .comparison-result {
   width: 100%;
   display: flex;
-  flex-direction: column;
+  box-sizing: border-box;
   align-items: center;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
 }
 
 .comparison-grid-h3 {
@@ -40,15 +31,15 @@
 
 .product-left-side,
 .product-right-side {
-  background: #dfdbdb;
-  padding: 0.5rem;
-  width: 30%;
-  max-width: 250px;
-  border: 1px solid #413e3e;
-  border-radius: 8px;
   display: flex;
   flex-direction: column;
-  font-size: 1.1rem;
+  width: 100%;
+  max-width: 250px;
+  box-sizing: border-box;
+  background: rgb(238, 227, 213);
+  border: rgb(228, 199, 161);
+  border-radius: 1rem;
+  font-size: clamp(1rem, 2vw + 1rem, 1.25rem);
   text-align: center;
 }
 .product-left-side {
@@ -58,22 +49,21 @@
 .product-left-side h4,
 .product-right-side h4 {
   text-align: center;
-  margin-bottom: 0.5rem;
   color: black;
 }
 
 .product-difference {
   background: #dfdbdb;
-  padding: 0.5rem;
-  width: 30%;
-  max-width: 80px;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 150px;
   border: 1px solid #413e3e;
-  border-radius: 8px;
+  border-radius: 1rem;
   display: flex;
   flex-direction: column;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 2vw + 1rem, 1.25rem);
   text-align: center;
-  margin-top: 3.5rem;
+  margin-top: 5.2rem;
 }
 
 .diff-positive {
@@ -89,27 +79,32 @@
 }
 
 .button-container {
-  position: sticky;
+  position: fixed;
   display: flex;
-  bottom: 0;
-  left: 0;
+  flex-direction: column;
+  bottom: 4.5%;
   width: 50%;
+  align-items: center;
   justify-content: center;
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
+  border-radius: 1rem;
+  border: 1px solid black;
   padding: 1rem 2rem;
   box-sizing: border-box;
   z-index: 9999;
 }
 
-@media (max-width: 900px) {
-  .product-left-side,
-  .product-right-side {
-    width: 45%;
-  }
+.button-container button {
+  font-size: clamp(1rem, 2vw + 1.25rem, 2rem);
 }
 
-@media (max-width: 600px) {
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+}
+
+@media (max-width: 768px) {
   .comparison-grid {
     flex-direction: column;
     align-items: center;
@@ -117,12 +112,22 @@
 
   .product-left-side,
   .product-right-side {
-    width: 90%;
+    width: 100%;
   }
+.product-left-side p {
+  margin: 0.4rem;
+}
 
-  .product-difference {
-    flex-direction: row;
-    justify-content: center;
-    gap: 1rem;
-  }
+.product-right-side p {
+  margin: 0.4rem;
+}
+
+.product-difference {
+  margin: 0;
+}
+
+.product-difference p {
+  margin: 0.4rem
+}
+
 }

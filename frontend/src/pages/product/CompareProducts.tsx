@@ -4,16 +4,27 @@ import { useMessage } from "../../context/MessageProvider";
 import { Alert } from "../../components/alert/Alert";
 import RateProduct from "./RateProduct";
 import '../../css/product/CompareProduct.css';
+import '../../css/product/ProductPage.css';
 
 function CompareProducts() {
     const { setErrorMessage, errorMessage } = useMessage();
     const { index, productArray, compare, comparison } = useProduct();
     const [selected, setSelected] = useState<string[]>([]);
+    
+    const fieldLabels: Record<string, string> = {
+      energy: "Energi (kcal)",
+      fat: "Fett (g)",
+      saturatedfat: "Mättat fett (g)",
+      salt: "Salt (g)",
+      protein: "Protein (g)",
+  };
+
 
   useEffect(() => {
     index();
   }, [index])
 
+  console.log(comparison);
 
   const handleSelect = (id: string) => {
     setSelected((prev) =>
@@ -23,7 +34,8 @@ function CompareProducts() {
 
   const handleCompare = async () => {
     if (selected.length !== 2) {
-      setErrorMessage('välj 2 produkter');
+      setErrorMessage('VÄLJ 2 PRODUKTER');
+      setTimeout(() => setErrorMessage(null), 2500);
       return;
     }
 
@@ -39,15 +51,11 @@ function CompareProducts() {
       {comparison && (
       <div className="comparison-result">  
         <div className="comparison-grid">
-
-          <h3 className="comparison-grid-h3">
-            Jämförelse mellan {comparison.comparedProducts[0]} och {comparison.comparedProducts[1]}
-          </h3>
         <div className="product-left-side">
         <h4>{comparison.comparedProducts[0]}</h4>
         {comparison.comparison.map((item) => (
           <p key={item.field}>
-            <strong>{item.field}:</strong> {item.productA}
+            <strong>{fieldLabels[item.field]}:</strong> {item.productA}
           </p>
         ))}
         </div>
@@ -69,7 +77,7 @@ function CompareProducts() {
           <h4>{comparison.comparedProducts[1]}</h4>
           {comparison.comparison.map((item) => (
             <p key={item.field}>
-              <strong>{item.field}:</strong> {item.productB}
+              <strong>{fieldLabels[item.field]}:</strong> {item.productB}
             </p>
           ))}
         </div>
@@ -113,12 +121,12 @@ function CompareProducts() {
         ))}
     </ul>
     <div className="button-container">
+    <div className="alert-message">
+      {errorMessage && <Alert type='error' message={errorMessage}/>}
+    </div>
       <button type="submit" onClick={handleCompare}>Jämför</button>
     </div>
-    </div>
-    
-        {errorMessage && <Alert type='error' message={errorMessage}/>}
-        
+    </div>        
     </>
   );
 }

@@ -1,13 +1,22 @@
 import { Link } from "react-router-dom";
 import { getDecodedToken } from "../../middleware/JwtDecode";
 import GoTopButton from "../navigation/button/GoTopButton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import '../../css/layout/Navbar.css';
 
 function Navbar() {
   const [open, setOpen] = useState<boolean>(false);
   const decoded = getDecodedToken();
   const role = decoded?.role || "guest";
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (open) setOpen(false);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [open]);
 
   return (
     <nav className="navbar">
