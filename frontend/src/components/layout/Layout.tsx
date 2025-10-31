@@ -4,13 +4,13 @@ import '../../css/layout/Layout.css';
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-    <Navbar />
-        <main className="main-content">
-          {children}
-        </main>
-    <Footer />
-    </>
+    <div className="wrapper">
+      <Navbar />
+          <main className="main-content">
+            {children}
+          </main>
+      <Footer />
+    </div>
   );
 }
 

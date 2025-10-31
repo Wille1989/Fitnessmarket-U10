@@ -190,6 +190,7 @@
 
   .product-card {
     min-width: none;
+    width: 90%;
     padding: 0.2rem;
   }
 

@@ -157,8 +157,6 @@ export async function updateProduct(
 export async function compareProducts(
     req: Request, res: Response<ApiResponse<ComparedProducts>>): Promise<void> {
     try {
-        console.log('REQ BODY:', req.body);
-        // Create an array of object
         const { products } = req.body;
 
         const { comparedProducts, comparison } = await compareProductsService(products);
@@ -166,9 +164,6 @@ export async function compareProducts(
         if(!products) {
             throw new NotFoundError('Det gick inte att jämföra produkterna');
         };
-
-        console.log(compareProducts);
-        console.log(comparison);
 
         res.status(200).json({ message: 'Jämförelse av datan genomförd, skickar vidare', data: { comparedProducts, comparison } });
 
@@ -197,8 +192,6 @@ export async function rateProduct(
     req: Request, res: Response<ApiResponse<Product>>): Promise<void> {
     try {
         const {id, ratingValue} = req.body;
-
-        console.log(id, ratingValue)
 
         const response = await rateProductService(id, ratingValue);
 

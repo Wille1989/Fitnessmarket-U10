@@ -1,15 +1,21 @@
 .user-page {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 800px;
-  justify-content: center;
+  width: 80%;
+  max-width: 1200px;
   box-sizing: border-box;
-  padding: 1rem;
+  justify-content: center;
 }
 
 .user-page h2 {
   margin-left: 0.5rem;
+}
+
+.user-list-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .user-list {
@@ -17,7 +23,6 @@
   flex-direction: column;
   width: 100%;
   box-sizing: border-box;
-  margin: 0;
   padding: 0;
 }
 

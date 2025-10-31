@@ -1,17 +1,36 @@
 html, body {
+  display: flex;
+  flex-direction: column;
   margin: 0;
   padding: 0;
+  height: 100%;
   background-color: white;
   color: #000000;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 100vh;
 }
 
 .main-content {
   display: flex;
   flex-direction: column;
+  flex: 1;
   width: 100%;
   box-sizing: border-box;
   min-width: 20vw;
   max-width: 1600px;
   align-items: center;
   margin: 0 auto;
+}
+
+input, textarea, select {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
