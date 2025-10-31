@@ -77,8 +77,12 @@ function ProductPage() {
                     <div className="to-cart-button-container">
                         {role === 'customer' && (
                             <>
-                                <p>🛒</p>
-                                <button type="button" onClick={() => removeFromCart(p)}>-</button>                            
+                                <button type="button" onClick={() => removeFromCart(p)}>-</button>
+
+                                <span className="cart-quantity">
+                                    {cart.find((item) => item.productID === p._id)?.quantity || 0}
+                                </span>          
+                                                 
                                 <button type="button" onClick={() => addToCart(p)}>+</button>
                             </>
                         )}
@@ -98,31 +102,20 @@ function ProductPage() {
             </ul>                
             {role === "customer" && (
             <>
-                <div className={`checkout-container ${expanded ? "expanded" : "collapsed"}`}>
-                    <button
-                        type="button"
-                        className="checkout-toggle"
-                        onClick={() => setExpanded(!expanded)}
-                        >
-                        {expanded ? "▼" : "▲"}
-                    </button>
 
+                {checkoutMessage && <Alert type="info" message={checkoutMessage}/>}
 
-                    {checkoutMessage && <Alert type="info" message={checkoutMessage}/>}
+                <div className="checkout-container">
+                        <div className="total-container">
+                            <p>
+                                <strong>Totalt:</strong> {total.toFixed(1)} kr
+                            </p>
+                             <div className="checkout-right">
+                            <button type="submit" onClick={handleCheckout}>Lägg beställning</button>
+                        </div>
 
-                    <ul className="checkout-content">
-                        {cart.map((item) => (
-                        <li key={item.productID}>
-                            <p>{item.title} x{item.quantity} = {item.price * item.quantity}:-</p>
-                        </li>
-                        ))}
-                    </ul>
-                    <div className="total-container"></div>
-                    <p><strong>Totalt:</strong> {total.toFixed(1)} kr</p>
-                    <div className="button-container">
-                        <button type="submit" onClick={handleCheckout}>Lägg beställning</button>
-                    </div>
-                </div>    
+                        </div>
+                </div>   
             </>
             )}
         </div>
