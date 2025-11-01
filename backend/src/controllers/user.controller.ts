@@ -36,7 +36,7 @@ export async function createUser(
 
         res.status(err.status || 500).json({
             message: process.env.NODE_ENV === 'production'
-            ? 'Server fel'
+            ? 'Något gick fel, försök igen'
             : err.message,
         });
     };
@@ -73,7 +73,7 @@ export async function createUserAsAdmin(
 
         res.status(err.status || 500).json({
             message: process.env.NODE_ENV === 'production'
-            ? 'Server fel'
+            ? 'Något gick fel, försök igen'
             : err.message,
         });
     };
