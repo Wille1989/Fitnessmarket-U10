@@ -91,7 +91,7 @@ function ProductPage() {
                         {role === 'admin' && (
                         <>
                             <button type="button" onClick={() => navigate(`/admin/product/${p._id}`)}>
-                                &#128393;
+                                ✏️
                             </button>
                         </>
                         )}
