@@ -18,6 +18,14 @@ export function useAuth() {
         try {
             setLoading(true);
 
+            if(!data.email) {
+                throw new Error('Fyll i e-post')
+            }
+
+            if(!data.password) {
+                throw new Error('fyll i lösenord')
+            }
+
             const result = await authApi.login(data);
             localStorage.setItem('token', result.data.token);
 

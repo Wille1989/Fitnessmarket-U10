@@ -94,17 +94,17 @@ function CompareProducts() {
             <img src={p.imageUrl} alt={p.title} className="product-image" />
             <h2>{p.title}</h2>
             <span><strong>Land:</strong> {p.originCountry}</span>
-            <span><strong>Vikt/kg:</strong> {p.weight}</span>
-            <span><strong>Pris:</strong> {p.price}</span>
-            <span><strong>Betyg:</strong> {p.rating.average}</span>
+            <span><strong>Vikt (g):</strong> {p.weight}</span>
+            <span><strong>Pris (sek):</strong> {p.price}:-</span>
+            <span><strong>Betyg (1-5):</strong> {p.rating.average}</span>
 
             <div className="nutritionalContent">
                 <h4>Näringsinnehåll:</h4>
-                <span><strong>Energi: </strong>{p.nutritionalContent.energy}</span>
-                <span><strong>Fett: </strong>{p.nutritionalContent.fat}</span>
-                <span><strong>Mättat fett:</strong>{p.nutritionalContent.saturatedfat}</span>
-                <span><strong>Salt: </strong>{p.nutritionalContent.salt}</span>
-                <span><strong>Protein: </strong>{p.nutritionalContent.protein}</span>
+                <span><strong>Kcal / 100g: </strong>{p.nutritionalContent.energy}</span>
+                <span><strong>Fett (g): </strong>{p.nutritionalContent.fat}</span>
+                <span><strong>Mättat fett (g): </strong>{p.nutritionalContent.saturatedfat}</span>
+                <span><strong>Salt (g): </strong>{p.nutritionalContent.salt}</span>
+                <span><strong>Protein (g): </strong>{p.nutritionalContent.protein}</span>
                 <RateProduct id={p._id} />
             </div>
 
