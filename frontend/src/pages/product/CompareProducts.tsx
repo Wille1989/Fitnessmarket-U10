@@ -19,12 +19,9 @@ function CompareProducts() {
       protein: "Protein (g)",
   };
 
-
   useEffect(() => {
     index();
   }, [index])
-
-  console.log(comparison);
 
   const handleSelect = (id: string) => {
     setSelected((prev) =>
