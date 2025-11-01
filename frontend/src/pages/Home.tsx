@@ -1,5 +1,4 @@
 import ProductPage from "./product/ProductPage";
-import './Home.css'
 
 
 function Home() {

@@ -63,7 +63,7 @@ function Navbar() {
 
             {role === "customer" && (
               <>
-                <li><Link to="/myOrders" onClick={() => setOpen(false)}>Mina ordrar</Link></li>
+                <li><Link to="/myOrders" onClick={() => setOpen(false)}>Beställningar</Link></li>
                 <li><Link to="/logout" onClick={() => setOpen(false)}>Logga ut</Link></li>
               </>
             )}
@@ -82,7 +82,7 @@ function Navbar() {
 
             {role === "guest" && (
               <>
-                <li><Link to="/register">Skapa Konto</Link></li>
+                <li><Link to="/register">Skapa konto</Link></li>
                 <li><Link to="/login">Logga in</Link></li>
               </>
             )}
@@ -90,21 +90,21 @@ function Navbar() {
             {role === "admin" && (
               <>
                 <li><Link to="/admin/users">Användare</Link></li>
-                <li><Link to="/product/create">Skapa Produkt</Link></li>
+                <li><Link to="/product/create">Skapa produkt</Link></li>
                 <li><Link to="/logout">Logga ut</Link></li>
               </>
             )}
 
             {role === "sales" && (
               <>
-                <li><Link to="/product/create">Skapa Produkt</Link></li>
+                <li><Link to="/product/create">Skapa produkt</Link></li>
                 <li><Link to="/logout">Logga ut</Link></li>
               </>
             )}
 
             {role === "customer" && (
               <>
-                <li><Link to="/myOrders">Mina ordrar</Link></li>
+                <li><Link to="/myOrders">Beställningar</Link></li>
                 <li><Link to="/logout">Logga ut</Link></li>
               </>
             )}

@@ -12,7 +12,6 @@ function ProductPage() {
     const { addToCart, removeFromCart, handleCheckout, cart, total, infoMessage: checkoutMessage} = useCart();
     const [infoMessage, setInfoMessage] = useState<string | null>(null);
     const [search, setSearch] = useState('');
-    const [expanded, setExpanded] = useState<boolean>(false);
     const navigate = useNavigate();
     const decoded = getDecodedToken();
     const role = decoded?.role || 'guest'
@@ -54,19 +53,19 @@ function ProductPage() {
                     <h2>{p.title}</h2>
                     <div className="product-info">
                         <span><strong>Land:</strong></span><p>{p.originCountry}</p>
-                        <span><strong>Vikt/kg:</strong></span> <p>{p.weight}</p>
-                        <span><strong>Pris:</strong></span> <p>{p.price}</p>
-                        <span><strong>Betyg:</strong></span> <p>{p.rating.average}</p>
+                        <span><strong>Vikt (g):</strong></span><p>{p.weight}</p>
+                        <span><strong>Pris (sek):</strong></span><p>{p.price}:-</p>
+                        <span><strong>Betyg (1-5):</strong></span> <p>{p.rating.average}</p>
                     </div>
                     
                     <div className="nutritionalContent">
                         <h2>Näringsinnehåll / 100g:</h2>
                         <div className="nutritionalContent-info">
-                            <span><strong>Kcal: </strong></span><p>{p.nutritionalContent.energy}</p>
-                            <span><strong>Fett: </strong></span><p>{p.nutritionalContent.fat}</p>
-                            <span><strong>Mättat fett:</strong></span><p>{p.nutritionalContent.saturatedfat}</p>
-                            <span><strong>Salt: </strong></span><p>{p.nutritionalContent.salt}</p>
-                            <span><strong>Protein: </strong></span><p>{p.nutritionalContent.protein}</p>
+                            <span><strong>Kcal / 100g: </strong></span><p>{p.nutritionalContent.energy}</p>
+                            <span><strong>Fett (g): </strong></span><p>{p.nutritionalContent.fat}</p>
+                            <span><strong>Mättat fett (g):</strong></span><p>{p.nutritionalContent.saturatedfat}</p>
+                            <span><strong>Salt (g): </strong></span><p>{p.nutritionalContent.salt}</p>
+                            <span><strong>Protein (g): </strong></span><p>{p.nutritionalContent.protein}</p>
                         </div>
                     </div>
 
