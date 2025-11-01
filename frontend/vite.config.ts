@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['offline.html', 'icons/icon-192x192.svg', 'icons/icon-512x512.svg'],
+      includeAssets: ['offline.html', 'icons/icon-192x192.png', 'icons/icon-512x512.png'],
       manifest: {
         name: 'Fitness Market',
         short_name: 'FM',
@@ -18,14 +18,14 @@ export default defineConfig({
         theme_color: '#111111',
         icons: [
           {
-            src: '/icons/icon-192x192.svg',
+            src: '/icons/icon-192x192.png',
             sizes: '192x192',
-            type: 'image/svg',
+            type: 'image/png',
           },
           {
-            src: '/icons/icon-512x512.svg',
+            src: '/icons/icon-512x512.png',
             sizes: '512x512',
-            type: 'image/svg',
+            type: 'image/png',
           },
         ],
       },
