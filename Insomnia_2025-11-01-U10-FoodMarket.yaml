@@ -1,0 +1,741 @@
+type: collection.insomnia.rest/5.0
+name: U10-FItness Market
+meta:
+  id: wrk_ae3c3a522a6a4158a089a4d83e047d02
+  created: 1759871130630
+  modified: 1759871130630
+  description: ""
+collection:
+  - url: localhost:3000/health
+    name: health
+    meta:
+      id: req_4c5f27b126e847acadcd77c1ea1fec9c
+      created: 1759872592601
+      modified: 1759872619012
+      isPrivate: false
+      description: ""
+      sortKey: -1759872592601
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.6.1
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - name: User
+    meta:
+      id: fld_b180040489774261a721ab0887b89c7e
+      created: 1759871156666
+      modified: 1761989018544
+      sortKey: -1759871156666
+      description: ""
+    children:
+      - url: localhost:3000/auth/register
+        name: Create
+        meta:
+          id: req_ac8c0ff9c8b1400580539df7a16bd90b
+          created: 1759871183925
+          modified: 1760127687333
+          isPrivate: false
+          description: ""
+          sortKey: -1759871183925
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"email": "customer7@test.se",
+            	"name": "Person7",
+            	"password": "testnummer7"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_0a2462ad9133403fb035f627a7ad4421
+          - id: pair_c8d1ef246e644c218895111c2afd6413
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU3NzgwMGQxYzc3ZTk3NjYwNGQ1MjQiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjAxMjcwNjIsImV4cCI6MTc2MDEzNDI2Mn0.Ac-iWAMKlhYE18QjJZw65zQrj4LLxPbt4kDxnuTx6Ik
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/user/delete
+        name: Delete
+        meta:
+          id: req_971160cde31948308327a755c134062e
+          created: 1759917635093
+          modified: 1761988955466
+          isPrivate: false
+          description: ""
+          sortKey: -1759871183825
+        method: DELETE
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"user": {
+            		"_id": "6905d09aa0a485dd9dfd1382",
+            		"email": "customer7@test.se"
+            	}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_814f02c3ff654aa39f22c51f1c587edf
+          - id: pair_dc6bbffa8b5b4b00838688d385bf2d31
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OTA1ZDA5YWEwYTQ4NWRkOWRmZDEzODIiLCJlbWFpbCI6ImN1c3RvbWVyN0B0ZXN0LnNlIiwicm9sZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzYxOTg4OTM5LCJleHAiOjE3NjE5OTI1Mzl9.0LCxohxGx9WdeSn83lBn_hZ2QMqm0W325lIok3W_4BE
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/user/all
+        name: Index users
+        meta:
+          id: req_750bc2778d8445268c77af29b4d4e6cf
+          created: 1759934528102
+          modified: 1760348167935
+          isPrivate: false
+          description: ""
+          sortKey: -1759871183700
+        method: GET
+        headers:
+          - id: pair_8dfda9dd6c3e4077a930033c2296f5e4
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU3NzgwMGQxYzc3ZTk3NjYwNGQ1MjQiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjAzNDU2MDUsImV4cCI6MTc2MDM1MjgwNX0.-XojZdyvzEtNTfvdGMZhtOaVxshejOJ1BFyQ378en18
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/user/update/myAccount
+        name: Update
+        meta:
+          id: req_5d74bfde62f24305bc087a02937a75ae
+          created: 1759934978691
+          modified: 1760359393093
+          isPrivate: false
+          description: ""
+          sortKey: -1759871183675
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"_id": "68e96a8f88e6aae6e91bc299",
+            	"name": "AdminKonto",
+            	"email" : "admin@test.se",
+            	"role": "admin"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_323a1654d41246b09f4408a17634441d
+          - id: pair_4c9fcdc495bb420a87b0bac336e5156b
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU5NmE4Zjg4ZTZhYWU2ZTkxYmMyOTkiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE3NjAzNTkzNTYsImV4cCI6MTc2MDM2NjU1Nn0.0F6OogzOwiK0Eez8G3owlWdqRMW_Mo7GE4fffoLK6Uc
+            description: ""
+            disabled: false
+            type: text
+            multiline: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/user/update
+        name: Update as admin
+        meta:
+          id: req_d7ab8975c5624bb69898d98e81752be5
+          created: 1760122605849
+          modified: 1760359878327
+          isPrivate: false
+          description: ""
+          sortKey: -1759871183650
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "user": {
+                "_id": "68e9686ce2eac7a1f04e0be7",
+                "name": "Updaterad Customer",
+                "email": "nyemail@test.se",
+                "role": "sales"
+              }
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_56f99e3ca3654cd6a6c5f7dd677f682d
+          - id: pair_33440753fa54490aa801674575d553bb
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU5NmE4Zjg4ZTZhYWU2ZTkxYmMyOTkiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjAzNTk4NjMsImV4cCI6MTc2MDM2NzA2M30.HRw3aeBqs-9unsWHvsNo51relgaymoQMrJQvnvaXTOU
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/user/admin/register
+        name: Create user as admin
+        meta:
+          id: req_730b7217c76440beb455cd0edb61b9b7
+          created: 1760127255189
+          modified: 1760127417770
+          isPrivate: false
+          description: ""
+          sortKey: -1759871183662.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"email": "customer56@test.se",
+            	"name": "Person6",
+            	"password": "testnummer6"
+            }
+        headers:
+          - id: pair_e452ce6fbc5546f49feb75612d13bbcd
+            name: Content-type
+            value: application/json
+            description: ""
+            disabled: false
+          - id: pair_e21041644eab4fb5b864e3984bcae18d
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU3NzgwMGQxYzc3ZTk3NjYwNGQ1MjQiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjAxMjczMjksImV4cCI6MTc2MDEzNDUyOX0.R-5C3AXr7nREUfvVJ-IJwh49si6JC0uI7hziH0fmZZ8
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Product
+    meta:
+      id: fld_9457052fde6c4c3d9b96f71094d82ed3
+      created: 1759871172456
+      modified: 1760123627475
+      sortKey: -1759871172456
+      description: ""
+    children:
+      - url: localhost:3000/product/new
+        name: Create (Accept Result at 2025-10-14)
+        meta:
+          id: req_b995768fa5f245f4999f391c77a63738
+          created: 1760025831369
+          modified: 1760436316325
+          isPrivate: false
+          description: ""
+          sortKey: -1760025831369
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "product": {
+                "title": "Nötfärs",
+                "price": 89.90,
+                "weight": 550,
+                "originCountry": "Sverige",
+                "category": "Nöt",
+                "nutritionalContent": {
+                  "energy": 230,
+                  "fat": 2.0,
+                  "saturatedfat": 1.8,
+                  "protein": 18.5,
+                  "salt": 0.1
+                }
+              },
+              "rating": {
+                "totalRatings": 0,
+                "sumRatings": 0,
+                "averageRating": 0
+              }
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_1c9651a37a6042ce9f54950318b54e62
+          - id: pair_b77de77223064820b9cb90ae694b9ea3
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU5NmE4Zjg4ZTZhYWU2ZTkxYmMyOTkiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjA0MzAwMDIsImV4cCI6MTc2MDQzNzIwMn0.TtPhyp03IZZ3qjviLn9JwCI_46bZQsM8RBmzI4F_s1c
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/product/delete
+        name: Delete (Accept Result at 2025-10-14)
+        meta:
+          id: req_938c6b03bd744c94aa449279196b0e5b
+          created: 1760026546193
+          modified: 1760431341703
+          isPrivate: false
+          description: ""
+          sortKey: -1760025831269
+        method: DELETE
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"_id": "68ee07c6d02bf96ce7acefe3"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_04d822a26ecc4eefb187df5f7e5df9ef
+          - id: pair_31aad11738e344b3b18997ca955ea9ab
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU5NmE4Zjg4ZTZhYWU2ZTkxYmMyOTkiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjA0MzAwMDIsImV4cCI6MTc2MDQzNzIwMn0.TtPhyp03IZZ3qjviLn9JwCI_46bZQsM8RBmzI4F_s1c
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/product/index
+        name: Index products (Accept Result at 2025-10-14)
+        meta:
+          id: req_a18d1c12b26448bb88cce0a7eb1ef4f5
+          created: 1760081833793
+          modified: 1760432935745
+          isPrivate: false
+          description: ""
+          sortKey: -1760025831225.25
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.6.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/product/show
+        name: Show product (Accept Result at 2025-10-14)
+        meta:
+          id: req_756dfa03eef940ebbe435879596c01df
+          created: 1760082042061
+          modified: 1760432807914
+          isPrivate: false
+          description: ""
+          sortKey: -1760025831231.5
+        method: GET
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"_id": "68ee0d0bb0cb205cf2766d87"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/product/update
+        name: Update (Accept Result at 2025-10-14)
+        meta:
+          id: req_b46b722f0a2e4cc3a9233f1843d6e026
+          created: 1760084349199
+          modified: 1760436108812
+          isPrivate: false
+          description: ""
+          sortKey: -1760025831219
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "product": {
+                "_id": "68ee0d0bb0cb205cf2766d87",
+                "title": "Kycklingbröstfilé",
+                "price": 109.90,
+                "weight": 850,
+                "originCountry": "Sverige",
+                "category": "Kyckling",
+                "nutritionalContent": {
+                  "energy": 440,
+                  "fat": 4.8,
+                  "saturatedfat": 1.1,
+                  "protein": 24.0,
+                  "salt": 0.19
+                },
+            		"rating": {
+                "totalRatings": 0,
+                "sumRatings": 0,
+                "averageRating": 0
+              	}
+              } 
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - id: pair_ac616e2473cd47e38dd9854d6a314aae
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU5NmE4Zjg4ZTZhYWU2ZTkxYmMyOTkiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjA0MzI5NDMsImV4cCI6MTc2MDQ0MDE0M30.DUgHHV3S-_gUPIMNfWWHoV2cJeNIpl7ULB2ky-JNTow
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/product/compare
+        name: Compare Products (Accept Result at 2025-10-14)
+        meta:
+          id: req_1f1d215df267476f9a5aec0b64a91f0e
+          created: 1760437179947
+          modified: 1760437958265
+          isPrivate: false
+          description: ""
+          sortKey: -1760025831119
+        method: GET
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"products": [
+            		"68ee0d0bb0cb205cf2766d87", "68ee205df5cf8d027767bb4b"
+            	]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/product/rate
+        name: Rate Product (Accept Result at 2025-10-14)
+        meta:
+          id: req_dc85e563eb2f4ccf85d336f7e8a4f455
+          created: 1760437968741
+          modified: 1760445301739
+          isPrivate: false
+          description: ""
+          sortKey: -1760025831019
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"productRating": {
+            		"_id": "68ee205df5cf8d027767bb4b",
+            		"rating": "3"
+            	}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Order
+    meta:
+      id: fld_f607815368574a3ea6ad37cbcd6b160a
+      created: 1759871179120
+      modified: 1760123625822
+      sortKey: -1759871179120
+      description: ""
+    children:
+      - url: localhost:3000/order/checkout
+        name: Create
+        meta:
+          id: req_519c1465d04a461da8601a2909f35afc
+          created: 1760015990040
+          modified: 1761989050675
+          isPrivate: false
+          description: ""
+          sortKey: -1760015990040
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "content": [
+                {
+                  "productID": "670c53c486b1234a5c11f999",
+                  "title": "Kycklingbröstfilé",
+                  "price": 119.9,
+                  "quantity": 7,
+                  "weight": 800,
+                  "category": "Kyckling"
+                }
+            	]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_d62d158c55bb48a09f6fd240a00cd293
+          - id: pair_c8420e46df804ea79cd666b62380df67
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU5NmE4Zjg4ZTZhYWU2ZTkxYmMyOTkiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjA0NDk2MjUsImV4cCI6MTc2MDQ1NjgyNX0.PfnQiWhRhehQn-mNIdrDfY3PktW6Kp_AfC7-7yJ2NWw
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/order/delete
+        name: Delete
+        meta:
+          id: req_ed1d1d42a4034a15a51b244802871059
+          created: 1760016039016
+          modified: 1760519919589
+          isPrivate: false
+          description: ""
+          sortKey: -1760015989940
+        method: DELETE
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"user": {
+            		
+            	}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_50f8a939ffe54d42ab196c2a0652e85d
+          - id: pair_ac2eccdd4c10409da14134794af9cce4
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU5NmE4Zjg4ZTZhYWU2ZTkxYmMyOTkiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjA1MTk4ODEsImV4cCI6MTc2MDUyNzA4MX0.Buy-tMpa-I0yLsBUIDqegTSuMZz6PJDBPFxv4ubIy5
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/order/show
+        name: Show order
+        meta:
+          id: req_0431eb3bf6244198a38a31087d16f00c
+          created: 1760016070243
+          modified: 1761989045266
+          isPrivate: false
+          description: ""
+          sortKey: -1760015989840
+        method: GET
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"id": "68e96a8f88e6aae6e91bc299",
+            	"orderID": "68ee5f8ca5d496181621df4d"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_0f540adb976f41e09168ac6faa55ab04
+          - id: pair_9d82c4f27abe4f8dae3b1381a51882fe
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU5NmE4Zjg4ZTZhYWU2ZTkxYmMyOTkiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjA1MjE3MjUsImV4cCI6MTc2MDUyODkyNX0.INCfUNGZ-vtdNbRd2Q8mzv8UfWgmEBvQCjmMf9sN5co
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/order/index
+        name: Index order
+        meta:
+          id: req_5c861a708ec9474795987a4da4246a53
+          created: 1760016101480
+          modified: 1760523784800
+          isPrivate: false
+          description: ""
+          sortKey: -1760015989740
+        method: GET
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"userID": "68e96a8f88e6aae6e91bc299"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_b94509b214c747d290d3c129a31901af
+          - id: pair_35b5e3c2747e4fe5a4b99c53b30b7899
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGU5NmE4Zjg4ZTZhYWU2ZTkxYmMyOTkiLCJlbWFpbCI6ImFkbWluQHRlc3Quc2UiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjA1MjM3NjMsImV4cCI6MTc2MDUzMDk2M30.G12BpklUShTQhLJvR3umbUuaecvzJ91_WbgVRNCz50w
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Auth
+    meta:
+      id: fld_96571e622ee74958ab7b336481daca6f
+      created: 1760001680317
+      modified: 1761988748709
+      sortKey: -1759871885860.5
+      description: ""
+    children:
+      - url: localhost:3000/auth/login
+        name: Logga in
+        meta:
+          id: req_1265b3a113934412941df20e94c2e89a
+          created: 1759917805635
+          modified: 1761988979383
+          isPrivate: false
+          description: ""
+          sortKey: -1760001689962
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email": "admin@fm.se",
+            	"password": "macka012"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_224812e25feb4fc1b8104c042ad97414
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:3000/auth/logout
+        name: Logga ut
+        meta:
+          id: req_2a384280a4dc45afb9ee145beac388fc
+          created: 1760000814067
+          modified: 1761988727967
+          isPrivate: false
+          description: ""
+          sortKey: -1760001689862
+        method: GET
+        headers:
+          - id: pair_12d1d9ec5164431b84ea7e87b3232e24
+            name: Authorization
+            value: Bearer
+              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2OGZmNDc4MmMwYmZhYzQwZDUyYTY1ODMiLCJlbWFpbCI6ImFkbWluQGZtLnNlIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzYxOTg4NjcxLCJleHAiOjE3NjE5OTIyNzF9.JSdrEzIZg10xOgG5g7IKsqNywrZwb2a9-4nPY3-m2xw
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_8c8f9c514088bae45ecfd2a55a43109e383a3f35
+    created: 1759871130635
+    modified: 1759871130635
+environments:
+  name: Base Environment
+  meta:
+    id: env_8c8f9c514088bae45ecfd2a55a43109e383a3f35
+    created: 1759871130633
+    modified: 1759871130633
+    isPrivate: false
